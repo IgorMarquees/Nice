@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../auth/auth_controller.dart';
-import '../cart/cart_controller.dart';
-import '../cart/cart_item.dart';
-import '../database/firestore_user_data_repository.dart';
+import '../controllers/cart_controller.dart';
+import '../models/cart_item.dart';
 import '../theme/nice_theme.dart';
-import '../widgets/nice_logo.dart';
+import '../utils/formatters.dart';
+import '../widgets/nice_network_image.dart';
+import '../widgets/responsive.dart';
+import '../widgets/state_views.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -14,90 +16,103 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cart = context.watch<CartController>();
+    final text = Theme.of(context).textTheme;
 
-    return SafeArea(
-      child: Column(
-        children: [
+    if (cart.isEmpty) {
+      return EmptyState(
+        icon: Icons.shopping_bag_outlined,
+        title: 'Seu carrinho está vazio',
+        message: 'Adicione peças pela Home ou pelo catálogo.',
+        actionLabel: 'Ver catálogo',
+        onAction: () => context.go('/catalogo'),
+      );
+    }
+
+    final list = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(child: Text('CARRINHO', style: text.headlineLarge)),
+            TextButton(onPressed: cart.clear, child: const Text('Limpar')),
+          ],
+        ),
+        const SizedBox(height: 16),
+        for (final item in cart.items) ...[
+          _CartTile(item: item),
           const SizedBox(height: 14),
-          const NiceLogo(compact: true),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 28, 24, 12),
-            child: Row(
-              children: [
-                Text('Carrinho', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900)),
-                const Spacer(),
-                if (cart.items.isNotEmpty) TextButton(onPressed: cart.clear, child: const Text('Limpar')),
-              ],
-            ),
-          ),
-          Expanded(
-            child: cart.items.isEmpty
-                ? const Center(
-                    child: Text(
-                      'Seu carrinho esta vazio.\nAdicione pecas pela Home ou Buscar.',
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                    itemCount: cart.items.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 14),
-                    itemBuilder: (context, index) => _CartTile(item: cart.items[index]),
-                  ),
-          ),
-          if (cart.items.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.fromLTRB(24, 18, 24, 24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 20, offset: const Offset(0, -8)),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Text('Total', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
-                      const Spacer(),
-                      Text(_currency(cart.total), style: const TextStyle(color: NiceTheme.red, fontWeight: FontWeight.w900, fontSize: 22)),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: FilledButton.icon(
-                      icon: const Icon(Icons.lock_outline),
-                      label: const Text('Finalizar compra'),
-                      onPressed: () async {
-                        final messenger = ScaffoldMessenger.of(context);
-                        final userId = context.read<AuthController>().user?.id;
-                        if (userId == null) return;
+        ],
+      ],
+    );
+    const summary = _OrderSummary();
 
-                        try {
-                          await context
-                              .read<FirestoreUserDataRepository>()
-                              .createOrder(
-                                userId: userId,
-                                items: cart.items,
-                                total: cart.total,
-                              );
-                          cart.clear();
-                          messenger.showSnackBar(
-                            const SnackBar(content: Text('Pedido salvo com sucesso.')),
-                          );
-                        } catch (_) {
-                          messenger.showSnackBar(
-                            const SnackBar(content: Text('Nao foi possivel finalizar a compra.')),
-                          );
-                        }
-                      },
-                    ),
-                  ),
+    return ContentWrapper(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: context.isDesktop ? 48 : 8),
+        child: context.isDesktop
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: list),
+                  const SizedBox(width: 40),
+                  const SizedBox(width: 380, child: summary),
                 ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [list, summary, const SizedBox(height: 32)],
               ),
-            ),
+      ),
+    );
+  }
+}
+
+class _OrderSummary extends StatelessWidget {
+  const _OrderSummary();
+
+  @override
+  Widget build(BuildContext context) {
+    final cart = context.watch<CartController>();
+    final text = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: NiceTheme.white,
+        borderRadius: BorderRadius.circular(NiceTheme.radius),
+        border: Border.all(color: NiceTheme.softGray, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('RESUMO DO PEDIDO', style: text.titleLarge),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Text('Itens (${cart.itemCount})', style: text.bodyMedium),
+              const Spacer(),
+              Text(formatCurrency(cart.total), style: text.bodyMedium),
+            ],
+          ),
+          const Divider(height: 32),
+          Row(
+            children: [
+              Text('Total', style: text.titleLarge),
+              const Spacer(),
+              Text(formatCurrency(cart.total), style: text.headlineSmall?.copyWith(color: NiceTheme.red)),
+            ],
+          ),
+          const SizedBox(height: 20),
+          FilledButton.icon(
+            onPressed: () => context.go('/checkout'),
+            icon: const Icon(Icons.lock_outline),
+            label: const Text('FINALIZAR COMPRA'),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => context.go('/catalogo'),
+            child: const Text('Continuar comprando'),
+          ),
         ],
       ),
     );
@@ -112,23 +127,22 @@ class _CartTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cart = context.read<CartController>();
+    final text = Theme.of(context).textTheme;
 
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: NiceTheme.softGray,
-        borderRadius: BorderRadius.circular(8),
+        color: NiceTheme.lightGray,
+        borderRadius: BorderRadius.circular(NiceTheme.radius),
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              item.product.imageUrl,
-              width: 72,
-              height: 86,
-              fit: BoxFit.contain,
-              errorBuilder: (_, _, _) => const Icon(Icons.checkroom, size: 48),
+          SizedBox(
+            width: 84,
+            height: 100,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(NiceTheme.radius),
+              child: ColoredBox(color: NiceTheme.softGray, child: NiceNetworkImage(url: item.imageUrl)),
             ),
           ),
           const SizedBox(width: 14),
@@ -136,11 +150,15 @@ class _CartTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.product.title, style: const TextStyle(fontWeight: FontWeight.w900, color: NiceTheme.red)),
+                Text(item.title, style: text.titleMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
+                if (item.size.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text('Variação: ${item.size}', style: text.bodySmall),
+                ],
                 const SizedBox(height: 4),
-                Text(item.product.description, maxLines: 1, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 10),
-                Text(_currency(item.subtotal), style: const TextStyle(fontWeight: FontWeight.w800)),
+                Text('${formatCurrency(item.unitPrice)} un.', style: text.bodySmall),
+                const SizedBox(height: 8),
+                Text(formatCurrency(item.subtotal), style: text.titleSmall),
               ],
             ),
           ),
@@ -149,7 +167,7 @@ class _CartTile extends StatelessWidget {
               IconButton(
                 tooltip: 'Remover',
                 icon: const Icon(Icons.delete_outline),
-                onPressed: () => cart.remove(item.product),
+                onPressed: () => cart.remove(item),
               ),
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -157,17 +175,15 @@ class _CartTile extends StatelessWidget {
                   IconButton(
                     tooltip: 'Diminuir',
                     visualDensity: VisualDensity.compact,
-                    constraints: const BoxConstraints.tightFor(width: 32, height: 32),
                     icon: const Icon(Icons.remove_circle_outline),
-                    onPressed: () => cart.decrease(item.product),
+                    onPressed: () => cart.decrease(item),
                   ),
-                  Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.w900)),
+                  Text('${item.quantity}', style: text.titleSmall),
                   IconButton(
                     tooltip: 'Aumentar',
                     visualDensity: VisualDensity.compact,
-                    constraints: const BoxConstraints.tightFor(width: 32, height: 32),
                     icon: const Icon(Icons.add_circle_outline),
-                    onPressed: () => cart.add(item.product),
+                    onPressed: () => cart.increase(item),
                   ),
                 ],
               ),
@@ -178,5 +194,3 @@ class _CartTile extends StatelessWidget {
     );
   }
 }
-
-String _currency(double value) => 'R\$${value.toStringAsFixed(2).replaceAll('.', ',')}';

@@ -8,48 +8,30 @@ class PrimaryButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.loading = false,
+    this.icon,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool loading;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
+    final child = loading
+        ? const SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(strokeWidth: 2, color: NiceTheme.white),
+          )
+        : Text(label);
+
     return SizedBox(
       width: double.infinity,
-      height: 56,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          gradient: const LinearGradient(
-            colors: [Color(0xFF858585), NiceTheme.darkRed],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.22),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-          ),
-          onPressed: loading ? null : onPressed,
-          child: loading
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                )
-              : Text(label),
-        ),
-      ),
+      height: 52,
+      child: icon == null || loading
+          ? FilledButton(onPressed: loading ? null : onPressed, child: child)
+          : FilledButton.icon(onPressed: onPressed, icon: Icon(icon), label: child),
     );
   }
 }

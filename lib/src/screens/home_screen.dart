@@ -1,132 +1,166 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../auth/auth_controller.dart';
-import '../catalog/catalog_controller.dart';
+import '../config/assets.dart';
+import '../controllers/auth_controller.dart';
+import '../controllers/catalog_controller.dart';
 import '../theme/nice_theme.dart';
-import '../widgets/nice_logo.dart';
-import '../widgets/product_card.dart';
+import '../widgets/banner_carousel.dart';
+import '../widgets/category_section.dart';
+import '../widgets/hero_banner.dart';
+import '../widgets/product_grid.dart';
+import '../widgets/responsive.dart';
+import '../widgets/section_header.dart';
+import '../widgets/state_views.dart';
 
-class HomeScreen extends StatefulWidget {
+const _slides = [
+  BannerSlide(
+    image: NiceAssets.heroBeyond,
+    eyebrow: 'NICE / Streetwear by Japan',
+    title: 'Beyond',
+    accent: 'the streets.',
+    subtitle: 'Mais que roupas, é uma forma de ver o mundo.',
+    ctaLabel: 'Explore a coleção',
+    route: '/catalogo',
+  ),
+  BannerSlide(
+    image: NiceAssets.heroCulture,
+    eyebrow: 'NICE / Streetwear by Japan',
+    title: 'Cultura em',
+    accent: 'movimento.',
+    subtitle: 'Rua, atitude e autenticidade em cada detalhe.',
+    ctaLabel: 'Ver novidades',
+    route: '/novidades',
+  ),
+];
+
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  Widget build(BuildContext context) {
+    final catalog = context.watch<CatalogController>();
+    final desktop = context.isDesktop;
+    final featured = catalog.featured.take(desktop ? 8 : 6).toList();
+    final arrivals = catalog.newArrivals.take(4).toList();
+    final gap = SizedBox(height: desktop ? 72 : 36);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (context.isCompact) const _MobileGreeting(),
+        const BannerCarousel(slides: _slides),
+        if (context.isCompact) ...[
+          const SizedBox(height: 20),
+          const ContentWrapper(child: CategorySection()),
+        ],
+        gap,
+        if (!context.isCompact) ...[
+          HeroBanner(
+            image: NiceAssets.identity,
+            eyebrow: 'Identidade',
+            title: 'A essência',
+            accent: 'da NICE.',
+            subtitle: 'Do Japão para o mundo. Streetwear que conecta pessoas, ideias e identidades.',
+            ctaLabel: 'Conheça a NICE',
+            onCta: () => context.go('/sobre'),
+            large: false,
+            height: 360,
+          ),
+          gap,
+        ],
+        ContentWrapper(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SectionHeader(
+                eyebrow: 'Destaques',
+                title: 'Escolhas do momento',
+                onAction: () => context.go('/catalogo'),
+              ),
+              const SizedBox(height: 24),
+              if (catalog.loading && featured.isEmpty)
+                const LoadingView()
+              else
+                ProductGrid(products: featured),
+            ],
+          ),
+        ),
+        if (!context.isCompact) ...[
+          gap,
+          ContentWrapper(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionHeader(eyebrow: 'Categorias', title: 'Explore por estilo'),
+                const SizedBox(height: 24),
+                const CategorySection(),
+              ],
+            ),
+          ),
+        ],
+        gap,
+        ContentWrapper(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SectionHeader(
+                eyebrow: 'Novidades',
+                title: 'Acabou de chegar',
+                onAction: () => context.go('/novidades'),
+              ),
+              const SizedBox(height: 24),
+              ProductGrid(products: arrivals),
+            ],
+          ),
+        ),
+        gap,
+        if (!context.isCompact)
+          HeroBanner(
+            image: NiceAssets.cta,
+            eyebrow: 'NICE / Completo',
+            title: 'Todas as peças.',
+            accent: 'Um só estilo.',
+            subtitle: 'Explore o catálogo completo da NICE e encontre o que combina com você.',
+            ctaLabel: 'Ver todos os produtos',
+            onCta: () => context.go('/catalogo'),
+            large: false,
+            height: 380,
+          ),
+        if (context.isCompact) const SizedBox(height: 40),
+      ],
+    );
+  }
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CatalogController>().load();
-    });
-  }
+class _MobileGreeting extends StatelessWidget {
+  const _MobileGreeting();
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
-    final catalog = context.watch<CatalogController>();
-    final products = catalog.products;
+    final text = Theme.of(context).textTheme;
+    final name = auth.user?.name.split(' ').first;
 
-    return SafeArea(
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-            sliver: SliverList.list(
-              children: [
-                const Center(child: NiceLogo(compact: true)),
-                const SizedBox(height: 28),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Bem-Vindo, ${auth.user?.name ?? 'Ale'}',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: NiceTheme.textGray,
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: 'Notificacoes',
-                      icon: const Icon(Icons.notifications_none),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 22),
-                TextField(
-                  onChanged: catalog.search,
-                  decoration: const InputDecoration(
-                    hintText: 'Encontre seu Drip...',
-                    prefixIcon: Icon(Icons.search, color: NiceTheme.red),
-                    filled: true,
-                    fillColor: NiceTheme.softGray,
-                  ),
-                ),
-                const SizedBox(height: 34),
-                Container(
-                  height: 120,
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEAF2FF),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.checkroom, size: 52, color: NiceTheme.charcoal),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text('Defina seu estilo. Domine as ruas', style: TextStyle(color: NiceTheme.red, fontWeight: FontWeight.w800)),
-                            SizedBox(height: 8),
-                            Text('Autenticidade, atitude e design urbano em cada detalhe', style: TextStyle(color: Color(0xFFD96F6F))),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 42),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Escolhas do momento', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: NiceTheme.textGray)),
-                          const Text('O que esta dominando as ruas'),
-                        ],
-                      ),
-                    ),
-                    TextButton(onPressed: () {}, child: const Text('Veja tudo')),
-                  ],
-                ),
-                const SizedBox(height: 18),
-              ],
+    return Padding(
+      padding: EdgeInsets.fromLTRB(context.pagePadding, 4, context.pagePadding, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(name == null ? 'Bem-vindo à NICE' : 'Bem-vindo, $name', style: text.headlineSmall),
+          const SizedBox(height: 14),
+          TextField(
+            textInputAction: TextInputAction.search,
+            onSubmitted: (value) {
+              final query = value.trim();
+              context.go(query.isEmpty ? '/catalogo' : '/catalogo?busca=${Uri.encodeQueryComponent(query)}');
+            },
+            decoration: const InputDecoration(
+              hintText: 'Encontre seu drip...',
+              prefixIcon: Icon(Icons.search, color: NiceTheme.red),
             ),
           ),
-          if (catalog.loading)
-            const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
-          else
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-              sliver: SliverGrid.builder(
-                itemCount: products.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 24,
-                  crossAxisSpacing: 18,
-                  childAspectRatio: 0.58,
-                ),
-                itemBuilder: (context, index) => ProductCard(product: products[index]),
-              ),
-            ),
         ],
       ),
     );
