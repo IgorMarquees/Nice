@@ -67,4 +67,11 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 </dict>
+<key>CFBundleURLTypes</key>
+<array><dict>
+  <key>CFBundleURLSchemes</key>
+  <array><string>io.supabase.nicestore</string></array>
+</dict></array>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Selecionar fotos de produtos (admin).</string>
 </plist>
