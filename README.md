@@ -84,35 +84,19 @@ cd Nice
 flutter pub get
 ```
 
-**2. Prepare o Supabase**
-
-1. Crie um projeto no Supabase
-2. No SQL Editor, rode o arquivo `supabase/schema.sql`
-3. Se o seu banco é de uma versão antiga, rode também os arquivos da pasta `supabase/migrations/` em ordem
-4. Em Authentication → URL Configuration, coloque `http://localhost:5555` como Site URL e adicione `http://localhost:5555/**` e `io.supabase.nicestore://login-callback/` nas Redirect URLs
-5. Se quiser login com Google, configure o provedor Google no Supabase
-
-Use só a chave pública do projeto no app. A chave `service_role` nunca deve ir pro código.
-
-**3. Rode o app**
+**2. Rode o app**
 
 Na Web, sempre na porta 5555:
 
 ```bash
-flutter run -d chrome --web-port=5555 --dart-define=SUPABASE_URL=https://SEU-PROJETO.supabase.co --dart-define=SUPABASE_ANON_KEY=SUA-CHAVE-PUBLICA
+flutter run -d chrome --web-port=5555 
 ```
 
 No Android, troque `chrome` pelo id do celular que aparece em `flutter devices`.
 
-**4. Vire admin**
+**3. Virar admin**
 
-Crie sua conta pelo app e rode no SQL Editor, trocando o e-mail:
-
-```sql
-update public.profiles set role = 'admin' where email = 'seu-email@exemplo.com';
-```
-
-Depois disso dá pra promover outros admins pelo próprio painel, em Usuários.
+Somente um administrador pode promover outros admins, pelo painel de administrador.
 
 ## Banco de dados
 
@@ -146,9 +130,6 @@ Os testes abrem todas as telas em mais de 20 tamanhos de tela diferentes, como v
 
 - Integração com um meio de pagamento de verdade
 - Cálculo de frete pelo CEP e baixa automática do estoque nas vendas
-- Tela pra criar uma nova senha e tela pro admin mudar o status dos pedidos
-- Perfis oficiais nas redes sociais
+- Mudar o status dos pedidos
 
-## Equipe
 
-Projeto desenvolvido em grupo na Fatec Marília.
