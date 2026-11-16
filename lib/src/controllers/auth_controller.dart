@@ -64,7 +64,6 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<bool> signInWithGoogle() => _run(_repository.signInWithGoogle);
-  Future<bool> signInWithApple() => _run(_repository.signInWithApple);
 
   Future<bool> sendPasswordReset(String email) {
     return _run(() async {
@@ -74,6 +73,15 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<void> signOut() => _repository.signOut();
+
+  /// Só para testes de widget: simula um usuário logado.
+  @visibleForTesting
+  void debugSignIn(AppUser user) {
+    _syncToken++;
+    _user = user;
+    _status = AuthStatus.signedIn;
+    notifyListeners();
+  }
 
   void clearMessages() {
     if (_error == null && _info == null) return;

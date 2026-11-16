@@ -5,6 +5,15 @@ import '../models/product.dart';
 import '../repositories/product_repository.dart';
 import '../repositories/storage_repository.dart';
 
+/// Cor em edição no formulário: fotos já salvas + arquivos novos a enviar.
+class VariantDraft {
+  const VariantDraft({required this.name, this.images = const [], this.newFiles = const []});
+
+  final String name;
+  final List<String> images;
+  final List<XFile> newFiles;
+}
+
 class AdminController extends ChangeNotifier {
   AdminController(this._products, this._storage);
 
@@ -39,36 +48,45 @@ class AdminController extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
-      _items = await _products.fetchAll();
+      _items = await _products.fetchAllForAdmin();
     } catch (_) {
-      _error = 'Não foi possível carregar os produtos.';
+      _error = 'Não foi possível carregar os produtos. Rode o SQL de atualização no Supabase.';
     }
     _loading = false;
     notifyListeners();
   }
 
   Future<Product?> findById(String id) async {
+    if (_items.isEmpty) await load();
     for (final p in _items) {
       if (p.id == id) return p;
     }
-    try {
-      return await _products.fetchById(id);
-    } catch (_) {
-      return null;
-    }
+    return null;
   }
 
-  /// Sobe as novas imagens para o Storage e grava o produto.
-  Future<bool> save(Product product, {List<XFile> newImages = const []}) async {
+  /// Sobe as fotos novas (gerais e de cada cor) e grava o produto.
+  Future<bool> save(
+    Product product, {
+    List<XFile> newImages = const [],
+    List<VariantDraft> variants = const [],
+  }) async {
     _saving = true;
     _error = null;
     notifyListeners();
     try {
-      final urls = [...product.images];
+      final general = [...product.images];
       for (final file in newImages) {
-        urls.add(await _storage.uploadProductImage(file));
+        general.add(await _storage.uploadProductImage(file));
       }
-      await _products.save(product.copyWith(images: urls));
+      final colorVariants = <ColorVariant>[];
+      for (final draft in variants) {
+        final urls = [...draft.images];
+        for (final file in draft.newFiles) {
+          urls.add(await _storage.uploadProductImage(file));
+        }
+        colorVariants.add(ColorVariant(name: draft.name, images: urls));
+      }
+      await _products.save(product.copyWith(images: general, colorVariants: colorVariants));
       await load();
       return true;
     } catch (_) {

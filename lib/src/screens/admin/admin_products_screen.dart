@@ -164,7 +164,13 @@ class _AdminTile extends StatelessWidget {
         Text(product.title, style: text.titleMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
         const SizedBox(height: 2),
         Text(
-          '${product.category} · ${formatCurrency(product.price)} · estoque ${product.stock}',
+          [
+            product.category,
+            product.hasDiscount
+                ? '${formatCurrency(product.finalPrice)} (-${product.discountPercent}%)'
+                : formatCurrency(product.price),
+            'estoque ${product.stock ?? 0}',
+          ].join(' · '),
           style: text.bodySmall,
         ),
         if (context.isCompact) ...[const SizedBox(height: 8), switches],

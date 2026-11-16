@@ -1,3 +1,23 @@
+import '../config/app_config.dart';
+
+/// Uma cor do produto com as próprias fotos (pode ter várias).
+class ColorVariant {
+  const ColorVariant({required this.name, this.images = const []});
+
+  final String name;
+  final List<String> images;
+
+  ColorVariant copyWith({String? name, List<String>? images}) =>
+      ColorVariant(name: name ?? this.name, images: images ?? this.images);
+
+  Map<String, dynamic> toMap() => {'name': name, 'images': images};
+
+  factory ColorVariant.fromMap(Map<String, dynamic> map) => ColorVariant(
+        name: (map['name'] as String?) ?? '',
+        images: Product._strings(map['images']),
+      );
+}
+
 class Product {
   const Product({
     required this.id,
@@ -5,10 +25,13 @@ class Product {
     required this.description,
     required this.price,
     required this.category,
+    this.technicalDetails = '',
     this.images = const [],
-    this.colors = const [],
+    this.colorVariants = const [],
     this.sizes = const [],
-    this.stock = 0,
+    this.stock,
+    this.available = true,
+    this.discountPercent = 0,
     this.isFeatured = false,
     this.isNew = false,
     this.createdAt,
@@ -18,29 +41,79 @@ class Product {
   final String id;
   final String title;
   final String description;
+  final String technicalDetails;
+
+  /// Preço cheio (sem desconto).
   final double price;
   final String category;
+
+  /// Fotos gerais (não ligadas a uma cor).
   final List<String> images;
-  final List<String> colors;
+  final List<ColorVariant> colorVariants;
   final List<String> sizes;
-  final int stock;
+
+  /// Quantidade em estoque: só chega preenchida para administradores
+  /// (o banco não expõe a coluna para clientes/visitantes).
+  final int? stock;
+
+  /// Coluna gerada `in_stock` (stock > 0), pública.
+  final bool available;
+
+  /// 0 = sem desconto.
+  final int discountPercent;
   final bool isFeatured;
   final bool isNew;
   final DateTime? createdAt;
 
   bool get isFallback => id.startsWith('fake-');
-  bool get inStock => stock > 0;
-  String get imageUrl => images.isEmpty ? '' : images.first;
+  bool get inStock => stock == null ? available : stock! > 0;
+
+  List<String> get colors => [for (final c in colorVariants) c.name];
+
+  /// Fotos gerais + fotos de todas as cores, sem repetição.
+  List<String> get allImages {
+    final seen = <String>{};
+    return [
+      for (final url in [...images, for (final c in colorVariants) ...c.images])
+        if (seen.add(url)) url,
+    ];
+  }
+
+  String get imageUrl {
+    final all = allImages;
+    return all.isEmpty ? '' : all.first;
+  }
+
+  /// Fotos de uma cor; se ela não tiver fotos, usa todas.
+  List<String> imagesFor(String? color) {
+    if (color == null) return allImages;
+    for (final c in colorVariants) {
+      if (c.name == color && c.images.isNotEmpty) return c.images;
+    }
+    return allImages;
+  }
+
+  bool get hasDiscount => discountPercent > 0;
+
+  /// Preço que o cliente paga (já com a promoção).
+  double get finalPrice => _round(price * (100 - discountPercent) / 100);
+
+  /// Preço no Pix (5% sobre o preço final).
+  double get pixPrice => _round(finalPrice * (1 - AppConfig.pixDiscount));
+
+  static double _round(double value) => (value * 100).roundToDouble() / 100;
 
   Product copyWith({
     String? title,
     String? description,
+    String? technicalDetails,
     double? price,
     String? category,
     List<String>? images,
-    List<String>? colors,
+    List<ColorVariant>? colorVariants,
     List<String>? sizes,
     int? stock,
+    int? discountPercent,
     bool? isFeatured,
     bool? isNew,
   }) {
@@ -48,29 +121,45 @@ class Product {
       id: id,
       title: title ?? this.title,
       description: description ?? this.description,
+      technicalDetails: technicalDetails ?? this.technicalDetails,
       price: price ?? this.price,
       category: category ?? this.category,
       images: images ?? this.images,
-      colors: colors ?? this.colors,
+      colorVariants: colorVariants ?? this.colorVariants,
       sizes: sizes ?? this.sizes,
       stock: stock ?? this.stock,
+      available: stock == null ? available : stock > 0,
+      discountPercent: discountPercent ?? this.discountPercent,
       isFeatured: isFeatured ?? this.isFeatured,
       isNew: isNew ?? this.isNew,
       createdAt: createdAt,
     );
   }
 
+  /// Colunas públicas de `products` (sem `stock`, que é só do admin).
+  static const publicColumns =
+      'id,title,description,technical_details,price,discount_percent,category,images,colors,'
+      'color_variants,sizes,in_stock,is_featured,is_new,created_at,updated_at';
+
   factory Product.fromMap(Map<String, dynamic> map) {
+    final variants = map['color_variants'];
+    final stock = (map['stock'] as num?)?.toInt();
     return Product(
       id: map['id'].toString(),
       title: (map['title'] as String?) ?? '',
       description: (map['description'] as String?) ?? '',
+      technicalDetails: (map['technical_details'] as String?) ?? '',
       price: (map['price'] as num?)?.toDouble() ?? 0,
+      discountPercent: (map['discount_percent'] as num?)?.toInt() ?? 0,
       category: (map['category'] as String?) ?? '',
       images: _strings(map['images']),
-      colors: _strings(map['colors']),
+      colorVariants: variants is List && variants.isNotEmpty
+          ? [for (final v in variants) ColorVariant.fromMap(Map<String, dynamic>.from(v as Map))]
+          // Produtos antigos: só nomes de cores, sem fotos próprias.
+          : [for (final name in _strings(map['colors'])) ColorVariant(name: name)],
       sizes: _strings(map['sizes']),
-      stock: (map['stock'] as num?)?.toInt() ?? 0,
+      stock: stock,
+      available: (map['in_stock'] as bool?) ?? (stock ?? 1) > 0,
       isFeatured: (map['is_featured'] as bool?) ?? false,
       isNew: (map['is_new'] as bool?) ?? false,
       createdAt: DateTime.tryParse(map['created_at']?.toString() ?? ''),
@@ -78,17 +167,21 @@ class Product {
   }
 
   /// Linha para INSERT/UPDATE na tabela `products` (sem id quando é novo).
+  /// `images` guarda todas as fotos e `colors` só os nomes, para compatibilidade.
   Map<String, dynamic> toMap() {
     return {
       if (id.isNotEmpty) 'id': id,
       'title': title,
       'description': description,
+      'technical_details': technicalDetails,
       'price': price,
+      'discount_percent': discountPercent,
       'category': category,
-      'images': images,
+      'images': allImages,
       'colors': colors,
+      'color_variants': [for (final c in colorVariants) c.toMap()],
       'sizes': sizes,
-      'stock': stock,
+      'stock': ?stock,
       'is_featured': isFeatured,
       'is_new': isNew,
     };
@@ -127,7 +220,6 @@ class Product {
       category: _fallbackCategories[index % _fallbackCategories.length],
       images: [json['image'] as String],
       sizes: const ['P', 'M', 'G', 'GG'],
-      stock: 20,
       isFeatured: index < 6,
       isNew: index >= 3,
     );

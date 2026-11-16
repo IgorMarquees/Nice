@@ -29,23 +29,17 @@ class MobileShell extends StatelessWidget {
     final cartCount = context.watch<CartController>().itemCount;
     final index = _index;
 
+    // A rolagem fica dentro de cada página ([ShellPage]); aqui o Navigator
+    // recebe altura limitada (Expanded), sem ser recriado a cada rota.
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            key: ValueKey(location),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _TopBar(canGoBack: context.canPop()),
-                  child,
-                ],
-              ),
-            ),
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _TopBar(canGoBack: context.canPop()),
+            Expanded(child: child),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../config/assets.dart';
-import '../widgets/hero_banner.dart';
+import '../widgets/banner_image.dart';
 import '../widgets/responsive.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -35,16 +34,13 @@ class AboutScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        HeroBanner(
-          image: NiceAssets.about,
-          eyebrow: 'NICE® / Sobre',
-          title: 'Mais que roupa.',
-          accent: 'Uma identidade.',
-          subtitle: 'Uma conexão entre a cultura urbana japonesa e a liberdade de expressar quem você é.',
-          large: false,
-          height: desktop ? 440 : 320,
+        const BannerImage(
+          asset: NiceAssets.aboutTop,
+          aspectRatio: 2880 / 1000,
+          label: 'Mais que roupa. Uma identidade.',
         ),
-        SizedBox(height: desktop ? 72 : 36),
+        const BannerImage(asset: NiceAssets.aboutStrip, aspectRatio: 2624 / 874),
+        SizedBox(height: desktop ? 88 : 40),
         ContentWrapper(
           child: desktop
               ? Row(
@@ -60,17 +56,11 @@ class AboutScreen extends StatelessWidget {
                   children: [headline, const SizedBox(height: 20), body],
                 ),
         ),
-        SizedBox(height: desktop ? 72 : 36),
-        HeroBanner(
-          image: NiceAssets.cta,
-          eyebrow: 'NICE / Completo',
-          title: 'Não vista apenas.',
-          accent: 'Expresse.',
-          subtitle: 'Explore o catálogo completo e encontre peças que representam você.',
-          ctaLabel: 'Ver todos os produtos',
-          onCta: () => context.go('/catalogo'),
-          large: false,
-          height: 380,
+        SizedBox(height: desktop ? 88 : 40),
+        const BannerImage(
+          asset: NiceAssets.aboutCta,
+          aspectRatio: 2624 / 732,
+          label: 'Não vista apenas. Expresse.',
         ),
       ],
     );

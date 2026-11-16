@@ -27,9 +27,21 @@ class AppConfig {
   static bool get isSupabaseConfigured =>
       !supabaseUrl.contains('SEU-PROJETO') && !supabaseAnonKey.contains('SUA-ANON');
 
-  // Plataformas que exibem cada provedor social.
+  /// Google aparece no Android e na Web. No iOS o login é só por e-mail/senha.
   static bool get showGoogleLogin =>
       kIsWeb || defaultTargetPlatform == TargetPlatform.android;
-  static bool get showAppleLogin =>
-      !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
+  // ---- Regras comerciais ----
+
+  /// Frete grátis a partir deste valor (em produtos).
+  static const freeShippingThreshold = 400.0;
+
+  /// Frete fixo abaixo do mínimo (não há cálculo por CEP).
+  static const flatShipping = 24.90;
+
+  /// Desconto do Pix sobre o valor dos produtos (já com promoções).
+  static const pixDiscount = 0.05;
+
+  /// API pública de CEP (sem chave; suporta CORS na Web).
+  static String cepUrl(String digits) => 'https://viacep.com.br/ws/$digits/json/';
 }

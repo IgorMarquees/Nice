@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 /// 1234.5 -> "R$ 1.234,50"
 String formatCurrency(double value) {
   final fixed = value.toStringAsFixed(2);
@@ -7,6 +9,17 @@ String formatCurrency(double value) {
     (_) => '.',
   );
   return 'R\$ $intPart,${parts[1]}';
+}
+
+/// Mantém só dígitos e aplica a máscara 00000-000.
+class CepInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    var digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+    if (digits.length > 8) digits = digits.substring(0, 8);
+    final text = digits.length > 5 ? '${digits.substring(0, 5)}-${digits.substring(5)}' : digits;
+    return TextEditingValue(text: text, selection: TextSelection.collapsed(offset: text.length));
+  }
 }
 
 String formatDate(DateTime? date) {

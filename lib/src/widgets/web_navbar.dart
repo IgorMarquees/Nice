@@ -30,16 +30,26 @@ void _search(BuildContext context, String value) {
 }
 
 /// Cabeçalho do site: logo, menu horizontal, busca, carrinho e conta.
+///
+/// Larguras (antes havia overflow entre ~900 e ~1100 px):
+/// - `>= 1240`: menu + campo de busca flexível + "Admin" com texto;
+/// - `980–1240`: menu + ícone de busca; "Admin" só com ícone;
+/// - `< 980`: logo, carrinho e menu lateral.
 class WebNavbar extends StatelessWidget {
   const WebNavbar({super.key, required this.location});
 
   final String location;
 
+  static const _menuBreakpoint = 980.0;
+  static const _fullBreakpoint = 1240.0;
+
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
     final cartCount = context.watch<CartController>().itemCount;
-    final wide = context.screenWidth >= 900;
+    final width = context.screenWidth;
+    final wide = width >= _menuBreakpoint;
+    final full = width >= _fullBreakpoint;
 
     return Material(
       color: NiceTheme.white,
@@ -57,12 +67,30 @@ class WebNavbar extends StatelessWidget {
                 child: const NiceLogo(compact: true),
               ),
               if (wide) ...[
-                const SizedBox(width: 40),
+                SizedBox(width: full ? 40 : 24),
                 for (final item in webDestinations)
                   _NavLink(item: item, active: _isActive(location, item.path)),
-                const Spacer(),
-                SizedBox(width: 280, child: _SearchField(onSubmit: (v) => _search(context, v))),
-                const SizedBox(width: 8),
+                if (full) ...[
+                  // A busca ocupa o espaço que sobrar (até 260 px), sem estourar a linha.
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 260),
+                        child: _SearchField(onSubmit: (v) => _search(context, v)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ] else ...[
+                  const Spacer(),
+                  IconButton(
+                    tooltip: 'Buscar',
+                    onPressed: () => context.go('/catalogo'),
+                    icon: const Icon(Icons.search),
+                  ),
+                ],
               ] else
                 const Spacer(),
               IconButton(
@@ -74,7 +102,7 @@ class WebNavbar extends StatelessWidget {
                   child: const Icon(Icons.shopping_bag_outlined),
                 ),
               ),
-              if (wide) ..._accountActions(context, auth) else
+              if (wide) ..._accountActions(context, auth, showLabel: full) else
                 Builder(
                   builder: (context) => IconButton(
                     tooltip: 'Menu',
@@ -89,7 +117,7 @@ class WebNavbar extends StatelessWidget {
     );
   }
 
-  List<Widget> _accountActions(BuildContext context, AuthController auth) {
+  List<Widget> _accountActions(BuildContext context, AuthController auth, {required bool showLabel}) {
     if (!auth.isSignedIn) {
       return [
         IconButton(
@@ -101,11 +129,18 @@ class WebNavbar extends StatelessWidget {
     }
     return [
       if (auth.isAdmin)
-        TextButton.icon(
-          onPressed: () => context.go('/admin'),
-          icon: const Icon(Icons.admin_panel_settings_outlined, size: 18),
-          label: const Text('Admin'),
-        ),
+        showLabel
+            ? TextButton.icon(
+                onPressed: () => context.go('/admin'),
+                icon: const Icon(Icons.admin_panel_settings_outlined, size: 18),
+                label: const Text('Admin'),
+              )
+            : IconButton(
+                tooltip: 'Painel admin',
+                color: NiceTheme.red,
+                onPressed: () => context.go('/admin'),
+                icon: const Icon(Icons.admin_panel_settings_outlined),
+              ),
       IconButton(
         tooltip: 'Minha conta',
         onPressed: () => context.go('/perfil'),
@@ -127,7 +162,7 @@ class _NavLink extends StatelessWidget {
     return InkWell(
       onTap: () => context.go(item.path),
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 14),
+        margin: EdgeInsets.symmetric(horizontal: context.screenWidth >= WebNavbar._fullBreakpoint ? 14 : 10),
         padding: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
           border: Border(

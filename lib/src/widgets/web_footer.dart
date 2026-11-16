@@ -4,42 +4,64 @@ import 'package:go_router/go_router.dart';
 import '../theme/nice_theme.dart';
 import 'responsive.dart';
 
+/// Rodapé do site: faixa vermelha, slogan, colunas de links e barra inferior.
 class WebFooter extends StatelessWidget {
   const WebFooter({super.key});
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final titleStyle = text.displaySmall?.copyWith(color: NiceTheme.white);
+    final desktop = context.isDesktop;
+    final titleStyle = desktop
+        ? NiceTheme.footerTitle()
+        : text.headlineLarge?.copyWith(color: NiceTheme.white);
+    final accent = titleStyle?.copyWith(color: NiceTheme.brightRed);
 
-    final brand = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('STREET CULTURE / 001', style: text.labelMedium),
-        const SizedBox(height: 14),
-        Text.rich(
-          TextSpan(
-            style: titleStyle,
-            children: [
-              const TextSpan(text: 'YOUR STYLE'),
-              TextSpan(text: '.\n', style: titleStyle?.copyWith(color: NiceTheme.brightRed)),
-              const TextSpan(text: 'YOUR IDENTITY'),
-              TextSpan(text: '.', style: titleStyle?.copyWith(color: NiceTheme.brightRed)),
-            ],
+    final brand = IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(width: 6, color: NiceTheme.brightRed),
+          const SizedBox(width: 28),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    style: text.labelLarge?.copyWith(color: NiceTheme.brightRed, letterSpacing: 1),
+                    children: [
+                      const TextSpan(text: 'STREET CULTURE '),
+                      TextSpan(text: '/ 001', style: text.labelLarge?.copyWith(color: NiceTheme.brightRed, fontWeight: FontWeight.w400)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text.rich(
+                  TextSpan(
+                    style: titleStyle,
+                    children: [
+                      const TextSpan(text: 'YOUR STYLE'),
+                      TextSpan(text: '.\n', style: accent),
+                      const TextSpan(text: 'YOUR IDENTITY'),
+                      TextSpan(text: '.', style: accent),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text('Vista sua identidade. Explore a NICE.', style: NiceTheme.footerLink()),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'Vista sua identidade. Explore a NICE.',
-          style: text.bodyMedium?.copyWith(color: NiceTheme.midGray),
-        ),
-      ],
+        ],
+      ),
     );
 
-    final columns = Wrap(
-      spacing: 64,
-      runSpacing: 24,
-      children: const [
+    const columns = Wrap(
+      spacing: 96,
+      runSpacing: 28,
+      children: [
         _FooterColumn(title: 'EXPLORE', links: [
           _FooterLinkData('Novidades', '/novidades'),
           _FooterLinkData('Categorias', '/catalogo'),
@@ -55,32 +77,56 @@ class WebFooter extends StatelessWidget {
       ],
     );
 
+    final bottomBar = Row(
+      children: [
+        Flexible(child: Text('STREETWEAR WITHOUT LIMITS.', style: NiceTheme.spaced())),
+        const SizedBox(width: 24),
+        const Spacer(),
+        Container(width: desktop ? 128 : 48, height: 3, color: NiceTheme.brightRed),
+      ],
+    );
+
     return Container(
       width: double.infinity,
       color: NiceTheme.black,
-      padding: const EdgeInsets.only(top: 56, bottom: 24),
+      padding: EdgeInsets.only(top: desktop ? 72 : 48, bottom: 28),
       child: ContentWrapper(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            context.isDesktop
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [brand, columns],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [brand, const SizedBox(height: 32), columns],
+            if (desktop)
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(flex: 5, child: Align(alignment: Alignment.centerLeft, child: brand)),
+                    const VerticalDivider(color: NiceTheme.footerLine, width: 64),
+                    const Expanded(flex: 4, child: columns),
+                  ],
+                ),
+              )
+            else ...[
+              brand,
+              const SizedBox(height: 36),
+              columns,
+            ],
+            const SizedBox(height: 48),
+            const Divider(color: NiceTheme.footerLine),
+            const SizedBox(height: 24),
+            bottomBar,
+            const SizedBox(height: 24),
+            const Divider(color: NiceTheme.footerLine),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '© ${DateTime.now().year} NICE. Todos os direitos reservados.',
+                    style: text.bodySmall?.copyWith(color: NiceTheme.midGray),
                   ),
-            const SizedBox(height: 40),
-            const Divider(color: NiceTheme.charcoal),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '© ${DateTime.now().year} NICE. Todos os direitos reservados. · STREETWEAR WITHOUT LIMITS.',
-                style: text.labelSmall,
-              ),
+                ),
+                Text('JP / BR', style: text.labelLarge?.copyWith(color: NiceTheme.brightRed)),
+              ],
             ),
           ],
         ),
@@ -106,18 +152,16 @@ class _FooterColumn extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(title, style: text.labelLarge?.copyWith(color: NiceTheme.white)),
-        const SizedBox(height: 12),
+        Text(title, style: text.titleLarge?.copyWith(color: NiceTheme.white, letterSpacing: 1)),
+        const SizedBox(height: 18),
         for (final link in links)
           InkWell(
             onTap: link.path == null ? null : () => context.go(link.path!),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Text(
-                link.label,
-                style: text.bodyMedium?.copyWith(color: NiceTheme.midGray),
-              ),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(link.label, style: NiceTheme.footerLink()),
             ),
           ),
       ],

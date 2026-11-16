@@ -1,8 +1,3 @@
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:crypto/crypto.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config/app_config.dart';
@@ -58,40 +53,6 @@ class AuthRepository {
     }
   }
 
-  /// Apple (somente iOS) com fluxo nativo + nonce.
-  Future<void> signInWithApple() async {
-    final rawNonce = _generateNonce();
-    final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
-    try {
-      final credential = await SignInWithApple.getAppleIDCredential(
-        scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName],
-        nonce: hashedNonce,
-      );
-      final idToken = credential.identityToken;
-      if (idToken == null) {
-        throw const NiceAuthException('Não foi possível entrar com a Apple.');
-      }
-      await _auth.signInWithIdToken(
-        provider: OAuthProvider.apple,
-        idToken: idToken,
-        nonce: rawNonce,
-      );
-      // A Apple só envia o nome no primeiro login.
-      final fullName = [credential.givenName, credential.familyName]
-          .whereType<String>()
-          .join(' ')
-          .trim();
-      if (fullName.isNotEmpty) {
-        await _auth.updateUser(UserAttributes(data: {'name': fullName}));
-      }
-    } on SignInWithAppleAuthorizationException catch (e) {
-      if (e.code == AuthorizationErrorCode.canceled) return;
-      throw const NiceAuthException('Não foi possível entrar com a Apple.');
-    } on AuthException catch (e) {
-      throw NiceAuthException(_message(e));
-    }
-  }
-
   Future<void> sendPasswordReset(String email) async {
     try {
       await _auth.resetPasswordForEmail(email.trim(), redirectTo: AppConfig.authRedirect);
@@ -117,12 +78,6 @@ class AuthRepository {
     } catch (_) {
       return AppUser(id: user.id, email: user.email ?? '', name: metaName ?? 'Cliente NICE');
     }
-  }
-
-  String _generateNonce([int length = 32]) {
-    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-._';
-    final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)]).join();
   }
 
   String _message(AuthException e) {

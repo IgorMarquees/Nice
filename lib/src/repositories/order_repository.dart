@@ -13,21 +13,25 @@ class OrderRepository {
   Future<void> create({
     required String userId,
     required List<CartItem> items,
-    required double total,
+    required OrderTotals totals,
     required ShippingAddress address,
     required PaymentMethod paymentMethod,
   }) async {
     await _table.insert({
       'user_id': userId,
       'items': [for (final item in items) item.toOrderMap()],
-      'total': total,
+      'subtotal': totals.subtotal,
+      'discount': totals.discount,
+      'shipping': totals.shipping,
+      'total': totals.total,
       'address': address.toMap(),
       'payment_method': paymentMethod.code,
       'status': 'created',
     });
   }
 
-  Future<List<Order>> fetchMine(String userId) async {
+  /// Pedidos de um usuário (o próprio cliente ou, via RLS, o admin).
+  Future<List<Order>> fetchByUser(String userId) async {
     final rows = await _table.select().eq('user_id', userId).order('created_at', ascending: false);
     return rows.map<Order>((row) => Order.fromMap(row)).toList();
   }

@@ -5,9 +5,8 @@ import '../theme/nice_theme.dart';
 import 'nice_logo.dart';
 import 'responsive.dart';
 
-/// Moldura das telas de login/cadastro.
-/// Web (desktop): imagem editorial à esquerda e formulário à direita.
-/// Mobile: banner no topo e formulário abaixo.
+/// Moldura das telas de login/cadastro: foto de fundo
+/// (fundo_tela_login_e_cadastro.png) e o formulário num cartão branco.
 class AuthLayout extends StatelessWidget {
   const AuthLayout({super.key, required this.child});
 
@@ -15,85 +14,45 @@ class AuthLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
+    final compact = context.isCompact;
 
-    if (context.isDesktop) {
-      final titleStyle = text.displaySmall?.copyWith(color: NiceTheme.white);
-      return Scaffold(
-        body: Row(
-          children: [
-            Expanded(
-              flex: 5,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(NiceAssets.loginSide, fit: BoxFit.cover),
-                  const DecoratedBox(decoration: BoxDecoration(gradient: NiceTheme.bottomOverlay)),
-                  Positioned(
-                    left: 56,
-                    right: 56,
-                    bottom: 64,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const NiceLogo(light: true),
-                        const SizedBox(height: 24),
-                        Text.rich(
-                          TextSpan(
-                            style: titleStyle,
-                            children: [
-                              const TextSpan(text: 'YOUR STYLE'),
-                              TextSpan(text: '.\n', style: titleStyle?.copyWith(color: NiceTheme.brightRed)),
-                              const TextSpan(text: 'YOUR IDENTITY'),
-                              TextSpan(text: '.', style: titleStyle?.copyWith(color: NiceTheme.brightRed)),
-                            ],
-                          ),
+    return Scaffold(
+      backgroundColor: NiceTheme.black,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(NiceAssets.authBackground, fit: BoxFit.cover, cacheWidth: compact ? 1080 : 2048),
+          const ColoredBox(color: NiceTheme.scrim),
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 32, vertical: 32),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Center(child: NiceLogo(light: true)),
+                      const SizedBox(height: 24),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: NiceTheme.white,
+                          borderRadius: BorderRadius.circular(NiceTheme.radius * 2),
+                          boxShadow: NiceTheme.softShadow,
                         ),
-                      ],
-                    ),
+                        child: Padding(
+                          padding: EdgeInsets.all(compact ? 24 : 40),
+                          child: child,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 4,
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(48),
-                  child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 420), child: child),
                 ),
               ),
             ),
-          ],
-        ),
-      );
-    }
-
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 230,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(NiceAssets.loginSide, fit: BoxFit.cover, alignment: Alignment.topCenter),
-                  const DecoratedBox(decoration: BoxDecoration(gradient: NiceTheme.bottomOverlay)),
-                  const SafeArea(bottom: false, child: Center(child: NiceLogo(light: true))),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(context.pagePadding + 4, 28, context.pagePadding + 4, 32),
-              child: Center(
-                child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 420), child: child),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

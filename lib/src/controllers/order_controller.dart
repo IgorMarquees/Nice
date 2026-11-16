@@ -24,7 +24,7 @@ class OrderController extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
-      _orders = await _repository.fetchMine(userId);
+      _orders = await _repository.fetchByUser(userId);
     } catch (_) {
       _error = 'Não foi possível carregar seus pedidos.';
     }
@@ -36,7 +36,7 @@ class OrderController extends ChangeNotifier {
   Future<bool> placeOrder({
     required String userId,
     required List<CartItem> items,
-    required double total,
+    required OrderTotals totals,
     required ShippingAddress address,
     required PaymentMethod paymentMethod,
   }) async {
@@ -47,7 +47,7 @@ class OrderController extends ChangeNotifier {
       await _repository.create(
         userId: userId,
         items: items,
-        total: total,
+        totals: totals,
         address: address,
         paymentMethod: paymentMethod,
       );

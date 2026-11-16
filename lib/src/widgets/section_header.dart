@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../theme/nice_theme.dart';
 import 'responsive.dart';
 
+/// Cabeçalho editorial: "Destaques" em vermelho e título fino em caixa alta.
 class SectionHeader extends StatelessWidget {
   const SectionHeader({
     super.key,
@@ -18,7 +20,7 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
+    final large = context.isDesktop;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -27,17 +29,20 @@ class SectionHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (eyebrow != null) ...[
-                Text(eyebrow!.toUpperCase(), style: text.labelMedium),
-                const SizedBox(height: 6),
+                Text(eyebrow!, style: NiceTheme.sectionEyebrow(large: large)),
+                SizedBox(height: large ? 10 : 6),
               ],
-              Text(
-                title.toUpperCase(),
-                style: context.isDesktop ? text.displaySmall : text.headlineMedium,
-              ),
+              Text(title.toUpperCase(), style: NiceTheme.sectionTitle(large: large)),
             ],
           ),
         ),
-        if (onAction != null) TextButton(onPressed: onAction, child: Text(actionLabel)),
+        if (onAction != null)
+          TextButton.icon(
+            onPressed: onAction,
+            iconAlignment: IconAlignment.end,
+            icon: const Icon(Icons.arrow_outward, size: 16),
+            label: Text(actionLabel.toUpperCase()),
+          ),
       ],
     );
   }

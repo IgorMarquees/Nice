@@ -19,6 +19,11 @@ class NiceTheme {
   static const white = Color(0xFFFFFFFF);
   static const success = Color(0xFF1B7F3B);
   static const transparent = Color(0x00000000);
+  static const darkGray = Color(0xFF4A4A4A);
+  static const mutedRed = Color(0xFFC46A6A);
+  static const sectionGray = Color(0xFFF7F7F5);
+  static const footerLine = Color(0xFF2E2E2E);
+  static const scrim = Color(0x8A000000);
 
   // ---- Medidas ----
   static const radius = 8.0;
@@ -44,6 +49,14 @@ class NiceTheme {
   static const softShadow = [
     BoxShadow(color: Color(0x1F000000), blurRadius: 8, offset: Offset(0, 4)),
   ];
+
+  /// Transição da seção clara de categorias para o rodapé preto.
+  static const footerFade = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [sectionGray, Color(0xFF8A8A8A), black],
+    stops: [0, 0.45, 1],
+  );
 
   // ---- Tipografia ----
   static TextStyle _display(double size, {FontWeight weight = FontWeight.w900, double height = 1.05, double spacing = -0.5}) =>
@@ -74,6 +87,45 @@ class NiceTheme {
 
   static TextStyle chipLabel({required bool selected}) =>
       _body(13, weight: FontWeight.w700, color: selected ? white : textGray);
+
+  // ---- Estilos do layout editorial (referências do Figma) ----
+
+  /// "Destaques", "Categorias"... acima dos títulos de seção.
+  static TextStyle sectionEyebrow({bool large = true}) =>
+      _body(large ? 18 : 14, weight: FontWeight.w500, color: brightRed, height: 1.2);
+
+  /// "ESCOLHAS DO MOMENTO": fino, cinza e em caixa alta.
+  static TextStyle sectionTitle({bool large = true}) =>
+      _body(large ? 54 : 30, weight: FontWeight.w300, color: darkGray, height: 0.95, spacing: -0.5);
+
+  /// Nome do produto nos cards.
+  static TextStyle productName({bool large = true}) =>
+      _body(large ? 24 : 16, weight: FontWeight.w700, color: red, height: 1.15, spacing: -0.2);
+
+  static TextStyle productSubtitle({bool large = true}) =>
+      _body(large ? 15 : 12, color: mutedRed, height: 1.3);
+
+  static TextStyle price({bool large = false}) =>
+      _body(large ? 28 : 16, weight: large ? FontWeight.w800 : FontWeight.w600, color: red, height: 1.2);
+
+  static TextStyle oldPrice({bool large = false}) => _body(
+        large ? 18 : 13,
+        color: textGray,
+        height: 1.2,
+      ).copyWith(decoration: TextDecoration.lineThrough, decorationColor: textGray);
+
+  static TextStyle badge() => _body(11, weight: FontWeight.w800, color: white, spacing: 0.6, height: 1.1);
+
+  /// Texto espaçado do rodapé ("STREETWEAR WITHOUT LIMITS.").
+  static TextStyle spaced({Color color = white}) =>
+      _body(13, weight: FontWeight.w500, color: color, spacing: 4);
+
+  static TextStyle footerTitle() => _display(44, spacing: -0.5).copyWith(color: white);
+
+  static TextStyle footerLink() => _body(16, color: softGray);
+
+  static TextStyle categoryLabel({bool large = true}) =>
+      _body(large ? 30 : 18, weight: FontWeight.w600, color: white, height: 1.1);
 
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(

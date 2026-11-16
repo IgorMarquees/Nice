@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../config/app_config.dart';
 import '../controllers/auth_controller.dart';
 
-/// Google no Android e Web; Apple somente no iOS.
+/// Google no Android e Web. No iOS só há e-mail/senha (sem botões sociais).
 class SocialAuthButtons extends StatelessWidget {
   const SocialAuthButtons({super.key});
 
@@ -19,12 +19,6 @@ class SocialAuthButtons extends StatelessWidget {
           label: 'Continuar com Google',
           icon: Icons.g_mobiledata,
           onPressed: auth.loading ? null : auth.signInWithGoogle,
-        ),
-      if (AppConfig.showAppleLogin)
-        _SocialButton(
-          label: 'Continuar com Apple',
-          icon: Icons.apple,
-          onPressed: auth.loading ? null : auth.signInWithApple,
         ),
     ];
     if (buttons.isEmpty) return const SizedBox.shrink();

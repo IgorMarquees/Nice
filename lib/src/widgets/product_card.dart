@@ -5,76 +5,89 @@ import 'package:provider/provider.dart';
 import '../controllers/cart_controller.dart';
 import '../models/product.dart';
 import '../theme/nice_theme.dart';
-import '../utils/formatters.dart';
+import '../utils/feedback.dart';
 import '../utils/navigation.dart';
 import 'nice_network_image.dart';
+import 'price_tag.dart';
 
+/// Card editorial: foto grande, nome em vermelho, subtítulo e preço.
+/// A altura é a natural do conteúdo (a grade não força proporção).
 class ProductCard extends StatelessWidget {
   const ProductCard({super.key, required this.product});
 
   final Product product;
 
+  /// Proporção (largura / altura) da foto.
+  static const imageRatio = 0.95;
+
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
     final badge = !product.inStock ? 'Esgotado' : (product.isNew ? 'Novo' : null);
 
-    return InkWell(
-      onTap: () => context.push('/produto/${product.id}'),
-      borderRadius: BorderRadius.circular(NiceTheme.radius),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(NiceTheme.radius),
-                    child: ColoredBox(
-                      color: NiceTheme.softGray,
-                      child: NiceNetworkImage(url: product.imageUrl),
-                    ),
-                  ),
-                ),
-                if (badge != null)
-                  Positioned(
-                    left: 8,
-                    top: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      color: product.inStock ? NiceTheme.red : NiceTheme.charcoal,
-                      child: Text(
-                        badge.toUpperCase(),
-                        style: text.labelSmall?.copyWith(color: NiceTheme.white),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final large = constraints.maxWidth >= 260;
+        return InkWell(
+          onTap: () => context.push('/produto/${product.id}'),
+          borderRadius: BorderRadius.circular(NiceTheme.radius),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AspectRatio(
+                aspectRatio: imageRatio,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(NiceTheme.radius),
+                        child: ColoredBox(
+                          color: NiceTheme.softGray,
+                          child: NiceNetworkImage(url: product.imageUrl),
+                        ),
                       ),
                     ),
-                  ),
-                Positioned(
-                  right: 8,
-                  bottom: 8,
-                  child: Material(
-                    shape: const CircleBorder(),
-                    color: NiceTheme.charcoal,
-                    child: IconButton(
-                      tooltip: 'Adicionar ao carrinho',
-                      color: NiceTheme.white,
-                      icon: const Icon(Icons.add_shopping_cart),
-                      onPressed: () => _quickAdd(context),
+                    if (badge != null)
+                      Positioned(left: 8, top: 8, child: TagBadge(label: badge, dark: !product.inStock)),
+                    if (product.hasDiscount)
+                      Positioned(right: 8, top: 8, child: DiscountBadge(percent: product.discountPercent)),
+                    Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: Material(
+                        shape: const CircleBorder(),
+                        color: NiceTheme.charcoal,
+                        child: IconButton(
+                          tooltip: 'Adicionar ao carrinho',
+                          color: NiceTheme.white,
+                          icon: const Icon(Icons.add_shopping_cart),
+                          onPressed: () => _quickAdd(context),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              SizedBox(height: large ? 12 : 8),
+              Text(
+                product.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: NiceTheme.productName(large: large),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                product.description,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: NiceTheme.productSubtitle(large: large),
+              ),
+              SizedBox(height: large ? 8 : 4),
+              PriceTag(product: product),
+            ],
           ),
-          const SizedBox(height: 10),
-          Text(product.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: text.titleMedium),
-          const SizedBox(height: 2),
-          Text(product.description, maxLines: 1, overflow: TextOverflow.ellipsis, style: text.bodySmall),
-          const SizedBox(height: 4),
-          Text(formatCurrency(product.price), style: text.titleSmall),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -82,20 +95,20 @@ class ProductCard extends StatelessWidget {
     // Visitante é enviado ao login.
     if (!context.requireLogin()) return;
 
-    final messenger = ScaffoldMessenger.of(context);
     if (!product.inStock) {
-      messenger.showSnackBar(const SnackBar(content: Text('Produto esgotado.')));
+      showMessage(context, 'Produto esgotado.');
       return;
     }
-    // Com mais de um tamanho, o cliente precisa escolher na página do produto.
-    if (product.sizes.length > 1) {
+    // Com mais de uma opção, o cliente escolhe na página do produto.
+    if (product.sizes.length > 1 || product.colors.length > 1) {
       context.push('/produto/${product.id}');
       return;
     }
-    context.read<CartController>().add(
-          product,
-          size: product.sizes.isEmpty ? '' : product.sizes.first,
-        );
-    messenger.showSnackBar(SnackBar(content: Text('${product.title} adicionado ao carrinho')));
+    final variant = [
+      if (product.sizes.isNotEmpty) product.sizes.first,
+      if (product.colors.isNotEmpty) product.colors.first,
+    ].join(' / ');
+    context.read<CartController>().add(product, size: variant);
+    showAddedToCart(context, product.title);
   }
 }

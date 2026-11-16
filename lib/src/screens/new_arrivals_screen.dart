@@ -6,9 +6,10 @@ import '../config/assets.dart';
 import '../controllers/catalog_controller.dart';
 import '../models/product.dart';
 import '../theme/nice_theme.dart';
-import '../widgets/hero_banner.dart';
+import '../widgets/banner_image.dart';
 import '../widgets/nice_network_image.dart';
-import '../widgets/product_grid.dart';
+import '../widgets/price_tag.dart';
+import '../widgets/product_carousel.dart';
 import '../widgets/responsive.dart';
 import '../widgets/section_header.dart';
 import '../widgets/state_views.dart';
@@ -26,29 +27,25 @@ class NewArrivalsScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        HeroBanner(
-          image: NiceAssets.newArrivals,
-          eyebrow: 'NICE® / Latest drop',
-          title: 'Just',
-          accent: 'dropped.',
-          subtitle: 'Novas peças. Nova atitude. Descubra as últimas novidades da NICE.',
-          ctaLabel: 'Ver todos os lançamentos',
-          onCta: () => context.go('/catalogo'),
-          height: desktop ? 480 : 300,
+        BannerImage(
+          asset: NiceAssets.newArrivalsTop,
+          aspectRatio: 2876 / 1472,
+          label: 'Just dropped. Ver todos os lançamentos',
+          onTap: () => context.go('/catalogo'),
         ),
-        SizedBox(height: desktop ? 64 : 32),
+        SizedBox(height: desktop ? 72 : 32),
         ContentWrapper(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SectionHeader(eyebrow: 'Últimos lançamentos', title: 'Peças que acabaram de chegar'),
-              const SizedBox(height: 24),
+              const SectionHeader(eyebrow: 'ÚLTIMOS LANÇAMENTOS', title: 'Peças que acabaram\nde chegar'),
+              SizedBox(height: desktop ? 40 : 24),
               if (catalog.loading && arrivals.isEmpty)
                 const LoadingView()
               else if (arrivals.isEmpty)
                 const EmptyState(icon: Icons.new_releases_outlined, title: 'Em breve novos lançamentos')
               else
-                ProductGrid(products: arrivals, maxColumns: 3),
+                ProductCarousel(products: arrivals),
             ],
           ),
         ),
@@ -81,6 +78,8 @@ class _Spotlight extends StatelessWidget {
         Text(product.title.toUpperCase(), style: desktop ? text.displaySmall : text.headlineMedium),
         const SizedBox(height: 12),
         Text(product.description, style: text.bodyLarge),
+        const SizedBox(height: 16),
+        PriceTag(product: product, large: true),
         const SizedBox(height: 24),
         FilledButton.icon(
           onPressed: () => context.push('/produto/${product.id}'),

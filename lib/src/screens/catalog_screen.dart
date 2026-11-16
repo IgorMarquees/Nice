@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../config/assets.dart';
 import '../controllers/catalog_controller.dart';
+import '../widgets/banner_image.dart';
 import '../widgets/category_section.dart';
 import '../widgets/filter_panel.dart';
 import '../widgets/product_grid.dart';
@@ -97,32 +100,74 @@ class _CatalogScreenState extends State<CatalogScreen> {
               )
             : ProductGrid(products: products, maxColumns: desktop ? 3 : 4);
 
-    if (desktop) {
-      return ContentWrapper(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 40),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(width: 280, child: FilterPanel()),
-              const SizedBox(width: 48),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+    if (!context.isCompact) {
+      // Web/tablet: banner de topo, blocos de categoria, catálogo e banner final.
+      final catalogBody = desktop
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(width: 280, child: FilterPanel()),
+                const SizedBox(width: 48),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text('CATÁLOGO', style: text.displaySmall),
+                      const SizedBox(height: 4),
+                      Text('${products.length} produtos', style: text.bodySmall),
+                      const SizedBox(height: 20),
+                      searchField,
+                      const SizedBox(height: 28),
+                      results,
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('CATÁLOGO', style: text.headlineLarge),
+                const SizedBox(height: 16),
+                Row(
                   children: [
-                    Text('CATÁLOGO', style: text.displaySmall),
-                    const SizedBox(height: 4),
-                    Text('${products.length} produtos', style: text.bodySmall),
-                    const SizedBox(height: 20),
-                    searchField,
-                    const SizedBox(height: 28),
-                    results,
+                    Expanded(child: searchField),
+                    const SizedBox(width: 10),
+                    IconButton.filledTonal(
+                      tooltip: 'Filtros',
+                      onPressed: _openFilters,
+                      icon: const Icon(Icons.tune),
+                    ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Text('${products.length} produtos', style: text.bodySmall),
+                const SizedBox(height: 16),
+                results,
+              ],
+            );
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          BannerImage(
+            asset: NiceAssets.categoriesTop,
+            aspectRatio: 2880 / 1472,
+            label: 'Explore as categorias. Ver todas as categorias',
+            onTap: () => context.go('/catalogo'),
           ),
-        ),
+          SizedBox(height: desktop ? 64 : 40),
+          const ContentWrapper(child: CategorySection(layout: CategoryLayout.grid)),
+          SizedBox(height: desktop ? 72 : 48),
+          ContentWrapper(child: catalogBody),
+          SizedBox(height: desktop ? 88 : 56),
+          BannerImage(
+            asset: NiceAssets.categoriesCta,
+            aspectRatio: 2880 / 960,
+            label: 'Todas as peças. Um só estilo. Ver todos os produtos',
+            onTap: () => context.go('/catalogo'),
+          ),
+        ],
       );
     }
 

@@ -4,30 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../theme/nice_theme.dart';
-import 'hero_banner.dart';
-import 'responsive.dart';
+import 'banner_image.dart';
 
 class BannerSlide {
   const BannerSlide({
     required this.image,
-    required this.eyebrow,
-    required this.title,
-    required this.accent,
-    required this.subtitle,
-    required this.ctaLabel,
+    required this.aspectRatio,
     required this.route,
+    required this.label,
   });
 
   final String image;
-  final String eyebrow;
-  final String title;
-  final String accent;
-  final String subtitle;
-  final String ctaLabel;
+  final double aspectRatio;
   final String route;
+  final String label;
 }
 
-/// Banners rotativos da Home (autoplay a cada 6s).
+/// Banners rotativos da Home (autoplay a cada 6s). Cada banner é um link.
 class BannerCarousel extends StatefulWidget {
   const BannerCarousel({super.key, required this.slides});
 
@@ -65,10 +58,10 @@ class _BannerCarouselState extends State<BannerCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    final height = context.isDesktop ? 600.0 : 380.0;
+    final ratio = widget.slides.first.aspectRatio;
 
-    return SizedBox(
-      height: height,
+    return AspectRatio(
+      aspectRatio: ratio,
       child: Stack(
         children: [
           PageView.builder(
@@ -77,32 +70,35 @@ class _BannerCarouselState extends State<BannerCarousel> {
             onPageChanged: (index) => setState(() => _page = index),
             itemBuilder: (context, index) {
               final slide = widget.slides[index];
-              return HeroBanner(
-                image: slide.image,
-                eyebrow: slide.eyebrow,
-                title: slide.title,
-                accent: slide.accent,
-                subtitle: slide.subtitle,
-                ctaLabel: slide.ctaLabel,
-                onCta: () => context.go(slide.route),
-                height: height,
+              return BannerImage(
+                asset: slide.image,
+                aspectRatio: ratio,
+                label: slide.label,
+                onTap: () => context.go(slide.route),
               );
             },
           ),
           Positioned(
             left: 0,
             right: 0,
-            bottom: 18,
+            bottom: 14,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 for (var i = 0; i < widget.slides.length; i++)
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: i == _page ? 32 : 14,
-                    height: 3,
-                    color: i == _page ? NiceTheme.brightRed : NiceTheme.midGray,
+                  GestureDetector(
+                    onTap: () => _controller.animateToPage(
+                      i,
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                    ),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                      width: i == _page ? 32 : 14,
+                      height: 3,
+                      color: i == _page ? NiceTheme.brightRed : NiceTheme.midGray,
+                    ),
                   ),
               ],
             ),

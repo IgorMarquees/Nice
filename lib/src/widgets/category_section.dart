@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../controllers/catalog_controller.dart';
 import '../theme/nice_theme.dart';
+import 'nice_network_image.dart';
 import 'responsive.dart';
 
 const _categoryIcons = <String, IconData>{
@@ -12,18 +14,29 @@ const _categoryIcons = <String, IconData>{
   'Acessórios': Icons.watch_outlined,
 };
 
-void _openCategory(BuildContext context, String category) =>
+void openCategory(BuildContext context, String category) =>
     context.go('/catalogo?categoria=${Uri.encodeQueryComponent(category)}');
 
-/// Mobile: chips rápidos. Desktop/Web: grade de blocos de categoria.
+enum CategoryLayout {
+  /// Uma linha de cards (Home Web, "Explore por estilo").
+  row,
+
+  /// Grade 2x2 de blocos grandes (topo da página de Categorias).
+  grid,
+}
+
+/// Mobile: chips rápidos. Web/tablet: blocos com a foto de um produto da
+/// categoria (as capas vêm do catálogo, não são imagens geradas).
 class CategorySection extends StatelessWidget {
-  const CategorySection({super.key});
+  const CategorySection({super.key, this.layout = CategoryLayout.row});
+
+  final CategoryLayout layout;
 
   @override
   Widget build(BuildContext context) {
     final names = CatalogController.categories.skip(1).toList();
 
-    if (context.isCompact) {
+    if (context.isCompact && layout == CategoryLayout.row) {
       return SizedBox(
         height: 44,
         child: ListView.separated(
@@ -33,51 +46,78 @@ class CategorySection extends StatelessWidget {
           itemBuilder: (context, index) => ActionChip(
             avatar: Icon(_categoryIcons[names[index]], size: 18, color: NiceTheme.red),
             label: Text(names[index]),
-            onPressed: () => _openCategory(context, names[index]),
+            onPressed: () => openCategory(context, names[index]),
           ),
         ),
       );
     }
 
-    final columns = context.isDesktop ? 4 : 2;
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: columns,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 1.5,
-      children: [for (final name in names) _CategoryTile(name: name)],
-    );
+    final catalog = context.watch<CatalogController>();
+    final columns = layout == CategoryLayout.grid ? (context.isCompact ? 1 : 2) : (context.isDesktop ? 4 : 2);
+    final ratio = layout == CategoryLayout.grid ? 1.8 : 1.35;
+    final large = layout == CategoryLayout.grid && !context.isCompact;
+
+    final rows = <Widget>[];
+    for (var start = 0; start < names.length; start += columns) {
+      if (start > 0) rows.add(const SizedBox(height: 16));
+      rows.add(
+        Row(
+          children: [
+            for (var i = start; i < start + columns; i++) ...[
+              if (i > start) const SizedBox(width: 16),
+              Expanded(
+                child: i < names.length
+                    ? AspectRatio(
+                        aspectRatio: ratio,
+                        child: _CategoryTile(
+                          name: names[i],
+                          cover: catalog.coverFor(names[i]),
+                          large: large,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: rows);
   }
 }
 
 class _CategoryTile extends StatelessWidget {
-  const _CategoryTile({required this.name});
+  const _CategoryTile({required this.name, required this.cover, required this.large});
 
   final String name;
+  final String cover;
+  final bool large;
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return InkWell(
-      onTap: () => _openCategory(context, name),
+    return Material(
+      color: NiceTheme.charcoal,
       borderRadius: BorderRadius.circular(NiceTheme.radius),
-      child: Ink(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: NiceTheme.charcoal,
-          borderRadius: BorderRadius.circular(NiceTheme.radius),
-          gradient: NiceTheme.bottomOverlay,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => openCategory(context, name),
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            Icon(_categoryIcons[name], size: 40, color: NiceTheme.brightRed),
-            Text(
-              name.toUpperCase(),
-              style: text.headlineSmall?.copyWith(color: NiceTheme.white),
+            if (cover.isNotEmpty)
+              NiceNetworkImage(url: cover, fit: BoxFit.cover)
+            else
+              Center(child: Icon(_categoryIcons[name], size: 56, color: NiceTheme.brightRed)),
+            const DecoratedBox(decoration: BoxDecoration(gradient: NiceTheme.bottomOverlay)),
+            Positioned(
+              left: large ? 32 : 16,
+              right: 16,
+              bottom: large ? 28 : 14,
+              child: Text(
+                name.toUpperCase(),
+                textAlign: large ? TextAlign.start : TextAlign.center,
+                style: NiceTheme.categoryLabel(large: large),
+              ),
             ),
           ],
         ),

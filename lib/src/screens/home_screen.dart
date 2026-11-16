@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -7,8 +8,9 @@ import '../controllers/auth_controller.dart';
 import '../controllers/catalog_controller.dart';
 import '../theme/nice_theme.dart';
 import '../widgets/banner_carousel.dart';
+import '../widgets/banner_image.dart';
 import '../widgets/category_section.dart';
-import '../widgets/hero_banner.dart';
+import '../widgets/product_carousel.dart';
 import '../widgets/product_grid.dart';
 import '../widgets/responsive.dart';
 import '../widgets/section_header.dart';
@@ -16,22 +18,16 @@ import '../widgets/state_views.dart';
 
 const _slides = [
   BannerSlide(
-    image: NiceAssets.heroBeyond,
-    eyebrow: 'NICE / Streetwear by Japan',
-    title: 'Beyond',
-    accent: 'the streets.',
-    subtitle: 'Mais que roupas, é uma forma de ver o mundo.',
-    ctaLabel: 'Explore a coleção',
+    image: NiceAssets.homeHero1,
+    aspectRatio: 2880 / 1500,
     route: '/catalogo',
+    label: 'Beyond the streets. Explore a coleção',
   ),
   BannerSlide(
-    image: NiceAssets.heroCulture,
-    eyebrow: 'NICE / Streetwear by Japan',
-    title: 'Cultura em',
-    accent: 'movimento.',
-    subtitle: 'Rua, atitude e autenticidade em cada detalhe.',
-    ctaLabel: 'Ver novidades',
-    route: '/novidades',
+    image: NiceAssets.homeHero2,
+    aspectRatio: 2880 / 1500,
+    route: '/catalogo',
+    label: 'Cultura em movimento. Explore a coleção',
   ),
 ];
 
@@ -42,34 +38,28 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final catalog = context.watch<CatalogController>();
     final desktop = context.isDesktop;
-    final featured = catalog.featured.take(desktop ? 8 : 6).toList();
-    final arrivals = catalog.newArrivals.take(4).toList();
-    final gap = SizedBox(height: desktop ? 72 : 36);
+    final compact = context.isCompact;
+    final featured = catalog.featured.take(desktop ? 6 : 4).toList();
+    final arrivals = catalog.newArrivals.take(9).toList();
+    final gap = SizedBox(height: desktop ? 88 : 40);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (context.isCompact) const _MobileGreeting(),
+        if (compact) const _MobileGreeting(),
         const BannerCarousel(slides: _slides),
-        if (context.isCompact) ...[
+        if (compact) ...[
           const SizedBox(height: 20),
           const ContentWrapper(child: CategorySection()),
         ],
+        SizedBox(height: desktop ? 56 : 28),
+        BannerImage(
+          asset: NiceAssets.homeEssence,
+          aspectRatio: 2880 / 800,
+          label: 'A essência da NICE. Conheça a NICE',
+          onTap: () => context.go('/sobre'),
+        ),
         gap,
-        if (!context.isCompact) ...[
-          HeroBanner(
-            image: NiceAssets.identity,
-            eyebrow: 'Identidade',
-            title: 'A essência',
-            accent: 'da NICE.',
-            subtitle: 'Do Japão para o mundo. Streetwear que conecta pessoas, ideias e identidades.',
-            ctaLabel: 'Conheça a NICE',
-            onCta: () => context.go('/sobre'),
-            large: false,
-            height: 360,
-          ),
-          gap,
-        ],
         ContentWrapper(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -79,27 +69,14 @@ class HomeScreen extends StatelessWidget {
                 title: 'Escolhas do momento',
                 onAction: () => context.go('/catalogo'),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: desktop ? 40 : 24),
               if (catalog.loading && featured.isEmpty)
                 const LoadingView()
               else
-                ProductGrid(products: featured),
+                ProductGrid(products: featured, maxColumns: 3),
             ],
           ),
         ),
-        if (!context.isCompact) ...[
-          gap,
-          ContentWrapper(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SectionHeader(eyebrow: 'Categorias', title: 'Explore por estilo'),
-                const SizedBox(height: 24),
-                const CategorySection(),
-              ],
-            ),
-          ),
-        ],
         gap,
         ContentWrapper(
           child: Column(
@@ -110,25 +87,57 @@ class HomeScreen extends StatelessWidget {
                 title: 'Acabou de chegar',
                 onAction: () => context.go('/novidades'),
               ),
-              const SizedBox(height: 24),
-              ProductGrid(products: arrivals),
+              SizedBox(height: desktop ? 40 : 24),
+              ProductCarousel(products: arrivals),
             ],
           ),
         ),
         gap,
-        if (!context.isCompact)
-          HeroBanner(
-            image: NiceAssets.cta,
-            eyebrow: 'NICE / Completo',
-            title: 'Todas as peças.',
-            accent: 'Um só estilo.',
-            subtitle: 'Explore o catálogo completo da NICE e encontre o que combina com você.',
-            ctaLabel: 'Ver todos os produtos',
-            onCta: () => context.go('/catalogo'),
-            large: false,
-            height: 380,
+        if (!compact) const _CategoriesBand() else const SizedBox(height: 16),
+      ],
+    );
+  }
+}
+
+/// "Categorias / Explore por estilo" em fundo claro, que escurece até o
+/// rodapé (na Web).
+class _CategoriesBand extends StatelessWidget {
+  const _CategoriesBand();
+
+  @override
+  Widget build(BuildContext context) {
+    final desktop = context.isDesktop;
+    const header = SectionHeader(eyebrow: 'Categorias', title: 'Explore\npor estilo');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ColoredBox(
+          color: NiceTheme.sectionGray,
+          child: Padding(
+            padding: EdgeInsets.only(top: desktop ? 72 : 48, bottom: kIsWeb ? 0 : 48),
+            child: ContentWrapper(
+              child: desktop
+                  ? const Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(width: 280, child: header),
+                        SizedBox(width: 32),
+                        Expanded(child: CategorySection()),
+                      ],
+                    )
+                  : const Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [header, SizedBox(height: 24), CategorySection()],
+                    ),
+            ),
           ),
-        if (context.isCompact) const SizedBox(height: 40),
+        ),
+        if (kIsWeb)
+          const SizedBox(
+            height: 160,
+            child: DecoratedBox(decoration: BoxDecoration(gradient: NiceTheme.footerFade)),
+          ),
       ],
     );
   }

@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../config/app_config.dart';
+import '../controllers/admin_controller.dart';
+import '../controllers/auth_controller.dart';
 import '../controllers/cart_controller.dart';
 import '../controllers/catalog_controller.dart';
 import '../models/product.dart';
 import '../theme/nice_theme.dart';
+import '../utils/feedback.dart';
 import '../utils/formatters.dart';
 import '../utils/navigation.dart';
+import '../widgets/breadcrumbs.dart';
 import '../widgets/nice_network_image.dart';
+import '../widgets/price_tag.dart';
 import '../widgets/responsive.dart';
 import '../widgets/state_views.dart';
 
@@ -23,6 +29,7 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Product? _product;
+  int? _adminStock;
   bool _loading = true;
   String? _size;
   String? _color;
@@ -36,12 +43,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Future<void> _load() async {
     final catalog = context.read<CatalogController>();
+    final isAdmin = context.read<AuthController>().isAdmin;
+    final admin = context.read<AdminController>();
     if (!catalog.loaded) await catalog.load();
     final product = await catalog.findById(widget.productId);
+    // Estoque só é lido (e exibido) para administradores.
+    final stock = isAdmin && product != null && !product.isFallback
+        ? (await admin.findById(product.id))?.stock
+        : null;
     if (!mounted) return;
     setState(() {
       _product = product;
+      _adminStock = stock;
       _loading = false;
+      // Uma única opção já vem selecionada.
+      if (product != null && product.sizes.length == 1) _size = product.sizes.first;
+      if (product != null && product.colors.length == 1) _color = product.colors.first;
+    });
+  }
+
+  void _selectColor(String color) {
+    setState(() {
+      _color = color;
+      _imageIndex = 0; // a foto grande passa a ser a primeira da cor
     });
   }
 
@@ -49,23 +73,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     // Visitante vai para o login e volta para esta página.
     if (!context.requireLogin()) return;
 
-    final messenger = ScaffoldMessenger.of(context);
     if (product.sizes.isNotEmpty && _size == null) {
-      messenger.showSnackBar(const SnackBar(content: Text('Escolha um tamanho.')));
+      showMessage(context, 'Escolha um tamanho.');
       return;
     }
     if (product.colors.isNotEmpty && _color == null) {
-      messenger.showSnackBar(const SnackBar(content: Text('Escolha uma cor.')));
+      showMessage(context, 'Escolha uma cor.');
       return;
     }
-    final variant = [if (_size != null) _size!, if (_color != null) _color!].join(' / ');
+    final variant = [?_size, ?_color].join(' / ');
     context.read<CartController>().add(product, size: variant);
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text('${product.title} adicionado ao carrinho'),
-        action: SnackBarAction(label: 'VER CARRINHO', onPressed: () => context.go('/carrinho')),
-      ),
-    );
+    showAddedToCart(context, product.title);
   }
 
   @override
@@ -82,17 +100,34 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     final gallery = _Gallery(
-      images: product.images,
+      // Ao escolher uma cor, a galeria mostra as fotos dessa cor.
+      images: product.imagesFor(_color),
       index: _imageIndex,
+      discountPercent: product.discountPercent,
       onSelect: (i) => setState(() => _imageIndex = i),
     );
     final info = _buildInfo(context, product);
+    final details = product.technicalDetails.trim().isEmpty ? null : _TechnicalDetails(text: product.technicalDetails);
+    final crumbs = Breadcrumbs(
+      items: [
+        const Crumb('Home', '/'),
+        const Crumb('Categorias', '/catalogo'),
+        if (product.category.isNotEmpty)
+          Crumb(product.category, '/catalogo?categoria=${Uri.encodeQueryComponent(product.category)}'),
+        Crumb(product.title),
+      ],
+    );
 
     return ContentWrapper(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: context.isDesktop ? 48 : 8),
-        child: context.isDesktop
-            ? Row(
+        padding: EdgeInsets.symmetric(vertical: context.isDesktop ? 40 : 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            crumbs,
+            SizedBox(height: context.isDesktop ? 28 : 16),
+            if (context.isDesktop)
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(flex: 6, child: gallery),
@@ -100,25 +135,47 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   Expanded(flex: 5, child: info),
                 ],
               )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [gallery, const SizedBox(height: 24), info, const SizedBox(height: 32)],
-              ),
+            else ...[
+              gallery,
+              const SizedBox(height: 24),
+              info,
+            ],
+            if (details != null) ...[
+              SizedBox(height: context.isDesktop ? 56 : 32),
+              details,
+            ],
+            const SizedBox(height: 32),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildInfo(BuildContext context, Product product) {
     final text = Theme.of(context).textTheme;
+    final isAdmin = context.watch<AuthController>().isAdmin;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(product.category.toUpperCase(), style: text.labelMedium),
-        const SizedBox(height: 8),
         Text(product.title.toUpperCase(), style: text.headlineLarge),
-        const SizedBox(height: 12),
-        Text(formatCurrency(product.price), style: text.headlineMedium),
+        const SizedBox(height: 14),
+        PriceTag(product: product, large: true),
+        const SizedBox(height: 6),
+        Text.rich(
+          TextSpan(
+            style: text.bodyMedium,
+            children: [
+              TextSpan(text: formatCurrency(product.pixPrice), style: text.titleSmall?.copyWith(color: NiceTheme.success)),
+              TextSpan(text: ' no Pix (${(AppConfig.pixDiscount * 100).round()}% de desconto)'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        _InfoLine(
+          icon: Icons.local_shipping_outlined,
+          text: 'Frete grátis em compras a partir de ${formatCurrency(AppConfig.freeShippingThreshold)}',
+        ),
         const SizedBox(height: 20),
         Text(product.description, style: text.bodyLarge),
         if (product.sizes.isNotEmpty) ...[
@@ -139,29 +196,32 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ],
           ),
         ],
-        if (product.colors.isNotEmpty) ...[
+        if (product.colorVariants.isNotEmpty) ...[
           const SizedBox(height: 24),
-          Text('COR', style: text.labelMedium),
+          Text('COR${_color == null ? '' : ': ${_color!.toUpperCase()}'}', style: text.labelMedium),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final color in product.colors)
+              for (final variant in product.colorVariants)
                 ChoiceChip(
-                  label: Text(color),
-                  selected: _color == color,
-                  labelStyle: NiceTheme.chipLabel(selected: _color == color),
-                  onSelected: (_) => setState(() => _color = color),
+                  avatar: variant.images.isEmpty
+                      ? null
+                      : ClipOval(child: NiceNetworkImage(url: variant.images.first, fit: BoxFit.cover)),
+                  label: Text(variant.name),
+                  selected: _color == variant.name,
+                  labelStyle: NiceTheme.chipLabel(selected: _color == variant.name),
+                  onSelected: (_) => _selectColor(variant.name),
                 ),
             ],
           ),
         ],
         const SizedBox(height: 24),
-        Text(
-          product.inStock ? '${product.stock} em estoque' : 'Produto esgotado',
-          style: text.bodySmall,
-        ),
+        if (!product.inStock)
+          Text('Produto esgotado', style: text.titleSmall?.copyWith(color: NiceTheme.red))
+        else if (isAdmin && _adminStock != null)
+          _InfoLine(icon: Icons.inventory_2_outlined, text: '$_adminStock em estoque (visível só para administradores)'),
         const SizedBox(height: 20),
         SizedBox(
           width: double.infinity,
@@ -176,23 +236,99 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 }
 
+class _InfoLine extends StatelessWidget {
+  const _InfoLine({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: NiceTheme.red),
+        const SizedBox(width: 8),
+        Expanded(child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
+      ],
+    );
+  }
+}
+
+class _TechnicalDetails extends StatelessWidget {
+  const _TechnicalDetails({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context).textTheme;
+    final lines = text.split('\n').map((l) => l.trim()).where((l) => l.isNotEmpty).toList();
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: NiceTheme.lightGray,
+        borderRadius: BorderRadius.circular(NiceTheme.radius),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('DETALHES TÉCNICOS', style: theme.labelMedium),
+          const SizedBox(height: 14),
+          for (final line in lines)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('•  ', style: theme.bodyMedium?.copyWith(color: NiceTheme.red)),
+                  Expanded(child: Text(line, style: theme.bodyMedium)),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _Gallery extends StatelessWidget {
-  const _Gallery({required this.images, required this.index, required this.onSelect});
+  const _Gallery({
+    required this.images,
+    required this.index,
+    required this.onSelect,
+    required this.discountPercent,
+  });
 
   final List<String> images;
   final int index;
+  final int discountPercent;
   final ValueChanged<int> onSelect;
 
   @override
   Widget build(BuildContext context) {
     final urls = images.isEmpty ? const [''] : images;
-    final current = urls[index.clamp(0, urls.length - 1)];
+    final selected = index.clamp(0, urls.length - 1);
 
     final main = AspectRatio(
       aspectRatio: 1,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(NiceTheme.radius),
-        child: ColoredBox(color: NiceTheme.softGray, child: NiceNetworkImage(url: current)),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(NiceTheme.radius),
+              child: ColoredBox(
+                color: NiceTheme.softGray,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: NiceNetworkImage(key: ValueKey(urls[selected]), url: urls[selected]),
+                ),
+              ),
+            ),
+          ),
+          if (discountPercent > 0)
+            Positioned(right: 12, top: 12, child: DiscountBadge(percent: discountPercent)),
+        ],
       ),
     );
     if (urls.length < 2) return main;
@@ -207,7 +343,7 @@ class _Gallery extends StatelessWidget {
             margin: const EdgeInsets.only(right: 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(NiceTheme.radius),
-              border: Border.all(color: i == index ? NiceTheme.red : NiceTheme.softGray, width: 2),
+              border: Border.all(color: i == selected ? NiceTheme.red : NiceTheme.softGray, width: 2),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(NiceTheme.radius - 2),

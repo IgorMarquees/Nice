@@ -46,30 +46,16 @@ class _LoginScreenState extends State<LoginScreen> {
     // Em caso de sucesso o roteador redireciona automaticamente.
   }
 
+  /// O diálogo é dono do próprio TextEditingController: antes ele era
+  /// descartado logo após o pop, enquanto o diálogo ainda animava a saída
+  /// usando o campo, o que gerava o erro "_dependents.isEmpty".
   Future<void> _forgotPassword() async {
-    final controller = TextEditingController(text: _email.text);
     final email = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Recuperar senha'),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(hintText: 'Seu e-mail'),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Enviar link'),
-          ),
-        ],
-      ),
+      builder: (_) => _ResetPasswordDialog(initialEmail: _email.text),
     );
-    controller.dispose();
-    if (email != null && email.contains('@') && mounted) {
-      await context.read<AuthController>().sendPasswordReset(email);
-    }
+    if (email == null || !mounted) return;
+    await context.read<AuthController>().sendPasswordReset(email);
   }
 
   @override
@@ -131,6 +117,53 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ResetPasswordDialog extends StatefulWidget {
+  const _ResetPasswordDialog({required this.initialEmail});
+
+  final String initialEmail;
+
+  @override
+  State<_ResetPasswordDialog> createState() => _ResetPasswordDialogState();
+}
+
+class _ResetPasswordDialogState extends State<_ResetPasswordDialog> {
+  late final _controller = TextEditingController(text: widget.initialEmail);
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _send() {
+    if (!_formKey.currentState!.validate()) return;
+    Navigator.pop(context, _controller.text.trim());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Recuperar senha'),
+      content: Form(
+        key: _formKey,
+        child: TextFormField(
+          controller: _controller,
+          autofocus: true,
+          keyboardType: TextInputType.emailAddress,
+          decoration: const InputDecoration(hintText: 'Seu e-mail'),
+          validator: (v) => v != null && v.contains('@') ? null : 'Informe um e-mail válido',
+          onFieldSubmitted: (_) => _send(),
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+        FilledButton(onPressed: _send, child: const Text('Enviar link')),
+      ],
     );
   }
 }

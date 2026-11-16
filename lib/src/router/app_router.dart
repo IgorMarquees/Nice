@@ -4,8 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../controllers/auth_controller.dart';
 import '../screens/about_screen.dart';
+import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/admin/admin_product_form_screen.dart';
 import '../screens/admin/admin_products_screen.dart';
+import '../screens/admin/admin_user_detail_screen.dart';
+import '../screens/admin/admin_users_screen.dart';
 import '../screens/cart_screen.dart';
 import '../screens/catalog_screen.dart';
 import '../screens/checkout_screen.dart';
@@ -16,6 +19,7 @@ import '../screens/new_arrivals_screen.dart';
 import '../screens/product_detail_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/register_screen.dart';
+import '../screens/shell_page.dart';
 import '../screens/splash_screen.dart';
 import '../screens/web_shell.dart';
 import '../widgets/state_views.dart';
@@ -63,34 +67,81 @@ GoRouter buildRouter(AuthController auth) {
             ? WebShell(location: state.uri.path, child: child)
             : MobileShell(location: state.uri.path, child: child),
         routes: [
-          GoRoute(path: '/', builder: (_, _) => const HomeScreen()),
-          GoRoute(path: '/novidades', builder: (_, _) => const NewArrivalsScreen()),
+          GoRoute(
+            path: '/',
+            builder: (_, _) => const ShellPage(child: HomeScreen()),
+          ),
+          GoRoute(
+            path: '/novidades',
+            builder: (_, _) => const ShellPage(child: NewArrivalsScreen()),
+          ),
           GoRoute(
             path: '/catalogo',
-            builder: (_, state) => CatalogScreen(
-              key: ValueKey(state.uri.toString()),
-              initialCategory: state.uri.queryParameters['categoria'],
-              initialQuery: state.uri.queryParameters['busca'],
+            builder: (_, state) => ShellPage(
+              child: CatalogScreen(
+                key: ValueKey(state.uri.toString()),
+                initialCategory: state.uri.queryParameters['categoria'],
+                initialQuery: state.uri.queryParameters['busca'],
+              ),
             ),
           ),
           GoRoute(
             path: '/produto/:id',
-            builder: (_, state) => ProductDetailScreen(
-              key: ValueKey(state.pathParameters['id']),
-              productId: state.pathParameters['id']!,
+            builder: (_, state) => ShellPage(
+              child: ProductDetailScreen(
+                key: ValueKey(state.pathParameters['id']),
+                productId: state.pathParameters['id']!,
+              ),
             ),
           ),
-          GoRoute(path: '/sobre', builder: (_, _) => const AboutScreen()),
-          GoRoute(path: '/carrinho', builder: (_, _) => const CartScreen()),
-          GoRoute(path: '/checkout', builder: (_, _) => const CheckoutScreen()),
-          GoRoute(path: '/perfil', builder: (_, _) => const ProfileScreen()),
-          GoRoute(path: '/admin', builder: (_, _) => const AdminProductsScreen()),
-          GoRoute(path: '/admin/produto/novo', builder: (_, _) => const AdminProductFormScreen()),
+          GoRoute(
+            path: '/sobre',
+            builder: (_, _) => const ShellPage(child: AboutScreen()),
+          ),
+          GoRoute(
+            path: '/carrinho',
+            builder: (_, _) => const ShellPage(child: CartScreen()),
+          ),
+          GoRoute(
+            path: '/checkout',
+            builder: (_, _) => const ShellPage(child: CheckoutScreen()),
+          ),
+          GoRoute(
+            path: '/perfil',
+            builder: (_, _) => const ShellPage(child: ProfileScreen()),
+          ),
+          GoRoute(
+            path: '/admin',
+            builder: (_, _) => const ShellPage(child: AdminDashboardScreen()),
+          ),
+          GoRoute(
+            path: '/admin/produtos',
+            builder: (_, _) => const ShellPage(child: AdminProductsScreen()),
+          ),
+          GoRoute(
+            path: '/admin/usuarios',
+            builder: (_, _) => const ShellPage(child: AdminUsersScreen()),
+          ),
+          GoRoute(
+            path: '/admin/usuarios/:id',
+            builder: (_, state) => ShellPage(
+              child: AdminUserDetailScreen(
+                key: ValueKey(state.pathParameters['id']),
+                userId: state.pathParameters['id']!,
+              ),
+            ),
+          ),
+          GoRoute(
+            path: '/admin/produto/novo',
+            builder: (_, _) => const ShellPage(child: AdminProductFormScreen()),
+          ),
           GoRoute(
             path: '/admin/produto/:id',
-            builder: (_, state) => AdminProductFormScreen(
-              key: ValueKey(state.pathParameters['id']),
-              productId: state.pathParameters['id'],
+            builder: (_, state) => ShellPage(
+              child: AdminProductFormScreen(
+                key: ValueKey(state.pathParameters['id']),
+                productId: state.pathParameters['id'],
+              ),
             ),
           ),
         ],

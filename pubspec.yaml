@@ -29,10 +29,6 @@ dependencies:
   # Upload de imagens de produtos (admin) - Android, iOS e Web
   image_picker: ^1.1.2
 
-  # Login com Apple (usado somente no iOS) + nonce
-  sign_in_with_apple: ^6.1.4
-  crypto: ^3.0.6
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -41,8 +37,18 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Logos (NiceB.PSD.png / NiceP.PSD.png) ficam na raiz de assets/
-  # Banners gerados ficam em assets/banners/
+  # Logos e banners prontos. Lista explícita: as imagens "*_inspiracao_*" e
+  # "*_nao_usar_*" são só referência de design e NÃO entram no app.
   assets:
-    - assets/
-    - assets/banners/
+    - assets/NiceB.PSD.png
+    - assets/NiceP.PSD.png
+    - assets/fundo_tela_login_e_cadastro.png
+    - assets/web_carrosel_topo_home1_colocar_hyperlink.png
+    - assets/web_carrosel_topo_home2_colocar_hyperlink.png
+    - assets/sobre_nos_embaixo_carrosel_do_topo_home_colocar_hyperlink.png
+    - assets/web_topo_categorias_colocar_hyperlink.png
+    - assets/web_acima_do_footer_categorias_colocar_hyperlink.png
+    - assets/web_topo_novidades_colocar_hyperlink.png
+    - assets/web_topo_sobrenos.png
+    - assets/web_embaixo_topo_sobrenos.png
+    - assets/web_acima_footer_sobrenos.png

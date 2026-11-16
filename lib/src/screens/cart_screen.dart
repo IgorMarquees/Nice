@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../config/app_config.dart';
 import '../controllers/cart_controller.dart';
 import '../models/cart_item.dart';
+import '../models/order.dart';
 import '../theme/nice_theme.dart';
 import '../utils/formatters.dart';
 import '../widgets/nice_network_image.dart';
@@ -74,6 +76,9 @@ class _OrderSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final cart = context.watch<CartController>();
     final text = Theme.of(context).textTheme;
+    final totals = OrderTotals.calculate(cart.total, PaymentMethod.card);
+    final pix = OrderTotals.calculate(cart.total, PaymentMethod.pix);
+    final missing = AppConfig.freeShippingThreshold - cart.total;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -89,18 +94,50 @@ class _OrderSummary extends StatelessWidget {
           const SizedBox(height: 20),
           Row(
             children: [
-              Text('Itens (${cart.itemCount})', style: text.bodyMedium),
-              const Spacer(),
+              Expanded(child: Text('Itens (${cart.itemCount})', style: text.bodyMedium)),
+              const SizedBox(width: 12),
               Text(formatCurrency(cart.total), style: text.bodyMedium),
             ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(child: Text('Frete', style: text.bodyMedium)),
+              const SizedBox(width: 12),
+              Text(
+                totals.freeShipping ? 'Grátis' : formatCurrency(totals.shipping),
+                style: text.bodyMedium?.copyWith(color: totals.freeShipping ? NiceTheme.success : null),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            missing > 0
+                ? 'Faltam ${formatCurrency(missing)} para ganhar frete grátis.'
+                : 'Você ganhou frete grátis!',
+            style: text.bodySmall,
+          ),
+          const SizedBox(height: 6),
+          LinearProgressIndicator(
+            value: (cart.total / AppConfig.freeShippingThreshold).clamp(0, 1).toDouble(),
+            backgroundColor: NiceTheme.softGray,
+            minHeight: 4,
           ),
           const Divider(height: 32),
           Row(
             children: [
-              Text('Total', style: text.titleLarge),
-              const Spacer(),
-              Text(formatCurrency(cart.total), style: text.headlineSmall?.copyWith(color: NiceTheme.red)),
+              Expanded(child: Text('Total', style: text.titleLarge)),
+              const SizedBox(width: 12),
+              Text(formatCurrency(totals.total), style: text.headlineSmall?.copyWith(color: NiceTheme.red)),
             ],
+          ),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              'ou ${formatCurrency(pix.total)} no Pix (5% de desconto)',
+              style: text.bodySmall?.copyWith(color: NiceTheme.success),
+            ),
           ),
           const SizedBox(height: 20),
           FilledButton.icon(

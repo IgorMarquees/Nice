@@ -27,7 +27,7 @@ class CartItem {
       productId: product.id,
       title: product.title,
       imageUrl: product.imageUrl,
-      unitPrice: product.price,
+      unitPrice: product.finalPrice,
       size: size,
       quantity: quantity,
     );

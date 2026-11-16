@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../controllers/address_controller.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/order_controller.dart';
 import '../models/order.dart';
 import '../theme/nice_theme.dart';
-import '../utils/formatters.dart';
+import '../widgets/address_form.dart';
+import '../widgets/order_card.dart';
 import '../widgets/responsive.dart';
 import '../widgets/state_views.dart';
 
@@ -86,6 +88,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
             const SizedBox(height: 36),
+            _AddressesSection(recipient: user.name),
+            const SizedBox(height: 36),
             Text('MEUS PEDIDOS', style: text.headlineSmall),
             const SizedBox(height: 16),
             if (orders.loading)
@@ -99,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               )
             else
               for (final order in orders.orders) ...[
-                _OrderCard(order: order),
+                OrderCard(order: order),
                 const SizedBox(height: 14),
               ],
             const SizedBox(height: 24),
@@ -116,54 +120,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-class _OrderCard extends StatelessWidget {
-  const _OrderCard({required this.order});
+class _AddressesSection extends StatelessWidget {
+  const _AddressesSection({required this.recipient});
 
-  final Order order;
+  final String recipient;
+
+  Future<void> _delete(BuildContext context, SavedAddress address) async {
+    final controller = context.read<AddressController>();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Excluir endereço'),
+        content: Text('Deseja excluir "${address.title}"?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Excluir')),
+        ],
+      ),
+    );
+    if (confirmed == true) await controller.delete(address);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final addresses = context.watch<AddressController>();
     final text = Theme.of(context).textTheme;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(NiceTheme.radius),
-        border: Border.all(color: NiceTheme.softGray, width: 1.5),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text('Pedido #${order.shortId} · ${formatDate(order.createdAt)}', style: text.titleSmall),
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(child: Text('MEUS ENDEREÇOS', style: text.headlineSmall)),
+            TextButton.icon(
+              onPressed: () => showAddressDialog(context, recipient: recipient),
+              icon: const Icon(Icons.add_location_alt_outlined, size: 18),
+              label: const Text('Adicionar'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (addresses.loading && addresses.items.isEmpty)
+          const LinearProgressIndicator()
+        else if (addresses.items.isEmpty)
+          Text(
+            'Nenhum endereço salvo. Salve um endereço para preencher a entrega automaticamente na finalização da compra.',
+            style: text.bodySmall,
+          )
+        else
+          for (final address in addresses.items) ...[
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 12, 4, 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(NiceTheme.radius),
+                border: Border.all(color: NiceTheme.softGray, width: 1.5),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                color: NiceTheme.red,
-                child: Text(order.statusLabel.toUpperCase(), style: text.labelSmall?.copyWith(color: NiceTheme.white)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          for (final item in order.items)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(
-                '${item.quantity}x ${item.title}${item.size.isEmpty ? '' : ' (${item.size})'}',
-                style: text.bodyMedium,
+              child: Row(
+                children: [
+                  const Icon(Icons.location_on_outlined, color: NiceTheme.red),
+                  const SizedBox(width: 12),
+                  Expanded(child: AddressSummary(address: address.address, title: address.title)),
+                  IconButton(
+                    tooltip: 'Editar',
+                    icon: const Icon(Icons.edit_outlined),
+                    onPressed: () => showAddressDialog(context, initial: address),
+                  ),
+                  IconButton(
+                    tooltip: 'Excluir',
+                    icon: const Icon(Icons.delete_outline),
+                    onPressed: () => _delete(context, address),
+                  ),
+                ],
               ),
             ),
-          const Divider(height: 24),
-          Row(
-            children: [
-              Text(order.paymentMethod.label, style: text.bodySmall),
-              const Spacer(),
-              Text(formatCurrency(order.total), style: text.titleSmall),
-            ],
-          ),
-        ],
-      ),
+            const SizedBox(height: 10),
+          ],
+      ],
     );
   }
 }

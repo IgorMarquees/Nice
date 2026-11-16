@@ -55,9 +55,27 @@ class CatalogController extends ChangeNotifier {
     return flagged.isNotEmpty ? flagged : _fallback.where((p) => p.isNew).toList();
   }
 
+  /// Tamanhos padrão + tamanhos personalizados cadastrados pelo admin.
+  List<String> get availableSizes {
+    final custom = <String>{
+      for (final p in _base)
+        for (final s in p.sizes)
+          if (!sizes.contains(s)) s,
+    };
+    return [...sizes, ...custom];
+  }
+
+  /// Foto de capa da categoria: primeira foto de um produto dela.
+  String coverFor(String category) {
+    for (final p in [..._base, ..._fallback]) {
+      if (p.category == category && p.imageUrl.isNotEmpty) return p.imageUrl;
+    }
+    return '';
+  }
+
   double get highestPrice {
     if (_base.isEmpty) return 500;
-    final max = _base.map((p) => p.price).reduce((a, b) => a > b ? a : b);
+    final max = _base.map((p) => p.finalPrice).reduce((a, b) => a > b ? a : b);
     return (max / 50).ceil() * 50.0;
   }
 
@@ -71,15 +89,15 @@ class CatalogController extends ChangeNotifier {
           p.title.toLowerCase().contains(q) ||
           p.description.toLowerCase().contains(q);
       final matchesSize = _size == null || p.sizes.contains(_size);
-      final matchesPrice = p.price <= maxPrice;
+      final matchesPrice = p.finalPrice <= maxPrice;
       return matchesCategory && matchesQuery && matchesSize && matchesPrice;
     }).toList();
 
     switch (_sort) {
       case SortOption.priceAsc:
-        list.sort((a, b) => a.price.compareTo(b.price));
+        list.sort((a, b) => a.finalPrice.compareTo(b.finalPrice));
       case SortOption.priceDesc:
-        list.sort((a, b) => b.price.compareTo(a.price));
+        list.sort((a, b) => b.finalPrice.compareTo(a.finalPrice));
       case SortOption.name:
         list.sort((a, b) => a.title.compareTo(b.title));
       case SortOption.newest:
@@ -88,8 +106,17 @@ class CatalogController extends ChangeNotifier {
     return list;
   }
 
-  Future<void> load({bool force = false}) async {
-    if (_loading || (_loaded && !force)) return;
+  Future<void>? _inFlight;
+
+  /// Carrega os produtos. Se já houver um carregamento em andamento,
+  /// devolve o mesmo Future (quem abre /produto/:id direto espera os dados).
+  Future<void> load({bool force = false}) {
+    if (_inFlight != null) return _inFlight!;
+    if (_loaded && !force) return Future.value();
+    return _inFlight = _load().whenComplete(() => _inFlight = null);
+  }
+
+  Future<void> _load() async {
     _loading = true;
     notifyListeners();
 

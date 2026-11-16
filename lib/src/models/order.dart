@@ -1,4 +1,11 @@
+import '../config/app_config.dart';
 import 'cart_item.dart';
+
+/// Siglas das 27 unidades federativas (UF obrigatória da lista).
+const brazilianStates = [
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA',
+  'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
+];
 
 class ShippingAddress {
   const ShippingAddress({
@@ -20,6 +27,8 @@ class ShippingAddress {
   final String neighborhood;
   final String city;
   final String state;
+
+  bool get isEmpty => street.isEmpty && city.isEmpty && zip.isEmpty;
 
   String get oneLine {
     final comp = complement.isEmpty ? '' : ' - $complement';
@@ -49,6 +58,31 @@ class ShippingAddress {
       );
 }
 
+/// Endereço salvo no perfil (tabela `addresses`).
+class SavedAddress {
+  const SavedAddress({required this.id, required this.label, required this.address});
+
+  /// Vazio = ainda não gravado.
+  final String id;
+  final String label;
+  final ShippingAddress address;
+
+  String get title => label.isEmpty ? 'Endereço' : label;
+
+  Map<String, dynamic> toRow(String userId) => {
+        if (id.isNotEmpty) 'id': id,
+        'user_id': userId,
+        'label': label,
+        ...address.toMap(),
+      };
+
+  factory SavedAddress.fromMap(Map<String, dynamic> map) => SavedAddress(
+        id: map['id'].toString(),
+        label: (map['label'] as String?) ?? '',
+        address: ShippingAddress.fromMap(map),
+      );
+}
+
 enum PaymentMethod {
   pix('pix', 'Pix'),
   card('card', 'Cartão de crédito'),
@@ -62,6 +96,26 @@ enum PaymentMethod {
       values.firstWhere((m) => m.code == code, orElse: () => PaymentMethod.pix);
 }
 
+/// Valores do pedido: produtos, desconto do Pix, frete e total.
+class OrderTotals {
+  const OrderTotals({required this.subtotal, required this.discount, required this.shipping});
+
+  factory OrderTotals.calculate(double subtotal, PaymentMethod method) {
+    final discount = method == PaymentMethod.pix ? _round(subtotal * AppConfig.pixDiscount) : 0.0;
+    final shipping = subtotal >= AppConfig.freeShippingThreshold || subtotal == 0 ? 0.0 : AppConfig.flatShipping;
+    return OrderTotals(subtotal: subtotal, discount: discount, shipping: shipping);
+  }
+
+  final double subtotal;
+  final double discount;
+  final double shipping;
+
+  double get total => _round(subtotal - discount + shipping);
+  bool get freeShipping => shipping == 0;
+
+  static double _round(double value) => (value * 100).roundToDouble() / 100;
+}
+
 class Order {
   const Order({
     required this.id,
@@ -70,12 +124,20 @@ class Order {
     required this.paymentMethod,
     required this.items,
     required this.address,
+    this.userId = '',
+    this.subtotal,
+    this.discount = 0,
+    this.shipping = 0,
     this.createdAt,
   });
 
   final String id;
+  final String userId;
   final String status;
   final double total;
+  final double? subtotal;
+  final double discount;
+  final double shipping;
   final PaymentMethod paymentMethod;
   final List<CartItem> items;
   final ShippingAddress address;
@@ -102,8 +164,12 @@ class Order {
     final rawItems = (map['items'] as List?) ?? const [];
     return Order(
       id: map['id'].toString(),
+      userId: map['user_id']?.toString() ?? '',
       status: (map['status'] as String?) ?? 'created',
       total: (map['total'] as num).toDouble(),
+      subtotal: (map['subtotal'] as num?)?.toDouble(),
+      discount: (map['discount'] as num?)?.toDouble() ?? 0,
+      shipping: (map['shipping'] as num?)?.toDouble() ?? 0,
       paymentMethod: PaymentMethod.fromCode(map['payment_method'] as String?),
       items: [
         for (final item in rawItems) CartItem.fromMap(Map<String, dynamic>.from(item as Map)),

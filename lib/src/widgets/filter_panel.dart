@@ -40,7 +40,7 @@ class FilterPanel extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final size in CatalogController.sizes)
+            for (final size in catalog.availableSizes)
               ChoiceChip(
                 label: Text(size),
                 selected: catalog.selectedSize == size,

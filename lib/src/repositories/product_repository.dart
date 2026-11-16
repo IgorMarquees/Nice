@@ -9,34 +9,47 @@ class ProductRepository {
 
   SupabaseQueryBuilder get _table => _client.from('products');
 
+  /// Leitura pública: a coluna `stock` não é exposta (só `in_stock`).
   Future<List<Product>> fetchAll() async {
-    final rows = await _table.select().order('created_at', ascending: false);
+    final rows = await _table.select(Product.publicColumns).order('created_at', ascending: false);
     return rows.map<Product>((row) => Product.fromMap(row)).toList();
   }
 
   Future<Product?> fetchById(String id) async {
-    final row = await _table.select().eq('id', id).maybeSingle();
+    final row = await _table.select(Product.publicColumns).eq('id', id).maybeSingle();
     return row == null ? null : Product.fromMap(row);
   }
 
+  /// Quantidades em estoque (função `admin_product_stock`, só para admin).
+  Future<Map<String, int>> fetchStock() async {
+    final rows = await _client.rpc('admin_product_stock') as List;
+    return {
+      for (final row in rows.cast<Map>()) row['id'].toString(): (row['stock'] as num).toInt(),
+    };
+  }
+
+  /// Produtos com estoque preenchido (painel admin).
+  Future<List<Product>> fetchAllForAdmin() async {
+    final products = await fetchAll();
+    final stock = await fetchStock();
+    return [for (final p in products) p.copyWith(stock: stock[p.id] ?? 0)];
+  }
+
   /// Insere (id vazio) ou atualiza. RLS só permite para administradores.
-  Future<Product> save(Product product) async {
+  Future<void> save(Product product) async {
     if (product.id.isEmpty) {
-      final row = await _table.insert(product.toMap()).select().single();
-      return Product.fromMap(row);
+      await _table.insert(product.toMap());
+      return;
     }
-    final row = await _table
+    await _table
         .update({...product.toMap(), 'updated_at': DateTime.now().toUtc().toIso8601String()})
-        .eq('id', product.id)
-        .select()
-        .single();
-    return Product.fromMap(row);
+        .eq('id', product.id);
   }
 
   Future<void> setFlags(String id, {bool? isFeatured, bool? isNew}) async {
     await _table.update({
-      if (isFeatured != null) 'is_featured': isFeatured,
-      if (isNew != null) 'is_new': isNew,
+      'is_featured': ?isFeatured,
+      'is_new': ?isNew,
     }).eq('id', id);
   }
 
