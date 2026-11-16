@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/cart_controller.dart';
 import '../theme/nice_theme.dart';
+import '../utils/navigation.dart';
 import 'nice_logo.dart';
 import 'responsive.dart';
 
@@ -17,17 +18,15 @@ class NavDestination {
 const webDestinations = [
   NavDestination('Home', '/'),
   NavDestination('Novidades', '/novidades'),
-  NavDestination('Categorias', '/catalogo'),
+  NavDestination('Catálogo', '/catalogo'),
   NavDestination('Sobre nós', '/sobre'),
 ];
 
 bool _isActive(String location, String path) =>
     path == '/' ? location == '/' : location.startsWith(path);
 
-void _search(BuildContext context, String value) {
-  final query = value.trim();
-  context.go(query.isEmpty ? '/catalogo' : '/catalogo?busca=${Uri.encodeQueryComponent(query)}');
-}
+/// Toda busca abre o Catálogo já rolado até os produtos.
+void _search(BuildContext context, String value) => context.searchCatalog(value);
 
 /// Cabeçalho do site: logo, menu horizontal, busca, carrinho e conta.
 ///
@@ -87,7 +86,7 @@ class WebNavbar extends StatelessWidget {
                   const Spacer(),
                   IconButton(
                     tooltip: 'Buscar',
-                    onPressed: () => context.go('/catalogo'),
+                    onPressed: () => context.searchCatalog(''),
                     icon: const Icon(Icons.search),
                   ),
                 ],

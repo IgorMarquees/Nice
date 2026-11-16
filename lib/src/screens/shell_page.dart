@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/responsive.dart';
 import '../widgets/web_footer.dart';
 import 'web_shell.dart';
 
@@ -23,20 +24,23 @@ class ShellPage extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: constraints.maxHeight),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (web)
-                ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight * 0.6),
-                  child: child,
-                )
-              else
-                child,
-              if (web) const WebFooter(),
-            ],
+        child: PageViewport(
+          height: constraints.maxHeight,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (web)
+                  ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight * 0.6),
+                    child: child,
+                  )
+                else
+                  child,
+                if (web) const WebFooter(),
+              ],
+            ),
           ),
         ),
       ),

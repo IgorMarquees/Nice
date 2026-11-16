@@ -50,7 +50,7 @@ class ProductCard extends StatelessWidget {
                     if (badge != null)
                       Positioned(left: 8, top: 8, child: TagBadge(label: badge, dark: !product.inStock)),
                     if (product.hasDiscount)
-                      Positioned(right: 8, top: 8, child: DiscountBadge(percent: product.discountPercent)),
+                      Positioned(right: 8, top: 8, child: DiscountBadge(percent: product.activeDiscountPercent)),
                     Positioned(
                       right: 8,
                       bottom: 8,

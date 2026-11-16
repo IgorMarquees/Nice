@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../config/assets.dart';
 import '../widgets/banner_image.dart';
 import '../widgets/responsive.dart';
+import '../widgets/social_links.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -36,9 +38,12 @@ class AboutScreen extends StatelessWidget {
       children: [
         const BannerImage(
           asset: NiceAssets.aboutTop,
+          fitViewport: true,
           aspectRatio: 2880 / 1000,
           label: 'Mais que roupa. Uma identidade.',
         ),
+        // Espaço entre os dois banners (não ficam colados).
+        SizedBox(height: desktop ? 56 : 24),
         const BannerImage(asset: NiceAssets.aboutStrip, aspectRatio: 2624 / 874),
         SizedBox(height: desktop ? 88 : 40),
         ContentWrapper(
@@ -56,12 +61,18 @@ class AboutScreen extends StatelessWidget {
                   children: [headline, const SizedBox(height: 20), body],
                 ),
         ),
+        // No app (sem rodapé de site), as redes sociais aparecem aqui.
+        if (!kIsWeb) ...[
+          const SizedBox(height: 32),
+          ContentWrapper(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [Text('SIGA A NICE', style: text.labelMedium), const SocialLinks()],
+            ),
+          ),
+        ],
         SizedBox(height: desktop ? 88 : 40),
-        const BannerImage(
-          asset: NiceAssets.aboutCta,
-          aspectRatio: 2624 / 732,
-          label: 'Não vista apenas. Expresse.',
-        ),
+        const BannerImage(asset: NiceAssets.aboutCta, aspectRatio: 2624 / 732, label: 'Não vista apenas. Expresse.'),
       ],
     );
   }

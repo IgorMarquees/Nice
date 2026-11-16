@@ -166,9 +166,11 @@ class _AdminTile extends StatelessWidget {
         Text(
           [
             product.category,
-            product.hasDiscount
-                ? '${formatCurrency(product.finalPrice)} (-${product.discountPercent}%)'
-                : formatCurrency(product.price),
+            switch (product.discountStatus) {
+              DiscountStatus.active => '${formatCurrency(product.finalPrice)} (-${product.discountPercent}%)',
+              DiscountStatus.scheduled => '${formatCurrency(product.price)} (-${product.discountPercent}% agendado)',
+              _ => formatCurrency(product.price),
+            },
             'estoque ${product.stock ?? 0}',
           ].join(' · '),
           style: text.bodySmall,

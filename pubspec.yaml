@@ -11,6 +11,9 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
+  # Textos do Material (calendário, relógio...) em português
+  flutter_localizations:
+    sdk: flutter
   cupertino_icons: ^1.0.8
 
   # Backend (Auth + Postgres + Storage) - Android, iOS e Web
@@ -28,6 +31,9 @@ dependencies:
 
   # Upload de imagens de produtos (admin) - Android, iOS e Web
   image_picker: ^1.1.2
+
+  # Ícones de redes sociais (Instagram, TikTok...) - Android, iOS e Web
+  font_awesome_flutter: ^11.0.0
 
 dev_dependencies:
   flutter_test:
@@ -49,6 +55,7 @@ flutter:
     - assets/web_topo_categorias_colocar_hyperlink.png
     - assets/web_acima_do_footer_categorias_colocar_hyperlink.png
     - assets/web_topo_novidades_colocar_hyperlink.png
+    - assets/web_novidades_em_cima_footer_destaque_imagem.png
     - assets/web_topo_sobrenos.png
     - assets/web_embaixo_topo_sobrenos.png
     - assets/web_acima_footer_sobrenos.png

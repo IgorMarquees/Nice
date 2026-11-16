@@ -16,4 +16,21 @@ extension NiceNavigation on BuildContext {
   }
 
   void goBackOr(String fallback) => canPop() ? pop() : go(fallback);
+
+  /// Busca: sempre vai para o Catálogo e rola até a área dos produtos.
+  void searchCatalog(String value) => go(catalogPath(query: value, toProducts: true));
+}
+
+/// Parâmetro que pede para o Catálogo rolar até a área de produtos.
+const catalogProductsSection = 'produtos';
+
+/// URL do Catálogo (`/catalogo?busca=&categoria=&secao=produtos`).
+String catalogPath({String? query, String? category, bool toProducts = false}) {
+  final q = query?.trim() ?? '';
+  final params = {
+    if (q.isNotEmpty) 'busca': q,
+    if (category != null && category.isNotEmpty) 'categoria': category,
+    if (toProducts) 'secao': catalogProductsSection,
+  };
+  return Uri(path: '/catalogo', queryParameters: params.isEmpty ? null : params).toString();
 }

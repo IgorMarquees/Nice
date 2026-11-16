@@ -22,6 +22,13 @@ class CepInputFormatter extends TextInputFormatter {
   }
 }
 
+/// 25/12/2026 às 18:30
+String formatDateTime(DateTime? date) {
+  if (date == null) return '';
+  String two(int n) => n.toString().padLeft(2, '0');
+  return '${formatDate(date)} às ${two(date.hour)}:${two(date.minute)}';
+}
+
 String formatDate(DateTime? date) {
   if (date == null) return '';
   String two(int n) => n.toString().padLeft(2, '0');

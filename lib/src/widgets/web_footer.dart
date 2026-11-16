@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../theme/nice_theme.dart';
 import 'responsive.dart';
+import 'social_links.dart';
 
 /// Rodapé do site: faixa vermelha, slogan, colunas de links e barra inferior.
 class WebFooter extends StatelessWidget {
@@ -64,7 +65,7 @@ class WebFooter extends StatelessWidget {
       children: [
         _FooterColumn(title: 'EXPLORE', links: [
           _FooterLinkData('Novidades', '/novidades'),
-          _FooterLinkData('Categorias', '/catalogo'),
+          _FooterLinkData('Catálogo', '/catalogo'),
           _FooterLinkData('Carrinho', '/carrinho'),
           _FooterLinkData('Minha conta', '/perfil'),
         ]),
@@ -77,7 +78,7 @@ class WebFooter extends StatelessWidget {
       ],
     );
 
-    final bottomBar = Row(
+    final slogan = Row(
       children: [
         Flexible(child: Text('STREETWEAR WITHOUT LIMITS.', style: NiceTheme.spaced())),
         const SizedBox(width: 24),
@@ -85,6 +86,19 @@ class WebFooter extends StatelessWidget {
         Container(width: desktop ? 128 : 48, height: 3, color: NiceTheme.brightRed),
       ],
     );
+    // Redes sociais + slogan (no celular/tablet, um embaixo do outro).
+    final bottomBar = desktop
+        ? Row(
+            children: [
+              const SocialLinks(light: true),
+              Container(width: 1, height: 40, margin: const EdgeInsets.symmetric(horizontal: 28), color: NiceTheme.footerLine),
+              Expanded(child: slogan),
+            ],
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [const SocialLinks(light: true), const SizedBox(height: 16), slogan],
+          );
 
     return Container(
       width: double.infinity,

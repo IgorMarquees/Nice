@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -35,6 +36,10 @@ class _NiceAppState extends State<NiceApp> {
       title: 'NICE Streetwear',
       theme: NiceTheme.light(),
       routerConfig: _router,
+      // Calendário/relógio dos descontos e demais textos do Material em português.
+      locale: const Locale('pt', 'BR'),
+      supportedLocales: const [Locale('pt', 'BR')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
     );
   }
 }

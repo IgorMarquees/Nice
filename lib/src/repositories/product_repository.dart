@@ -53,6 +53,18 @@ class ProductRepository {
     }).eq('id', id);
   }
 
+  /// Aplica o mesmo desconto (e período) a vários produtos de uma vez.
+  /// [percent] 0 remove o desconto.
+  Future<void> setDiscount(List<String> ids, {required int percent, DateTime? startsAt, DateTime? endsAt}) async {
+    if (ids.isEmpty) return;
+    await _table.update({
+      'discount_percent': percent,
+      'discount_starts_at': percent == 0 ? null : startsAt?.toUtc().toIso8601String(),
+      'discount_ends_at': percent == 0 ? null : endsAt?.toUtc().toIso8601String(),
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    }).inFilter('id', ids);
+  }
+
   Future<void> delete(String id) async {
     await _table.delete().eq('id', id);
   }

@@ -6,11 +6,13 @@ import 'package:provider/provider.dart';
 import '../config/assets.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/catalog_controller.dart';
+import '../models/product.dart';
 import '../theme/nice_theme.dart';
+import '../utils/navigation.dart';
 import '../widgets/banner_carousel.dart';
 import '../widgets/banner_image.dart';
 import '../widgets/category_section.dart';
-import '../widgets/product_carousel.dart';
+import '../widgets/product_card.dart';
 import '../widgets/product_grid.dart';
 import '../widgets/responsive.dart';
 import '../widgets/section_header.dart';
@@ -39,8 +41,8 @@ class HomeScreen extends StatelessWidget {
     final catalog = context.watch<CatalogController>();
     final desktop = context.isDesktop;
     final compact = context.isCompact;
-    final featured = catalog.featured.take(desktop ? 6 : 4).toList();
-    final arrivals = catalog.newArrivals.take(9).toList();
+    // Só uma linha (3 peças): o restante fica no "Ver mais".
+    final featured = catalog.featured.take(3).toList();
     final gap = SizedBox(height: desktop ? 88 : 40);
 
     return Column(
@@ -67,28 +69,16 @@ class HomeScreen extends StatelessWidget {
               SectionHeader(
                 eyebrow: 'Destaques',
                 title: 'Escolhas do momento',
-                onAction: () => context.go('/catalogo'),
+                actionLabel: 'Ver mais',
+                onAction: () => context.go(catalogPath(toProducts: true)),
               ),
               SizedBox(height: desktop ? 40 : 24),
               if (catalog.loading && featured.isEmpty)
                 const LoadingView()
+              else if (compact)
+                _FeaturedStrip(products: featured)
               else
-                ProductGrid(products: featured, maxColumns: 3),
-            ],
-          ),
-        ),
-        gap,
-        ContentWrapper(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SectionHeader(
-                eyebrow: 'Novidades',
-                title: 'Acabou de chegar',
-                onAction: () => context.go('/novidades'),
-              ),
-              SizedBox(height: desktop ? 40 : 24),
-              ProductCarousel(products: arrivals),
+                ProductRow(products: featured, columns: 3, gap: 24),
             ],
           ),
         ),
@@ -143,6 +133,30 @@ class _CategoriesBand extends StatelessWidget {
   }
 }
 
+/// Celular: as 3 peças em uma linha que rola para o lado (cards legíveis).
+class _FeaturedStrip extends StatelessWidget {
+  const _FeaturedStrip({required this.products});
+
+  final List<Product> products;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < products.length; i++) ...[
+            if (i > 0) const SizedBox(width: 14),
+            SizedBox(width: 170, child: ProductCard(product: products[i])),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _MobileGreeting extends StatelessWidget {
   const _MobileGreeting();
 
@@ -162,8 +176,7 @@ class _MobileGreeting extends StatelessWidget {
           TextField(
             textInputAction: TextInputAction.search,
             onSubmitted: (value) {
-              final query = value.trim();
-              context.go(query.isEmpty ? '/catalogo' : '/catalogo?busca=${Uri.encodeQueryComponent(query)}');
+              context.searchCatalog(value);
             },
             decoration: const InputDecoration(
               hintText: 'Encontre seu drip...',

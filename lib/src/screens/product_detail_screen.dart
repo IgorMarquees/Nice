@@ -62,10 +62,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
   }
 
+  /// Clicar na cor selecionada desmarca e volta a mostrar todas as fotos.
   void _selectColor(String color) {
     setState(() {
-      _color = color;
-      _imageIndex = 0; // a foto grande passa a ser a primeira da cor
+      _color = _color == color ? null : color;
+      _imageIndex = 0; // a foto grande passa a ser a primeira da cor (ou do produto)
     });
   }
 
@@ -103,7 +104,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       // Ao escolher uma cor, a galeria mostra as fotos dessa cor.
       images: product.imagesFor(_color),
       index: _imageIndex,
-      discountPercent: product.discountPercent,
+      discountPercent: product.activeDiscountPercent,
       onSelect: (i) => setState(() => _imageIndex = i),
     );
     final info = _buildInfo(context, product);
@@ -111,9 +112,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final crumbs = Breadcrumbs(
       items: [
         const Crumb('Home', '/'),
-        const Crumb('Categorias', '/catalogo'),
+        const Crumb('Catálogo', '/catalogo'),
         if (product.category.isNotEmpty)
-          Crumb(product.category, '/catalogo?categoria=${Uri.encodeQueryComponent(product.category)}'),
+          Crumb(product.category, catalogPath(category: product.category, toProducts: true)),
         Crumb(product.title),
       ],
     );

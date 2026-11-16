@@ -6,9 +6,9 @@ import '../config/assets.dart';
 import '../controllers/catalog_controller.dart';
 import '../models/product.dart';
 import '../theme/nice_theme.dart';
+import '../utils/navigation.dart';
 import '../widgets/banner_image.dart';
 import '../widgets/nice_network_image.dart';
-import '../widgets/price_tag.dart';
 import '../widgets/product_carousel.dart';
 import '../widgets/responsive.dart';
 import '../widgets/section_header.dart';
@@ -29,9 +29,10 @@ class NewArrivalsScreen extends StatelessWidget {
       children: [
         BannerImage(
           asset: NiceAssets.newArrivalsTop,
+          fitViewport: true,
           aspectRatio: 2876 / 1472,
           label: 'Just dropped. Ver todos os lançamentos',
-          onTap: () => context.go('/catalogo'),
+          onTap: () => context.go(catalogPath(toProducts: true)),
         ),
         SizedBox(height: desktop ? 72 : 32),
         ContentWrapper(
@@ -49,11 +50,15 @@ class NewArrivalsScreen extends StatelessWidget {
             ],
           ),
         ),
-        if (spotlight != null) ...[
-          SizedBox(height: desktop ? 72 : 36),
-          _Spotlight(product: spotlight),
-        ],
-        const SizedBox(height: 48),
+        if (spotlight != null) ...[SizedBox(height: desktop ? 72 : 36), _Spotlight(product: spotlight)],
+        SizedBox(height: desktop ? 88 : 48),
+        // Acima do rodapé: "Todas as peças. Um só estilo." → produtos do Catálogo.
+        BannerImage(
+          asset: NiceAssets.catalogCta,
+          aspectRatio: 2880 / 960,
+          label: 'Todas as peças. Um só estilo. Ver todos os produtos',
+          onTap: () => context.go(catalogPath(toProducts: true)),
+        ),
       ],
     );
   }
@@ -64,10 +69,15 @@ class _Spotlight extends StatelessWidget {
 
   final Product product;
 
+  /// Bloco "Em destaque": retângulo cinza-claro com a foto editorial à
+  /// esquerda, texto no meio e, à direita, a foto do produto sobre um bloco
+  /// vermelho e o kanji 東京.
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final desktop = context.isDesktop;
+    final compact = context.isCompact;
+    void open() => context.push('/produto/${product.id}');
 
     final info = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,41 +85,97 @@ class _Spotlight extends StatelessWidget {
       children: [
         Text('EM DESTAQUE', style: text.labelMedium),
         const SizedBox(height: 10),
-        Text(product.title.toUpperCase(), style: desktop ? text.displaySmall : text.headlineMedium),
-        const SizedBox(height: 12),
-        Text(product.description, style: text.bodyLarge),
+        Text(product.title.toUpperCase(), style: NiceTheme.spotlightTitle(large: !compact)),
         const SizedBox(height: 16),
-        PriceTag(product: product, large: true),
-        const SizedBox(height: 24),
-        FilledButton.icon(
-          onPressed: () => context.push('/produto/${product.id}'),
-          icon: const Icon(Icons.arrow_outward, size: 18),
-          label: const Text('VER DETALHES'),
+        Text(product.description, style: text.bodyLarge),
+        const SizedBox(height: 28),
+        InkWell(
+          onTap: open,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('VER DETALHES', style: NiceTheme.spacedLink()),
+                const SizedBox(width: 18),
+                const Icon(Icons.arrow_outward, size: 20, color: NiceTheme.brightRed),
+              ],
+            ),
+          ),
         ),
       ],
     );
 
-    final image = AspectRatio(
-      aspectRatio: 1.3,
-      child: ColoredBox(
-        color: NiceTheme.softGray,
-        child: NiceNetworkImage(url: product.imageUrl),
+    const editorial = AspectRatio(
+      aspectRatio: 826 / 679,
+      child: Image(image: AssetImage(NiceAssets.newArrivalsSpotlight), fit: BoxFit.cover),
+    );
+
+    final productShot = AspectRatio(
+      aspectRatio: 0.82,
+      child: Stack(
+        children: [
+          // Bloco vermelho atrás da peça, deslocado para a direita.
+          const Positioned(right: 0, top: 24, bottom: 24, width: 96, child: ColoredBox(color: NiceTheme.brightRed)),
+          Positioned.fill(
+            right: 28,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: open,
+                child: NiceNetworkImage(url: product.imageUrl),
+              ),
+            ),
+          ),
+        ],
       ),
     );
 
+    final kanji = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 1, height: 56, color: NiceTheme.charcoal),
+        const SizedBox(height: 14),
+        Text('東', style: NiceTheme.kanji()),
+        Text('京', style: NiceTheme.kanji()),
+        const SizedBox(height: 14),
+        Container(width: 1, height: 56, color: NiceTheme.charcoal),
+      ],
+    );
+
+    final Widget content;
+    if (desktop) {
+      content = Row(
+        children: [
+          const Expanded(flex: 9, child: editorial),
+          const SizedBox(width: 40),
+          Expanded(flex: 7, child: info),
+          const SizedBox(width: 24),
+          Expanded(flex: 5, child: productShot),
+          SizedBox(width: 88, child: Center(child: kanji)),
+        ],
+      );
+    } else if (!compact) {
+      content = Row(
+        children: [
+          const Expanded(child: editorial),
+          Expanded(
+            child: Padding(padding: const EdgeInsets.all(32), child: info),
+          ),
+        ],
+      );
+    } else {
+      content = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          editorial,
+          Padding(padding: const EdgeInsets.all(24), child: info),
+        ],
+      );
+    }
+
     return ContentWrapper(
-      child: desktop
-          ? Row(
-              children: [
-                Expanded(child: info),
-                const SizedBox(width: 48),
-                Expanded(child: image),
-              ],
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [image, const SizedBox(height: 20), info],
-            ),
+      child: ColoredBox(color: NiceTheme.sectionGray, child: content),
     );
   }
 }

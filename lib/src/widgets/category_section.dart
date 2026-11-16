@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../controllers/catalog_controller.dart';
 import '../theme/nice_theme.dart';
+import '../utils/navigation.dart';
 import 'nice_network_image.dart';
 import 'responsive.dart';
 
@@ -14,29 +15,18 @@ const _categoryIcons = <String, IconData>{
   'Acessórios': Icons.watch_outlined,
 };
 
-void openCategory(BuildContext context, String category) =>
-    context.go('/catalogo?categoria=${Uri.encodeQueryComponent(category)}');
+void openCategory(BuildContext context, String category) => context.go(catalogPath(category: category));
 
-enum CategoryLayout {
-  /// Uma linha de cards (Home Web, "Explore por estilo").
-  row,
-
-  /// Grade 2x2 de blocos grandes (topo da página de Categorias).
-  grid,
-}
-
-/// Mobile: chips rápidos. Web/tablet: blocos com a foto de um produto da
-/// categoria (as capas vêm do catálogo, não são imagens geradas).
+/// Mobile: chips rápidos. Web/tablet: uma linha de blocos com a foto de um
+/// produto da categoria (as capas vêm do catálogo, não são imagens geradas).
 class CategorySection extends StatelessWidget {
-  const CategorySection({super.key, this.layout = CategoryLayout.row});
-
-  final CategoryLayout layout;
+  const CategorySection({super.key});
 
   @override
   Widget build(BuildContext context) {
     final names = CatalogController.categories.skip(1).toList();
 
-    if (context.isCompact && layout == CategoryLayout.row) {
+    if (context.isCompact) {
       return SizedBox(
         height: 44,
         child: ListView.separated(
@@ -53,9 +43,9 @@ class CategorySection extends StatelessWidget {
     }
 
     final catalog = context.watch<CatalogController>();
-    final columns = layout == CategoryLayout.grid ? (context.isCompact ? 1 : 2) : (context.isDesktop ? 4 : 2);
-    final ratio = layout == CategoryLayout.grid ? 1.8 : 1.35;
-    final large = layout == CategoryLayout.grid && !context.isCompact;
+    final columns = context.isDesktop ? 4 : 2;
+    const ratio = 1.35;
+    const large = false;
 
     final rows = <Widget>[];
     for (var start = 0; start < names.length; start += columns) {
@@ -69,11 +59,7 @@ class CategorySection extends StatelessWidget {
                 child: i < names.length
                     ? AspectRatio(
                         aspectRatio: ratio,
-                        child: _CategoryTile(
-                          name: names[i],
-                          cover: catalog.coverFor(names[i]),
-                          large: large,
-                        ),
+                        child: _CategoryTile(name: names[i], cover: catalog.coverFor(names[i]), large: large),
                       )
                     : const SizedBox.shrink(),
               ),

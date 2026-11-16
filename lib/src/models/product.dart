@@ -18,6 +18,17 @@ class ColorVariant {
       );
 }
 
+/// Situação do desconto de um produto num instante.
+enum DiscountStatus {
+  none('Sem desconto'),
+  scheduled('Agendado'),
+  active('Ativo'),
+  expired('Encerrado');
+
+  const DiscountStatus(this.label);
+  final String label;
+}
+
 class Product {
   const Product({
     required this.id,
@@ -32,6 +43,8 @@ class Product {
     this.stock,
     this.available = true,
     this.discountPercent = 0,
+    this.discountStartsAt,
+    this.discountEndsAt,
     this.isFeatured = false,
     this.isNew = false,
     this.createdAt,
@@ -59,8 +72,11 @@ class Product {
   /// Coluna gerada `in_stock` (stock > 0), pública.
   final bool available;
 
-  /// 0 = sem desconto.
+  /// Percentual configurado pelo admin (0 = sem desconto).
+  /// Só vale entre [discountStartsAt] e [discountEndsAt] (null = sem limite).
   final int discountPercent;
+  final DateTime? discountStartsAt;
+  final DateTime? discountEndsAt;
   final bool isFeatured;
   final bool isNew;
   final DateTime? createdAt;
@@ -93,10 +109,23 @@ class Product {
     return allImages;
   }
 
-  bool get hasDiscount => discountPercent > 0;
+  DiscountStatus discountStatusAt(DateTime now) {
+    if (discountPercent <= 0) return DiscountStatus.none;
+    if (discountStartsAt != null && now.isBefore(discountStartsAt!)) return DiscountStatus.scheduled;
+    if (discountEndsAt != null && !now.isBefore(discountEndsAt!)) return DiscountStatus.expired;
+    return DiscountStatus.active;
+  }
 
-  /// Preço que o cliente paga (já com a promoção).
-  double get finalPrice => _round(price * (100 - discountPercent) / 100);
+  DiscountStatus get discountStatus => discountStatusAt(DateTime.now());
+
+  /// O desconto está valendo agora?
+  bool get hasDiscount => discountStatus == DiscountStatus.active;
+
+  /// Percentual em vigor agora (0 fora do período).
+  int get activeDiscountPercent => hasDiscount ? discountPercent : 0;
+
+  /// Preço que o cliente paga (já com a promoção, se estiver no período).
+  double get finalPrice => _round(price * (100 - activeDiscountPercent) / 100);
 
   /// Preço no Pix (5% sobre o preço final).
   double get pixPrice => _round(finalPrice * (1 - AppConfig.pixDiscount));
@@ -130,6 +159,8 @@ class Product {
       stock: stock ?? this.stock,
       available: stock == null ? available : stock > 0,
       discountPercent: discountPercent ?? this.discountPercent,
+      discountStartsAt: discountStartsAt,
+      discountEndsAt: discountEndsAt,
       isFeatured: isFeatured ?? this.isFeatured,
       isNew: isNew ?? this.isNew,
       createdAt: createdAt,
@@ -138,7 +169,8 @@ class Product {
 
   /// Colunas públicas de `products` (sem `stock`, que é só do admin).
   static const publicColumns =
-      'id,title,description,technical_details,price,discount_percent,category,images,colors,'
+      'id,title,description,technical_details,price,discount_percent,discount_starts_at,discount_ends_at,'
+      'category,images,colors,'
       'color_variants,sizes,in_stock,is_featured,is_new,created_at,updated_at';
 
   factory Product.fromMap(Map<String, dynamic> map) {
@@ -151,6 +183,8 @@ class Product {
       technicalDetails: (map['technical_details'] as String?) ?? '',
       price: (map['price'] as num?)?.toDouble() ?? 0,
       discountPercent: (map['discount_percent'] as num?)?.toInt() ?? 0,
+      discountStartsAt: _date(map['discount_starts_at']),
+      discountEndsAt: _date(map['discount_ends_at']),
       category: (map['category'] as String?) ?? '',
       images: _strings(map['images']),
       colorVariants: variants is List && variants.isNotEmpty
@@ -176,6 +210,8 @@ class Product {
       'technical_details': technicalDetails,
       'price': price,
       'discount_percent': discountPercent,
+      'discount_starts_at': discountStartsAt?.toUtc().toIso8601String(),
+      'discount_ends_at': discountEndsAt?.toUtc().toIso8601String(),
       'category': category,
       'images': allImages,
       'colors': colors,
@@ -224,6 +260,8 @@ class Product {
       isNew: index >= 3,
     );
   }
+
+  static DateTime? _date(dynamic value) => value == null ? null : DateTime.tryParse(value.toString())?.toLocal();
 
   static List<String> _strings(dynamic value) =>
       value is List ? value.map((e) => e.toString()).toList() : const [];

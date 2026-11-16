@@ -21,7 +21,7 @@ void main() {
   ];
   const routes = [
     '/', '/novidades', '/catalogo', '/sobre', '/carrinho', '/produto/fake-101', '/admin', //
-    '/admin/produtos', '/admin/usuarios', '/admin/produto/novo', '/checkout', '/perfil', '/login', '/cadastro',
+    '/admin/produtos', '/admin/descontos', '/admin/usuarios', '/admin/produto/novo', '/checkout', '/perfil', '/login', '/cadastro',
   ];
 
   for (final user in [null, _admin]) {
@@ -35,7 +35,10 @@ void main() {
             await tester.pumpWidget(
               TestProviders(
                 user: user,
-                child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: testRouter(route, web: web)),
+                child: MaterialApp.router(
+                  theme: NiceTheme.light(),
+                  routerConfig: testRouter(route, web: web),
+                ),
               ),
             );
             await tester.pump(const Duration(milliseconds: 100));
@@ -56,7 +59,10 @@ void main() {
       tester.view.physicalSize = const Size(1440, 900);
       final router = testRouter('/', web: web);
       await tester.pumpWidget(
-        TestProviders(user: _admin, child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: router)),
+        TestProviders(
+          user: _admin,
+          child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: router),
+        ),
       );
       await tester.pump(const Duration(milliseconds: 100));
       const paths = ['/novidades', '/catalogo', '/sobre', '/produto/fake-102', '/carrinho', '/admin', '/'];

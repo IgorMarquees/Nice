@@ -1,7 +1,15 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
+
+import 'responsive.dart';
 
 /// Banner pronto (a arte já contém o texto). Mantém a proporção original
 /// para não cortar o texto e, com [onTap], vira um link clicável.
+///
+/// Com [fitViewport] (banners do topo das páginas), a altura nunca passa da
+/// área visível da página: em telas largas/baixas a arte inteira aparece sem
+/// rolar, centralizada, com as laterais preenchidas pela própria arte desfocada.
 class BannerImage extends StatelessWidget {
   const BannerImage({
     super.key,
@@ -9,6 +17,7 @@ class BannerImage extends StatelessWidget {
     required this.aspectRatio,
     this.onTap,
     this.label,
+    this.fitViewport = false,
   });
 
   final String asset;
@@ -19,27 +28,59 @@ class BannerImage extends StatelessWidget {
 
   /// Texto para leitores de tela (o texto da arte não é acessível).
   final String? label;
+  final bool fitViewport;
+
+  /// Altura do banner para uma largura, limitada à área visível se pedido.
+  static double heightFor(BuildContext context, double width, double aspectRatio, {required bool fitViewport}) {
+    final natural = width / aspectRatio;
+    if (!fitViewport) return natural;
+    final viewport = PageViewport.maybeOf(context) ?? MediaQuery.sizeOf(context).height;
+    return natural > viewport ? viewport : natural;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final image = AspectRatio(
-      aspectRatio: aspectRatio,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          // Decodifica no tamanho exibido (artes de 2880 px pesam no celular).
-          // Arredonda em degraus para não recarregar a cada pixel de resize.
-          final dpr = MediaQuery.devicePixelRatioOf(context);
-          final target = ((constraints.maxWidth * dpr) / 480).ceil() * 480;
-          return Image.asset(
-            asset,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-            cacheWidth: target.clamp(480, 2880),
-            gaplessPlayback: true,
-          );
-        },
-      ),
+    final image = LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final height = heightFor(context, width, aspectRatio, fitViewport: fitViewport);
+        // Decodifica no tamanho exibido (artes de 2880 px pesam no celular).
+        // Arredonda em degraus para não recarregar a cada pixel de resize.
+        final dpr = MediaQuery.devicePixelRatioOf(context);
+        final cacheWidth = (((width * dpr) / 480).ceil() * 480).clamp(480, 2880);
+
+        Widget picture({BoxFit fit = BoxFit.cover}) => Image.asset(
+          asset,
+          fit: fit,
+          width: double.infinity,
+          height: double.infinity,
+          cacheWidth: cacheWidth,
+          gaplessPlayback: true,
+        );
+
+        final letterboxed = height < width / aspectRatio - 0.5;
+        return SizedBox(
+          width: width,
+          height: height,
+          child: !letterboxed
+              ? picture()
+              : ClipRect(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Laterais: a mesma arte ampliada e desfocada.
+                      Transform.scale(
+                        scale: 1.3,
+                        child: ImageFiltered(imageFilter: ImageFilter.blur(sigmaX: 40, sigmaY: 40), child: picture()),
+                      ),
+                      Center(
+                        child: AspectRatio(aspectRatio: aspectRatio, child: picture()),
+                      ),
+                    ],
+                  ),
+                ),
+        );
+      },
     );
 
     if (onTap == null) return Semantics(image: true, label: label, child: image);

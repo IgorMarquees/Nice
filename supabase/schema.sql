@@ -78,6 +78,12 @@ create table if not exists public.products (
 -- color_variants: [{"name": "Preto", "images": ["url", ...]}]; images = todas as fotos; colors = nomes.
 alter table public.products add column if not exists technical_details text not null default '';
 alter table public.products add column if not exists discount_percent integer not null default 0;
+-- Período do desconto (null = sem limite).
+alter table public.products add column if not exists discount_starts_at timestamptz;
+alter table public.products add column if not exists discount_ends_at timestamptz;
+alter table public.products drop constraint if exists products_discount_period_check;
+alter table public.products add constraint products_discount_period_check
+  check (discount_starts_at is null or discount_ends_at is null or discount_ends_at > discount_starts_at);
 alter table public.products add column if not exists color_variants jsonb not null default '[]'::jsonb;
 alter table public.products add column if not exists in_stock boolean generated always as (stock > 0) stored;
 
@@ -97,7 +103,7 @@ where color_variants = '[]'::jsonb and cardinality(colors) > 0;
 -- (o app lê as colunas explicitamente; "select *" deixa de funcionar para anon/authenticated)
 revoke select on public.products from anon, authenticated;
 grant select (
-  id, title, description, technical_details, price, discount_percent, category,
+  id, title, description, technical_details, price, discount_percent, discount_starts_at, discount_ends_at, category,
   images, colors, color_variants, sizes, in_stock, is_featured, is_new, created_at, updated_at
 ) on public.products to anon, authenticated;
 

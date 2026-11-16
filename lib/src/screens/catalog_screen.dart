@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../config/assets.dart';
@@ -14,10 +13,13 @@ import '../widgets/state_views.dart';
 /// Catálogo completo com busca e filtros.
 /// Web: barra lateral de filtros + grade. Mobile: busca + gaveta de filtros.
 class CatalogScreen extends StatefulWidget {
-  const CatalogScreen({super.key, this.initialCategory, this.initialQuery});
+  const CatalogScreen({super.key, this.initialCategory, this.initialQuery, this.scrollToProducts = false});
 
   final String? initialCategory;
   final String? initialQuery;
+
+  /// Busca e links "ver todos os produtos": rola até a área dos produtos.
+  final bool scrollToProducts;
 
   @override
   State<CatalogScreen> createState() => _CatalogScreenState();
@@ -25,6 +27,7 @@ class CatalogScreen extends StatefulWidget {
 
 class _CatalogScreenState extends State<CatalogScreen> {
   late final TextEditingController _search;
+  final _productsKey = GlobalKey();
 
   @override
   void initState() {
@@ -35,7 +38,14 @@ class _CatalogScreenState extends State<CatalogScreen> {
       final catalog = context.read<CatalogController>();
       catalog.applyInitial(category: widget.initialCategory, query: widget.initialQuery);
       catalog.load();
+      if (widget.scrollToProducts) _scrollToProducts();
     });
+  }
+
+  void _scrollToProducts() {
+    final target = _productsKey.currentContext;
+    if (target == null) return;
+    Scrollable.ensureVisible(target, duration: const Duration(milliseconds: 450), curve: Curves.easeOutCubic);
   }
 
   @override
@@ -51,10 +61,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
       builder: (_) => ChangeNotifierProvider<CatalogController>.value(
         value: context.read<CatalogController>(),
         child: const SafeArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
-            child: FilterPanel(),
-          ),
+          child: SingleChildScrollView(padding: EdgeInsets.fromLTRB(24, 0, 24, 24), child: FilterPanel()),
         ),
       ),
     );
@@ -88,20 +95,20 @@ class _CatalogScreenState extends State<CatalogScreen> {
     final results = catalog.loading && !catalog.loaded
         ? const LoadingView()
         : products.isEmpty
-            ? EmptyState(
-                icon: Icons.search_off,
-                title: 'Nenhum produto encontrado',
-                message: 'Tente ajustar a busca ou os filtros.',
-                actionLabel: 'Limpar filtros',
-                onAction: () {
-                  _search.clear();
-                  catalog.clearFilters();
-                },
-              )
-            : ProductGrid(products: products, maxColumns: desktop ? 3 : 4);
+        ? EmptyState(
+            icon: Icons.search_off,
+            title: 'Nenhum produto encontrado',
+            message: 'Tente ajustar a busca ou os filtros.',
+            actionLabel: 'Limpar filtros',
+            onAction: () {
+              _search.clear();
+              catalog.clearFilters();
+            },
+          )
+        : ProductGrid(products: products, maxColumns: desktop ? 3 : 4);
 
     if (!context.isCompact) {
-      // Web/tablet: banner de topo, blocos de categoria, catálogo e banner final.
+      // Web/tablet: banner de topo e, abaixo, filtros + produtos.
       final catalogBody = desktop
           ? Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,11 +140,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   children: [
                     Expanded(child: searchField),
                     const SizedBox(width: 10),
-                    IconButton.filledTonal(
-                      tooltip: 'Filtros',
-                      onPressed: _openFilters,
-                      icon: const Icon(Icons.tune),
-                    ),
+                    IconButton.filledTonal(tooltip: 'Filtros', onPressed: _openFilters, icon: const Icon(Icons.tune)),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -151,27 +154,25 @@ class _CatalogScreenState extends State<CatalogScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           BannerImage(
-            asset: NiceAssets.categoriesTop,
-            aspectRatio: 2880 / 1472,
-            label: 'Explore as categorias. Ver todas as categorias',
-            onTap: () => context.go('/catalogo'),
+            asset: NiceAssets.catalogTop,
+            fitViewport: true,
+            aspectRatio: 1755 / 896,
+            label: 'Explore os produtos. Ver todos os produtos',
+            onTap: _scrollToProducts,
           ),
-          SizedBox(height: desktop ? 64 : 40),
-          const ContentWrapper(child: CategorySection(layout: CategoryLayout.grid)),
-          SizedBox(height: desktop ? 72 : 48),
-          ContentWrapper(child: catalogBody),
+          // Margem de cima: o produto não fica colado na navbar ao rolar até aqui.
+          Padding(
+            key: _productsKey,
+            padding: EdgeInsets.only(top: desktop ? 64 : 40),
+            child: ContentWrapper(child: catalogBody),
+          ),
           SizedBox(height: desktop ? 88 : 56),
-          BannerImage(
-            asset: NiceAssets.categoriesCta,
-            aspectRatio: 2880 / 960,
-            label: 'Todas as peças. Um só estilo. Ver todos os produtos',
-            onTap: () => context.go('/catalogo'),
-          ),
         ],
       );
     }
 
     return Padding(
+      key: _productsKey,
       padding: EdgeInsets.symmetric(horizontal: context.pagePadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -180,11 +181,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             children: [
               Expanded(child: searchField),
               const SizedBox(width: 10),
-              IconButton.filledTonal(
-                tooltip: 'Filtros',
-                onPressed: _openFilters,
-                icon: const Icon(Icons.tune),
-              ),
+              IconButton.filledTonal(tooltip: 'Filtros', onPressed: _openFilters, icon: const Icon(Icons.tune)),
             ],
           ),
           const SizedBox(height: 16),

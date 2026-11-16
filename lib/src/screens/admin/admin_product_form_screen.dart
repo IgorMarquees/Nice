@@ -12,6 +12,7 @@ import '../../theme/nice_theme.dart';
 import '../../utils/feedback.dart';
 import '../../utils/formatters.dart';
 import '../../utils/navigation.dart';
+import '../../widgets/discount_editor.dart';
 import '../../widgets/nice_network_image.dart';
 import '../../widgets/responsive.dart';
 import '../../widgets/state_views.dart';
@@ -70,6 +71,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
   bool _featured = false;
   bool _isNew = false;
   bool _hasDiscount = false;
+  DateTime? _discountStart;
+  DateTime? _discountEnd;
+  String? _discountError;
   final _general = _PhotoSet();
   final List<_ColorDraft> _colors = [];
 
@@ -98,8 +102,14 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         _technical.text = product.technicalDetails;
         _price.text = product.price.toStringAsFixed(2).replaceAll('.', ',');
         _stock.text = (product.stock ?? 0).toString();
-        _hasDiscount = product.hasDiscount;
-        if (product.hasDiscount) _discount.text = product.discountPercent.toString();
+        // Desconto ativo ou agendado volta para edição; encerrado aparece desligado.
+        final status = product.discountStatus;
+        _hasDiscount = status == DiscountStatus.active || status == DiscountStatus.scheduled;
+        if (_hasDiscount) {
+          _discount.text = product.discountPercent.toString();
+          _discountStart = product.discountStartsAt;
+          _discountEnd = product.discountEndsAt;
+        }
         _category = _categories.contains(product.category) ? product.category : _categories.first;
         _sizes
           ..clear()
@@ -168,7 +178,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
       ];
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
+    final periodError = _hasDiscount ? validateDiscountPeriod(_discountStart, _discountEnd) : null;
+    setState(() => _discountError = periodError);
+    if (!_formKey.currentState!.validate() || periodError != null) return;
     final admin = context.read<AdminController>();
     final catalog = context.read<CatalogController>();
 
@@ -189,6 +201,8 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
       technicalDetails: _technical.text.trim(),
       price: double.parse(_price.text.trim().replaceAll(',', '.')),
       discountPercent: _hasDiscount ? int.parse(_discount.text.trim()) : 0,
+      discountStartsAt: _hasDiscount ? _discountStart : null,
+      discountEndsAt: _hasDiscount ? _discountEnd : null,
       category: _category,
       images: _general.urls,
       sizes: _orderedSizes,
@@ -310,7 +324,10 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Ativar desconto'),
-                subtitle: const Text('O preço cheio aparece riscado e o produto ganha a etiqueta de desconto.'),
+                subtitle: const Text(
+                  'Durante o período, o preço cheio aparece riscado e o produto ganha a etiqueta de desconto. '
+                  'Para vários produtos de uma vez, use o painel "Descontos".',
+                ),
                 value: _hasDiscount,
                 onChanged: (v) => setState(() => _hasDiscount = v),
               ),
@@ -321,10 +338,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(labelText: 'Desconto (%)', suffixText: '%'),
                     onChanged: (_) => setState(() {}),
-                    validator: (v) {
-                      final value = int.tryParse((v ?? '').trim());
-                      return value == null || value < 1 || value > 90 ? 'Entre 1 e 90' : null;
-                    },
+                    validator: validateDiscountPercent,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
@@ -336,6 +350,27 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                     ),
                   ),
                 ),
+              if (_hasDiscount) ...[
+                const SizedBox(height: 12),
+                _pair(
+                  DateTimeField(
+                    label: 'Início do desconto',
+                    value: _discountStart,
+                    emptyText: 'Imediatamente',
+                    onChanged: (v) => setState(() => _discountStart = v),
+                  ),
+                  DateTimeField(
+                    label: 'Fim do desconto',
+                    value: _discountEnd,
+                    emptyText: 'Sem data de término',
+                    onChanged: (v) => setState(() => _discountEnd = v),
+                  ),
+                ),
+                if (_discountError != null) ...[
+                  const SizedBox(height: 6),
+                  Text(_discountError!, style: text.bodySmall?.copyWith(color: NiceTheme.brightRed)),
+                ],
+              ],
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: _category,
@@ -350,7 +385,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  for (final size in [...CatalogController.sizes, 'Único'])
+                  for (final size in CatalogController.sizes)
                     FilterChip(
                       label: Text(size),
                       selected: _sizes.contains(size),
@@ -358,7 +393,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                       labelStyle: NiceTheme.chipLabel(selected: _sizes.contains(size)),
                       onSelected: (selected) => _toggleSize(size, selected),
                     ),
-                  for (final size in customSizes.where((s) => s != 'Único'))
+                  for (final size in customSizes)
                     InputChip(
                       label: Text(size),
                       selected: true,

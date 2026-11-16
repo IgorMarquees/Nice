@@ -16,7 +16,7 @@ class _AdminSection {
 const _sections = [
   _AdminSection(
     'Produtos',
-    'Lista, busca, destaque, novidade, desconto e exclusão de produtos.',
+    'Lista, busca, destaque, novidade, edição e exclusão de produtos.',
     Icons.inventory_2_outlined,
     '/admin/produtos',
   ),
@@ -25,6 +25,12 @@ const _sections = [
     'Novo produto com cores, fotos por cor, tamanhos e detalhes técnicos.',
     Icons.add_box_outlined,
     '/admin/produto/novo',
+  ),
+  _AdminSection(
+    'Descontos',
+    'Descontos com data e hora de início e fim, aplicados ou cancelados em massa.',
+    Icons.local_offer_outlined,
+    '/admin/descontos',
   ),
   _AdminSection(
     'Usuários',

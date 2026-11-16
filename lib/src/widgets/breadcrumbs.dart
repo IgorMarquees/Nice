@@ -12,7 +12,7 @@ class Crumb {
   final String? path;
 }
 
-/// Trilha de navegação: Home / Categorias / Camisetas / Produto.
+/// Trilha de navegação: Home / Catálogo / Camisetas / Produto.
 class Breadcrumbs extends StatelessWidget {
   const Breadcrumbs({super.key, required this.items});
 

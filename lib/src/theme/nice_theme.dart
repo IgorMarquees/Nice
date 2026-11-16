@@ -43,12 +43,8 @@ class NiceTheme {
     end: Alignment.bottomCenter,
     colors: [Color(0x00000000), Color(0xCC000000)],
   );
-  static const topShadow = [
-    BoxShadow(color: Color(0x14000000), blurRadius: 20, offset: Offset(0, -8)),
-  ];
-  static const softShadow = [
-    BoxShadow(color: Color(0x1F000000), blurRadius: 8, offset: Offset(0, 4)),
-  ];
+  static const topShadow = [BoxShadow(color: Color(0x14000000), blurRadius: 20, offset: Offset(0, -8))];
+  static const softShadow = [BoxShadow(color: Color(0x1F000000), blurRadius: 8, offset: Offset(0, 4))];
 
   /// Transição da seção clara de categorias para o rodapé preto.
   static const footerFade = LinearGradient(
@@ -59,11 +55,21 @@ class NiceTheme {
   );
 
   // ---- Tipografia ----
-  static TextStyle _display(double size, {FontWeight weight = FontWeight.w900, double height = 1.05, double spacing = -0.5}) =>
+  static TextStyle _display(
+    double size, {
+    FontWeight weight = FontWeight.w900,
+    double height = 1.05,
+    double spacing = -0.5,
+  }) =>
       GoogleFonts.archivo(fontSize: size, fontWeight: weight, height: height, letterSpacing: spacing, color: charcoal);
 
-  static TextStyle _body(double size, {FontWeight weight = FontWeight.w400, Color color = charcoal, double height = 1.45, double spacing = 0}) =>
-      GoogleFonts.inter(fontSize: size, fontWeight: weight, color: color, height: height, letterSpacing: spacing);
+  static TextStyle _body(
+    double size, {
+    FontWeight weight = FontWeight.w400,
+    Color color = charcoal,
+    double height = 1.45,
+    double spacing = 0,
+  }) => GoogleFonts.inter(fontSize: size, fontWeight: weight, color: color, height: height, letterSpacing: spacing);
 
   static TextTheme _textTheme() {
     return TextTheme(
@@ -102,27 +108,35 @@ class NiceTheme {
   static TextStyle productName({bool large = true}) =>
       _body(large ? 24 : 16, weight: FontWeight.w700, color: red, height: 1.15, spacing: -0.2);
 
-  static TextStyle productSubtitle({bool large = true}) =>
-      _body(large ? 15 : 12, color: mutedRed, height: 1.3);
+  static TextStyle productSubtitle({bool large = true}) => _body(large ? 15 : 12, color: mutedRed, height: 1.3);
 
   static TextStyle price({bool large = false}) =>
       _body(large ? 28 : 16, weight: large ? FontWeight.w800 : FontWeight.w600, color: red, height: 1.2);
 
   static TextStyle oldPrice({bool large = false}) => _body(
-        large ? 18 : 13,
-        color: textGray,
-        height: 1.2,
-      ).copyWith(decoration: TextDecoration.lineThrough, decorationColor: textGray);
+    large ? 18 : 13,
+    color: textGray,
+    height: 1.2,
+  ).copyWith(decoration: TextDecoration.lineThrough, decorationColor: textGray);
 
   static TextStyle badge() => _body(11, weight: FontWeight.w800, color: white, spacing: 0.6, height: 1.1);
 
   /// Texto espaçado do rodapé ("STREETWEAR WITHOUT LIMITS.").
-  static TextStyle spaced({Color color = white}) =>
-      _body(13, weight: FontWeight.w500, color: color, spacing: 4);
+  static TextStyle spaced({Color color = white}) => _body(13, weight: FontWeight.w500, color: color, spacing: 4);
 
   static TextStyle footerTitle() => _display(44, spacing: -0.5).copyWith(color: white);
 
   static TextStyle footerLink() => _body(16, color: softGray);
+
+  /// Kanji vertical decorativo (東京).
+  static TextStyle kanji() => _body(30, weight: FontWeight.w400, color: charcoal, height: 1.15);
+
+  /// Título do bloco "Em destaque" (Novidades).
+  static TextStyle spotlightTitle({bool large = true}) =>
+      _body(large ? 38 : 28, weight: FontWeight.w500, color: charcoal, height: 1.05, spacing: 0.5);
+
+  /// Link "VER DETALHES ↗" em caixa alta espaçada.
+  static TextStyle spacedLink() => _body(13, weight: FontWeight.w700, color: charcoal, spacing: 2);
 
   static TextStyle categoryLabel({bool large = true}) =>
       _body(large ? 30 : 18, weight: FontWeight.w600, color: white, height: 1.1);
@@ -135,10 +149,7 @@ class NiceTheme {
       surface: white,
       error: brightRed,
     );
-    final inputBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(radius),
-      borderSide: BorderSide.none,
-    );
+    final inputBorder = OutlineInputBorder(borderRadius: BorderRadius.circular(radius), borderSide: BorderSide.none);
 
     return ThemeData(
       useMaterial3: true,
@@ -210,9 +221,7 @@ class NiceTheme {
         thumbColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected) ? white : midGray,
         ),
-        trackColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected) ? red : softGray,
-        ),
+        trackColor: WidgetStateProperty.resolveWith((states) => states.contains(WidgetState.selected) ? red : softGray),
         trackOutlineColor: const WidgetStatePropertyAll(transparent),
       ),
       snackBarTheme: SnackBarThemeData(
@@ -226,10 +235,7 @@ class NiceTheme {
         titleTextStyle: _display(20, weight: FontWeight.w800, spacing: 0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: white,
-        showDragHandle: true,
-      ),
+      bottomSheetTheme: const BottomSheetThemeData(backgroundColor: white, showDragHandle: true),
       progressIndicatorTheme: const ProgressIndicatorThemeData(color: red),
       sliderTheme: const SliderThemeData(
         activeTrackColor: red,

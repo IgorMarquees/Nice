@@ -30,6 +30,9 @@ class AdminController extends ChangeNotifier {
   bool get saving => _saving;
   String? get error => _error;
 
+  /// Todos os produtos, sem o filtro de busca da lista de produtos.
+  List<Product> get all => _items;
+
   List<Product> get items {
     final q = _query.trim().toLowerCase();
     if (q.isEmpty) return _items;
@@ -112,6 +115,34 @@ class AdminController extends ChangeNotifier {
       _error = 'Não foi possível atualizar o produto.';
       notifyListeners();
       return false;
+    }
+  }
+
+  /// Aplica um desconto com período a vários produtos (ou a um só).
+  Future<bool> applyDiscount(List<String> ids, {required int percent, DateTime? startsAt, DateTime? endsAt}) async {
+    return _bulk(() => _products.setDiscount(ids, percent: percent, startsAt: startsAt, endsAt: endsAt),
+        'Não foi possível aplicar o desconto.');
+  }
+
+  /// Cancela o desconto de vários produtos (ou de um só).
+  Future<bool> cancelDiscount(List<String> ids) {
+    return _bulk(() => _products.setDiscount(ids, percent: 0), 'Não foi possível cancelar o desconto.');
+  }
+
+  Future<bool> _bulk(Future<void> Function() action, String errorMessage) async {
+    _saving = true;
+    _error = null;
+    notifyListeners();
+    try {
+      await action();
+      await load();
+      return true;
+    } catch (_) {
+      _error = errorMessage;
+      return false;
+    } finally {
+      _saving = false;
+      notifyListeners();
     }
   }
 

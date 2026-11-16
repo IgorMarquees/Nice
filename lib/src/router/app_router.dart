@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../controllers/auth_controller.dart';
 import '../screens/about_screen.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
+import '../screens/admin/admin_discounts_screen.dart';
 import '../screens/admin/admin_product_form_screen.dart';
 import '../screens/admin/admin_products_screen.dart';
 import '../screens/admin/admin_user_detail_screen.dart';
@@ -22,6 +23,7 @@ import '../screens/register_screen.dart';
 import '../screens/shell_page.dart';
 import '../screens/splash_screen.dart';
 import '../screens/web_shell.dart';
+import '../utils/navigation.dart';
 import '../widgets/state_views.dart';
 
 /// Rotas que exigem login (visitante é redirecionado para /login).
@@ -82,6 +84,7 @@ GoRouter buildRouter(AuthController auth) {
                 key: ValueKey(state.uri.toString()),
                 initialCategory: state.uri.queryParameters['categoria'],
                 initialQuery: state.uri.queryParameters['busca'],
+                scrollToProducts: state.uri.queryParameters['secao'] == catalogProductsSection,
               ),
             ),
           ),
@@ -117,6 +120,10 @@ GoRouter buildRouter(AuthController auth) {
           GoRoute(
             path: '/admin/produtos',
             builder: (_, _) => const ShellPage(child: AdminProductsScreen()),
+          ),
+          GoRoute(
+            path: '/admin/descontos',
+            builder: (_, _) => const ShellPage(child: AdminDiscountsScreen()),
           ),
           GoRoute(
             path: '/admin/usuarios',

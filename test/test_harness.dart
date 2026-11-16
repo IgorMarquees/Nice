@@ -20,8 +20,10 @@ import 'package:nice_store/src/repositories/order_repository.dart';
 import 'package:nice_store/src/repositories/product_repository.dart';
 import 'package:nice_store/src/repositories/storage_repository.dart';
 import 'package:nice_store/src/repositories/user_repository.dart';
+import 'package:nice_store/src/utils/navigation.dart';
 import 'package:nice_store/src/screens/about_screen.dart';
 import 'package:nice_store/src/screens/admin/admin_dashboard_screen.dart';
+import 'package:nice_store/src/screens/admin/admin_discounts_screen.dart';
 import 'package:nice_store/src/screens/admin/admin_product_form_screen.dart';
 import 'package:nice_store/src/screens/admin/admin_products_screen.dart';
 import 'package:nice_store/src/screens/admin/admin_users_screen.dart';
@@ -146,7 +148,14 @@ GoRouter testRouter(String initial, {required bool web}) => GoRouter(
         ),
         GoRoute(
           path: '/catalogo',
-          builder: (_, _) => const ShellPage(child: CatalogScreen()),
+          builder: (_, state) => ShellPage(
+            child: CatalogScreen(
+              key: ValueKey(state.uri.toString()),
+              initialCategory: state.uri.queryParameters['categoria'],
+              initialQuery: state.uri.queryParameters['busca'],
+              scrollToProducts: state.uri.queryParameters['secao'] == catalogProductsSection,
+            ),
+          ),
         ),
         GoRoute(
           path: '/sobre',
@@ -176,8 +185,18 @@ GoRouter testRouter(String initial, {required bool web}) => GoRouter(
           path: '/admin/produto/novo',
           builder: (_, _) => const ShellPage(child: AdminProductFormScreen()),
         ),
-        GoRoute(path: '/checkout', builder: (_, _) => const ShellPage(child: CheckoutScreen())),
-        GoRoute(path: '/perfil', builder: (_, _) => const ShellPage(child: ProfileScreen())),
+        GoRoute(
+          path: '/admin/descontos',
+          builder: (_, _) => const ShellPage(child: AdminDiscountsScreen()),
+        ),
+        GoRoute(
+          path: '/checkout',
+          builder: (_, _) => const ShellPage(child: CheckoutScreen()),
+        ),
+        GoRoute(
+          path: '/perfil',
+          builder: (_, _) => const ShellPage(child: ProfileScreen()),
+        ),
       ],
     ),
     GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),

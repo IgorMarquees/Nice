@@ -13,12 +13,13 @@ class NiceAssets {
   static const homeHero2 = 'assets/web_carrosel_topo_home2_colocar_hyperlink.png';
   static const homeEssence = 'assets/sobre_nos_embaixo_carrosel_do_topo_home_colocar_hyperlink.png';
 
-  // Categorias
-  static const categoriesTop = 'assets/web_topo_categorias_colocar_hyperlink.png';
-  static const categoriesCta = 'assets/web_acima_do_footer_categorias_colocar_hyperlink.png';
+  // Catálogo (topo) e banner "Todas as peças" (acima do rodapé de Novidades)
+  static const catalogTop = 'assets/web_topo_categorias_colocar_hyperlink.png';
+  static const catalogCta = 'assets/web_acima_do_footer_categorias_colocar_hyperlink.png';
 
   // Novidades
   static const newArrivalsTop = 'assets/web_topo_novidades_colocar_hyperlink.png';
+  static const newArrivalsSpotlight = 'assets/web_novidades_em_cima_footer_destaque_imagem.png';
 
   // Sobre nós
   static const aboutTop = 'assets/web_topo_sobrenos.png';
