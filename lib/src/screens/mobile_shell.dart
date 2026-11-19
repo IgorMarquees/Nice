@@ -77,7 +77,7 @@ class MobileShell extends StatelessWidget {
             _NavItem(
               icon: Icons.shopping_bag_outlined,
               selectedIcon: Icons.shopping_bag,
-              label: 'Bag',
+              label: 'Carrinho',
               selected: index == 3,
               badgeCount: cartCount,
               onTap: () => context.go('/carrinho'),

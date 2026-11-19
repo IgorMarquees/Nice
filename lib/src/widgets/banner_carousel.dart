@@ -17,9 +17,12 @@ class BannerSlide {
 
 /// Banners rotativos da Home (autoplay a cada 6s). Cada banner é um link.
 class BannerCarousel extends StatefulWidget {
-  const BannerCarousel({super.key, required this.slides});
+  const BannerCarousel({super.key, required this.slides, this.appAspectRatio});
 
   final List<BannerSlide> slides;
+
+  /// Proporção mais alta só no app (ver [BannerImage.appAspectRatio]).
+  final double? appAspectRatio;
 
   @override
   State<BannerCarousel> createState() => _BannerCarouselState();
@@ -54,7 +57,13 @@ class _BannerCarouselState extends State<BannerCarousel> {
     // Banner do topo: nunca mais alto que a área visível da página.
     return LayoutBuilder(
       builder: (context, constraints) => SizedBox(
-        height: BannerImage.heightFor(context, constraints.maxWidth, ratio, fitViewport: true),
+        height: BannerImage.heightFor(
+          context,
+          constraints.maxWidth,
+          ratio,
+          fitViewport: true,
+          appAspectRatio: widget.appAspectRatio,
+        ),
         child: _stack(ratio),
       ),
     );
@@ -74,6 +83,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
               aspectRatio: ratio,
               label: slide.label,
               fitViewport: true,
+              appAspectRatio: widget.appAspectRatio,
               onTap: () => context.go(slide.route),
             );
           },

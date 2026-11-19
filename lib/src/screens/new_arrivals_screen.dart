@@ -31,6 +31,7 @@ class NewArrivalsScreen extends StatelessWidget {
           asset: NiceAssets.newArrivalsTop,
           fitViewport: true,
           aspectRatio: 2876 / 1472,
+          appAspectRatio: 1.2,
           label: 'Just dropped. Ver todos os lançamentos',
           onTap: () => context.go(catalogPath(toProducts: true)),
         ),

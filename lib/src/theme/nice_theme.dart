@@ -101,8 +101,9 @@ class NiceTheme {
       _body(large ? 18 : 14, weight: FontWeight.w500, color: brightRed, height: 1.2);
 
   /// "ESCOLHAS DO MOMENTO": fino, cinza e em caixa alta.
-  static TextStyle sectionTitle({bool large = true}) =>
-      _body(large ? 54 : 30, weight: FontWeight.w300, color: darkGray, height: 0.95, spacing: -0.5);
+  /// [small]: versão reduzida usada no app (Android/iOS).
+  static TextStyle sectionTitle({bool large = true, bool small = false}) =>
+      _body(small ? 24 : (large ? 54 : 30), weight: FontWeight.w300, color: darkGray, height: 0.95, spacing: -0.5);
 
   /// Nome do produto nos cards.
   static TextStyle productName({bool large = true}) =>

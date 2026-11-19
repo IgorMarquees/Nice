@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/nice_theme.dart';
@@ -32,7 +33,8 @@ class SectionHeader extends StatelessWidget {
                 Text(eyebrow!, style: NiceTheme.sectionEyebrow(large: large)),
                 SizedBox(height: large ? 10 : 6),
               ],
-              Text(title.toUpperCase(), style: NiceTheme.sectionTitle(large: large)),
+              // No app o título é um pouco menor ("Escolhas do momento", "Peças que acabaram de chegar").
+              Text(title.toUpperCase(), style: NiceTheme.sectionTitle(large: large, small: !kIsWeb)),
             ],
           ),
         ),

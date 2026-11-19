@@ -49,18 +49,22 @@ class HomeScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (compact) const _MobileGreeting(),
-        const BannerCarousel(slides: _slides),
+        // No app o banner fica mais alto (texto maior e legível).
+        const BannerCarousel(slides: _slides, appAspectRatio: 1.2),
         if (compact) ...[
           const SizedBox(height: 20),
           const ContentWrapper(child: CategorySection()),
         ],
-        SizedBox(height: desktop ? 56 : 28),
-        BannerImage(
-          asset: NiceAssets.homeEssence,
-          aspectRatio: 2880 / 800,
-          label: 'A essência da NICE. Conheça a NICE',
-          onTap: () => context.go('/sobre'),
-        ),
+        // "A essência da NICE": só no site (no app a faixa fica pequena demais).
+        if (kIsWeb) ...[
+          SizedBox(height: desktop ? 56 : 28),
+          BannerImage(
+            asset: NiceAssets.homeEssence,
+            aspectRatio: 2880 / 800,
+            label: 'A essência da NICE. Conheça a NICE',
+            onTap: () => context.go('/sobre'),
+          ),
+        ],
         gap,
         ContentWrapper(
           child: Column(

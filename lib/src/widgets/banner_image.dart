@@ -1,5 +1,6 @@
 import 'dart:ui' show ImageFilter;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'responsive.dart';
@@ -18,6 +19,7 @@ class BannerImage extends StatelessWidget {
     this.onTap,
     this.label,
     this.fitViewport = false,
+    this.appAspectRatio,
   });
 
   final String asset;
@@ -30,8 +32,24 @@ class BannerImage extends StatelessWidget {
   final String? label;
   final bool fitViewport;
 
+  /// Só no app (Android/iOS): proporção mais alta para o banner. A arte é
+  /// ampliada e recortada pela direita, mantendo o texto (à esquerda) maior
+  /// e legível no celular.
+  final double? appAspectRatio;
+
+  /// Só no app e com largura de celular (tablet usa a proporção normal).
+  static bool _useApp(BuildContext context, double? appAspectRatio) =>
+      !kIsWeb && appAspectRatio != null && context.isCompact;
+
   /// Altura do banner para uma largura, limitada à área visível se pedido.
-  static double heightFor(BuildContext context, double width, double aspectRatio, {required bool fitViewport}) {
+  static double heightFor(
+    BuildContext context,
+    double width,
+    double aspectRatio, {
+    required bool fitViewport,
+    double? appAspectRatio,
+  }) {
+    if (_useApp(context, appAspectRatio)) return width / appAspectRatio!;
     final natural = width / aspectRatio;
     if (!fitViewport) return natural;
     final viewport = PageViewport.maybeOf(context) ?? MediaQuery.sizeOf(context).height;
@@ -43,7 +61,8 @@ class BannerImage extends StatelessWidget {
     final image = LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final height = heightFor(context, width, aspectRatio, fitViewport: fitViewport);
+        final cropped = _useApp(context, appAspectRatio);
+        final height = heightFor(context, width, aspectRatio, fitViewport: fitViewport, appAspectRatio: appAspectRatio);
         // Decodifica no tamanho exibido (artes de 2880 px pesam no celular).
         // Arredonda em degraus para não recarregar a cada pixel de resize.
         final dpr = MediaQuery.devicePixelRatioOf(context);
@@ -52,13 +71,15 @@ class BannerImage extends StatelessWidget {
         Widget picture({BoxFit fit = BoxFit.cover}) => Image.asset(
           asset,
           fit: fit,
+          alignment: cropped ? Alignment.centerLeft : Alignment.center,
           width: double.infinity,
           height: double.infinity,
-          cacheWidth: cacheWidth,
+          // Recortado, a arte aparece ampliada: decodifica proporcionalmente maior.
+          cacheWidth: cropped ? (cacheWidth * aspectRatio / appAspectRatio!).round().clamp(480, 2880) : cacheWidth,
           gaplessPlayback: true,
         );
 
-        final letterboxed = height < width / aspectRatio - 0.5;
+        final letterboxed = !cropped && height < width / aspectRatio - 0.5;
         return SizedBox(
           width: width,
           height: height,
