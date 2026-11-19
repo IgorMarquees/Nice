@@ -55,16 +55,17 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 20),
           const ContentWrapper(child: CategorySection()),
         ],
-        // "A essência da NICE": só no site (no app a faixa fica pequena demais).
-        if (kIsWeb) ...[
-          SizedBox(height: desktop ? 56 : 28),
-          BannerImage(
-            asset: NiceAssets.homeEssence,
-            aspectRatio: 2880 / 800,
-            label: 'A essência da NICE. Conheça a NICE',
-            onTap: () => context.go('/sobre'),
-          ),
-        ],
+        SizedBox(height: desktop ? 56 : 28),
+        // No app (celular) a faixa fica mais alta e recortada no texto do meio,
+        // com o bloco vermelho e o kanji nas laterais, para ser legível.
+        BannerImage(
+          asset: NiceAssets.homeEssence,
+          aspectRatio: 2880 / 800,
+          appAspectRatio: 1.5,
+          appAlignment: const Alignment(0.24, 0),
+          label: 'A essência da NICE. Conheça a NICE',
+          onTap: () => context.go('/sobre'),
+        ),
         gap,
         ContentWrapper(
           child: Column(
