@@ -57,6 +57,8 @@ class NewArrivalsScreen extends StatelessWidget {
         BannerImage(
           asset: NiceAssets.catalogCta,
           aspectRatio: 2880 / 960,
+          // No celular (app) fica mais alto, recortado no texto, para ser legível.
+          appAspectRatio: 1.6,
           label: 'Todas as peças. Um só estilo. Ver todos os produtos',
           onTap: () => context.go(catalogPath(toProducts: true)),
         ),
