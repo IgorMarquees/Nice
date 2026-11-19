@@ -47,14 +47,6 @@ class NiceTheme {
   static const softShadow = [BoxShadow(color: Color(0x1F000000), blurRadius: 8, offset: Offset(0, 4))];
 
   /// Transição da seção clara de categorias para o rodapé preto.
-  /// Fim das páginas no app: degradê cinza, como a transição para o rodapé do site.
-  static const appFooterFade = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [white, sectionGray, Color(0xFFB5B5B5), Color(0xFF6E6E6E)],
-    stops: [0, 0.3, 0.7, 1],
-  );
-
   static const footerFade = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,

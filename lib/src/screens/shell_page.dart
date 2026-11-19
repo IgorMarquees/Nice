@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../theme/nice_theme.dart';
 import '../widgets/responsive.dart';
 import '../widgets/web_footer.dart';
 import 'web_shell.dart';
@@ -17,8 +16,6 @@ class ShellPage extends StatelessWidget {
   const ShellPage({super.key, required this.child});
 
   final Widget child;
-
-  static const _appFooterHeight = 120.0;
 
   @override
   Widget build(BuildContext context) {
@@ -40,20 +37,8 @@ class ShellPage extends StatelessWidget {
                     child: child,
                   )
                 else
-                  // Ocupa o resto da tela para o degradê ficar sempre no fim.
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: (constraints.maxHeight - _appFooterHeight).clamp(0, double.infinity),
-                    ),
-                    child: child,
-                  ),
+                  child,
                 if (web) const WebFooter(),
-                // No app não há rodapé de site: a página termina num degradê cinza.
-                if (!web)
-                  const SizedBox(
-                    height: _appFooterHeight,
-                    child: DecoratedBox(decoration: BoxDecoration(gradient: NiceTheme.appFooterFade)),
-                  ),
               ],
             ),
           ),

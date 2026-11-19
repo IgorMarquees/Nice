@@ -20,7 +20,6 @@ class BannerImage extends StatelessWidget {
     this.label,
     this.fitViewport = false,
     this.appAspectRatio,
-    this.appAlignment = Alignment.centerLeft,
   });
 
   final String asset;
@@ -37,9 +36,6 @@ class BannerImage extends StatelessWidget {
   /// ampliada e recortada pela direita, mantendo o texto (à esquerda) maior
   /// e legível no celular.
   final double? appAspectRatio;
-
-  /// Parte da arte mantida no recorte do app (padrão: o texto à esquerda).
-  final Alignment appAlignment;
 
   /// Só no app e com largura de celular (tablet usa a proporção normal).
   static bool _useApp(BuildContext context, double? appAspectRatio) =>
@@ -75,7 +71,7 @@ class BannerImage extends StatelessWidget {
         Widget picture({BoxFit fit = BoxFit.cover}) => Image.asset(
           asset,
           fit: fit,
-          alignment: cropped ? appAlignment : Alignment.center,
+          alignment: cropped ? Alignment.centerLeft : Alignment.center,
           width: double.infinity,
           height: double.infinity,
           // Recortado, a arte aparece ampliada: decodifica proporcionalmente maior.
