@@ -1,9 +1,5 @@
-// Modelo do produto da loja.
-// Calcula preço com desconto preço no Pix e as fotos de cada cor.
-
 import '../nucleo/configuracao.dart';
 
-/// Uma cor do produto com as próprias fotos.
 class VarianteCor {
   const VarianteCor({required this.nome, this.fotos = const []});
 
@@ -21,7 +17,6 @@ class VarianteCor {
       );
 }
 
-/// Situação do desconto em um momento.
 enum SituacaoDesconto {
   nenhum('Sem desconto'),
   agendado('Agendado'),
@@ -32,7 +27,6 @@ enum SituacaoDesconto {
   final String rotulo;
 }
 
-/// Produto vendido na loja.
 class Produto {
   const Produto({
     required this.id,
@@ -60,7 +54,6 @@ class Produto {
   final String descricao;
   final String detalhesTecnicos;
 
-  /// Preço cheio sem desconto.
   final double preco;
   final String categoria;
 
@@ -84,13 +77,11 @@ class Produto {
   final bool novidade;
   final DateTime? criadoEm;
 
-  /// Verdadeiro para os produtos de exemplo.
   bool get ehReserva => id.startsWith('fake-');
   bool get temEstoque => estoque == null ? disponivel : estoque! > 0;
 
   List<String> get cores => [for (final c in variantesCor) c.nome];
 
-  /// Todas as fotos do produto sem repetir.
   List<String> get todasFotos {
     final vistas = <String>{};
     return [
@@ -99,7 +90,6 @@ class Produto {
     ];
   }
 
-  /// Primeira foto usada nos cards.
   String get urlFoto {
     final todos = todasFotos;
     return todos.isEmpty ? '' : todos.first;
@@ -115,7 +105,6 @@ class Produto {
     return todasFotos;
   }
 
-  /// Diz se o desconto está agendado ativo ou encerrado num momento.
   SituacaoDesconto situacaoDescontoEm(DateTime agora) {
     if (percentualDesconto <= 0) return SituacaoDesconto.nenhum;
     if (inicioDesconto != null && agora.isBefore(inicioDesconto!)) return SituacaoDesconto.agendado;
@@ -125,16 +114,12 @@ class Produto {
 
   SituacaoDesconto get situacaoDesconto => situacaoDescontoEm(DateTime.now());
 
-  /// Verdadeiro quando o desconto está valendo agora.
   bool get temDesconto => situacaoDesconto == SituacaoDesconto.ativo;
 
-  /// Porcentagem em vigor agora ou zero fora do período.
   int get percentualDescontoAtivo => temDesconto ? percentualDesconto : 0;
 
-  /// Preço que o cliente paga agora.
   double get precoFinal => _arredondar(preco * (100 - percentualDescontoAtivo) / 100);
 
-  /// Preço pagando no Pix.
   double get precoPix => _arredondar(precoFinal * (1 - Configuracao.descontoPix));
 
   static double _arredondar(double valor) => (valor * 100).roundToDouble() / 100;
@@ -181,7 +166,6 @@ class Produto {
       'category,images,colors,'
       'color_variants,sizes,in_stock,is_featured,is_new,created_at,updated_at';
 
-  /// Lê um produto que veio do banco.
   factory Produto.doMapa(Map<String, dynamic> mapa) {
     final variantes = mapa['color_variants'];
     final estoque = (mapa['stock'] as num?)?.toInt();
@@ -208,7 +192,6 @@ class Produto {
     );
   }
 
-  /// Formato usado para gravar o produto no banco.
   Map<String, dynamic> paraMapa() {
     return {
       if (id.isNotEmpty) 'id': id,
@@ -230,7 +213,6 @@ class Produto {
     };
   }
 
-  /// Nomes e descrições usados nos produtos de exemplo.
   static const _categoriasReserva = ['Camisetas', 'Moletons', 'Calças', 'Acessórios'];
   static const _nomes = [
     'Kuro Essential Tee',

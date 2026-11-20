@@ -1,5 +1,3 @@
-// Página do produto.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +18,6 @@ import '../componentes/etiqueta_preco.dart';
 import '../componentes/responsivo.dart';
 import '../componentes/estados_tela.dart';
 
-/// Galeria preço tamanhos cores detalhes técnicos e botão de carrinho.
 class TelaProduto extends StatefulWidget {
   const TelaProduto({super.key, required this.idProduto});
 
@@ -45,7 +42,6 @@ class _TelaProdutoEstado extends State<TelaProduto> {
     _carregar();
   }
 
-  /// Carrega o produto e para o admin também o estoque.
   Future<void> _carregar() async {
     final catalogo = context.read<ControladorCatalogo>();
     final ehAdmin = context.read<ControladorAutenticacao>().ehAdmin;
@@ -74,7 +70,6 @@ class _TelaProdutoEstado extends State<TelaProduto> {
     });
   }
 
-  /// Confere tamanho e cor e coloca o produto no carrinho.
   void _adicionarAoCarrinho(Produto produto) {
     if (!context.exigirLogin()) return;
 
@@ -155,7 +150,6 @@ class _TelaProdutoEstado extends State<TelaProduto> {
     );
   }
 
-  /// Coluna de informações ao lado da galeria.
   Widget _montarInfo(BuildContext context, Produto produto) {
     final texto = Theme.of(context).textTheme;
     final ehAdmin = context.watch<ControladorAutenticacao>().ehAdmin;
@@ -241,7 +235,6 @@ class _TelaProdutoEstado extends State<TelaProduto> {
   }
 }
 
-/// Linha com ícone e texto como o aviso de frete grátis.
 class _LinhaInfo extends StatelessWidget {
   const _LinhaInfo({required this.icone, required this.texto});
 
@@ -260,7 +253,6 @@ class _LinhaInfo extends StatelessWidget {
   }
 }
 
-/// Bloco de detalhes técnicos com um item por linha.
 class _DetalhesTecnicos extends StatelessWidget {
   const _DetalhesTecnicos({required this.texto});
 
@@ -299,7 +291,6 @@ class _DetalhesTecnicos extends StatelessWidget {
   }
 }
 
-/// Foto grande com as miniaturas embaixo.
 class _Galeria extends StatelessWidget {
   const _Galeria({
     required this.fotos,

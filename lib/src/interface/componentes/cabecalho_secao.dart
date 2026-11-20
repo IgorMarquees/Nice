@@ -1,12 +1,9 @@
-// Título das seções no estilo da marca.
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../nucleo/tema.dart';
 import 'responsivo.dart';
 
-/// Sobretítulo vermelho título fino em caixa alta e o botão Ver mais.
 class CabecalhoSecao extends StatelessWidget {
   const CabecalhoSecao({
     super.key,

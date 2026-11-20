@@ -1,28 +1,22 @@
-// Acesso ao login do Supabase.
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../nucleo/configuracao.dart';
 import 'usuario.dart';
 
-/// Erro de login com uma mensagem pronta para mostrar na tela.
 class ErroAutenticacao implements Exception {
   const ErroAutenticacao(this.mensagem);
   final String mensagem;
 }
 
-/// Login cadastro recuperação de senha e leitura do perfil.
 class RepositorioAutenticacao {
   RepositorioAutenticacao(this._conexao);
 
   final SupabaseClient _conexao;
   GoTrueClient get _autenticacao => _conexao.auth;
 
-  /// Avisa sempre que alguém entra ou sai.
   Stream<AuthState> get mudancasLogin => _autenticacao.onAuthStateChange;
   Session? get sessaoAtual => _autenticacao.currentSession;
 
-  /// Entra com email e senha.
   Future<void> entrar({required String email, required String senha}) async {
     try {
       await _autenticacao.signInWithPassword(email: email.trim(), password: senha);
@@ -47,7 +41,6 @@ class RepositorioAutenticacao {
     }
   }
 
-  /// Abre o login do Google pelo navegador.
   Future<void> entrarComGoogle() async {
     try {
       await _autenticacao.signInWithOAuth(
@@ -59,7 +52,6 @@ class RepositorioAutenticacao {
     }
   }
 
-  /// Envia o email de recuperação de senha.
   Future<void> enviarRecuperacaoSenha(String email) async {
     try {
       await _autenticacao.resetPasswordForEmail(email.trim(), redirectTo: Configuracao.redirecionamentoLogin);
@@ -70,7 +62,6 @@ class RepositorioAutenticacao {
 
   Future<void> sair() => _autenticacao.signOut();
 
-  /// Lê o nome e o tipo de conta na tabela profiles.
   Future<Usuario> buscarPerfil(User usuario) async {
     final nomeMetadados = (usuario.userMetadata?['name'] ?? usuario.userMetadata?['full_name'])?.toString();
     try {

@@ -7,11 +7,9 @@ import 'package:http/http.dart' as http;
 
 import 'produto.dart';
 
-/// Busca produtos de exemplo na FakeStoreAPI.
 class RepositorioVitrineReserva {
   static const _urlBase = 'https://fakestoreapi.com/products';
 
-  /// Pega as roupas da API e transforma em produtos com a cara da NICE.
   Future<List<Produto>> buscarProdutos() async {
     try {
       final resposta = await http.get(Uri.parse(_urlBase)).timeout(const Duration(seconds: 8));

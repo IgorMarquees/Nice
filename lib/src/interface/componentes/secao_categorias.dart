@@ -1,5 +1,3 @@
-// Categorias da loja.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +8,6 @@ import '../../nucleo/navegacao.dart';
 import 'imagem_rede.dart';
 import 'responsivo.dart';
 
-/// Ícone de cada categoria usado nos chips.
 const _iconesCategorias = <String, IconData>{
   'Camisetas': Icons.checkroom,
   'Moletons': Icons.dry_cleaning,
@@ -18,10 +15,10 @@ const _iconesCategorias = <String, IconData>{
   'Acessórios': Icons.watch_outlined,
 };
 
-/// Abre o catálogo já filtrado pela categoria.
-void abrirCategoria(BuildContext context, String categoria) => context.go(caminhoCatalogo(categoria: categoria));
+/// Abre o catálogo filtrado pela categoria já rolado até os produtos.
+void abrirCategoria(BuildContext context, String categoria) =>
+    context.go(caminhoCatalogo(categoria: categoria, irParaProdutos: true));
 
-/// Chips no celular e cards com foto no site.
 class SecaoCategorias extends StatelessWidget {
   const SecaoCategorias({super.key});
 

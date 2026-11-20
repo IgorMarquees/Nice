@@ -10,7 +10,6 @@ import 'package:nice_store/src/nucleo/tema.dart';
 
 import 'test_harness.dart';
 
-/// Administrador falso usado para testar as telas do painel.
 const _administrador = Usuario(id: 'admin-1', email: 'admin@nice.com', nome: 'Admin NICE', papel: PapelUsuario.admin);
 
 void main() {

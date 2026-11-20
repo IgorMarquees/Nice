@@ -1,5 +1,3 @@
-// Moldura do app no celular.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -8,15 +6,12 @@ import '../../controladores/controlador_carrinho.dart';
 import '../../nucleo/tema.dart';
 import '../componentes/logo_nice.dart';
 
-/// Logo no topo e barra vermelha embaixo com a busca no centro.
-/// Igual no Android e no iOS.
 class MolduraCelular extends StatelessWidget {
   const MolduraCelular({super.key, required this.local, required this.conteudo});
 
   final String local;
   final Widget conteudo;
 
-  /// Qual item da barra fica aceso para a página atual.
   int get _indice {
     if (local == '/') return 0;
     if (local.startsWith('/novidades')) return 1;
@@ -96,7 +91,6 @@ class MolduraCelular extends StatelessWidget {
   }
 }
 
-/// Barra do topo com o logo e o botão de voltar.
 class _BarraTopo extends StatelessWidget {
   const _BarraTopo({required this.podeVoltar});
 
@@ -125,7 +119,6 @@ class _BarraTopo extends StatelessWidget {
   }
 }
 
-/// Um item da barra de baixo.
 class _ItemBarra extends StatelessWidget {
   const _ItemBarra({
     required this.icone,

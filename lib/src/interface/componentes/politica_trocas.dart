@@ -1,10 +1,7 @@
-// Política de trocas e devoluções da loja.
-
 import 'package:flutter/material.dart';
 
 import '../../nucleo/tema.dart';
 
-/// Um tópico da política com ícone título e itens.
 class _TopicoPolitica {
   const _TopicoPolitica(this.icone, this.titulo, this.itens);
   final IconData icone;
@@ -12,7 +9,6 @@ class _TopicoPolitica {
   final List<String> itens;
 }
 
-/// Regras de troca arrependimento defeito e reembolso.
 const _topicos = [
   _TopicoPolitica(Icons.swap_horiz, 'Troca de tamanho ou cor', [
     'Você tem até 30 dias corridos após o recebimento para trocar o tamanho ou a cor da peça.',
@@ -44,7 +40,6 @@ const _topicos = [
   ]),
 ];
 
-/// Mostra os tópicos que abrem e fecham ao tocar.
 class PoliticaTrocas extends StatelessWidget {
   const PoliticaTrocas({super.key});
 

@@ -1,12 +1,9 @@
-// Preço e selos dos produtos.
-
 import 'package:flutter/material.dart';
 
 import '../../dados/produto.dart';
 import '../../nucleo/tema.dart';
 import '../../nucleo/formatadores.dart';
 
-/// Mostra o preço cheio riscado e o preço com desconto ao lado.
 class EtiquetaPreco extends StatelessWidget {
   const EtiquetaPreco({super.key, required this.produto, this.grande = false});
 
@@ -29,7 +26,6 @@ class EtiquetaPreco extends StatelessWidget {
   }
 }
 
-/// Etiqueta vermelha com a porcentagem de desconto.
 class SeloDesconto extends StatelessWidget {
   const SeloDesconto({super.key, required this.percentual});
 
@@ -48,7 +44,6 @@ class SeloDesconto extends StatelessWidget {
   }
 }
 
-/// Selo de texto como Novo ou Esgotado.
 class SeloTexto extends StatelessWidget {
   const SeloTexto({super.key, required this.rotulo, this.escuro = false});
 

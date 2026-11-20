@@ -1,12 +1,9 @@
-// Página inicial do painel do administrador.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../nucleo/tema.dart';
 import '../../componentes/responsivo.dart';
 
-/// Um cartão do painel e a página que ele abre.
 class _SecaoAdmin {
   const _SecaoAdmin(this.titulo, this.descricao, this.icone, this.caminho);
 
@@ -16,7 +13,6 @@ class _SecaoAdmin {
   final String caminho;
 }
 
-/// Áreas do painel.
 const _secoes = [
   _SecaoAdmin(
     'Produtos',
@@ -44,7 +40,6 @@ const _secoes = [
   ),
 ];
 
-/// Mostra um cartão para cada área do painel.
 class TelaPainelAdmin extends StatelessWidget {
   const TelaPainelAdmin({super.key});
 
@@ -83,7 +78,6 @@ class TelaPainelAdmin extends StatelessWidget {
   }
 }
 
-/// Cartão clicável de uma área.
 class _CartaoAdmin extends StatelessWidget {
   const _CartaoAdmin({required this.secao});
 

@@ -1,6 +1,3 @@
-// Widget raiz do app.
-// Aplica o tema da marca e liga o roteador de páginas.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -10,7 +7,6 @@ import 'controladores/controlador_autenticacao.dart';
 import 'nucleo/rotas.dart';
 import 'nucleo/tema.dart';
 
-/// Aplicativo da NICE com tema rotas e idioma português.
 class AplicativoNice extends StatefulWidget {
   const AplicativoNice({super.key});
 
@@ -34,7 +30,6 @@ class _AplicativoNiceEstado extends State<AplicativoNice> {
     super.dispose();
   }
 
-  /// Monta o MaterialApp com o tema e os textos do Flutter em português.
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(

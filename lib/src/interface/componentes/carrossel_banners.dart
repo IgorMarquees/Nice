@@ -1,5 +1,3 @@
-// Carrossel de banners da Home.
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -8,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../nucleo/tema.dart';
 import 'imagem_banner.dart';
 
-/// Um banner do carrossel e a página que ele abre.
 class SlideBanner {
   const SlideBanner({required this.imagem, required this.proporcao, required this.rota, required this.rotulo});
 
@@ -18,7 +15,6 @@ class SlideBanner {
   final String rotulo;
 }
 
-/// Banners que trocam sozinhos a cada seis segundos.
 class CarrosselBanners extends StatefulWidget {
   const CarrosselBanners({super.key, required this.slides, this.proporcaoApp});
 
@@ -31,13 +27,11 @@ class CarrosselBanners extends StatefulWidget {
   State<CarrosselBanners> createState() => _CarrosselBannersEstado();
 }
 
-/// Guarda a página atual e o temporizador da troca automática.
 class _CarrosselBannersEstado extends State<CarrosselBanners> {
   final _controlador = PageController();
   Timer? _temporizador;
   int _pagina = 0;
 
-  /// Liga o temporizador que avança o carrossel.
   @override
   void initState() {
     super.initState();
@@ -48,7 +42,6 @@ class _CarrosselBannersEstado extends State<CarrosselBanners> {
     });
   }
 
-  /// Desliga o temporizador quando a tela fecha.
   @override
   void dispose() {
     _temporizador?.cancel();
@@ -74,7 +67,6 @@ class _CarrosselBannersEstado extends State<CarrosselBanners> {
     );
   }
 
-  /// Banners e os indicadores de página por cima.
   Widget _pilha(double formato) {
     return Stack(
       children: [

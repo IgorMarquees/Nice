@@ -1,5 +1,3 @@
-// Formulário de cadastro e edição de produto.
-
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -19,14 +17,12 @@ import '../../componentes/imagem_rede.dart';
 import '../../componentes/responsivo.dart';
 import '../../componentes/estados_tela.dart';
 
-/// Foto escolhida no aparelho que ainda vai subir.
 class _FotoEscolhida {
   _FotoEscolhida(this.arquivo, this.bytes);
   final XFile arquivo;
   final Uint8List bytes;
 }
 
-/// Fotos que já estão salvas mais as escolhidas agora.
 class _ConjuntoFotos {
   _ConjuntoFotos([List<String>? urls]) : urls = urls ?? [];
 
@@ -36,7 +32,6 @@ class _ConjuntoFotos {
   bool get vazio => urls.isEmpty && escolhidas.isEmpty;
 }
 
-/// Uma cor em edição com nome e fotos.
 class _RascunhoCor {
   _RascunhoCor({String nome = '', List<String>? urls})
       : nome = TextEditingController(text: nome),
@@ -46,8 +41,6 @@ class _RascunhoCor {
   final _ConjuntoFotos fotos;
 }
 
-/// Cadastra ou edita um produto.
-/// Sem id é um produto novo.
 class TelaFormularioProduto extends StatefulWidget {
   const TelaFormularioProduto({super.key, this.idProduto});
 
@@ -94,7 +87,6 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
     }
   }
 
-  /// Preenche o formulário com os dados do produto que está sendo editado.
   Future<void> _carregarExistente() async {
     final produto = await context.read<ControladorAdmin>().encontrarPorId(widget.idProduto!);
     if (!mounted) return;
@@ -140,7 +132,6 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
     super.dispose();
   }
 
-  /// Abre a galeria para escolher várias fotos.
   Future<void> _escolherFotos(_ConjuntoFotos alvo) async {
     final arquivos = await ImagePicker().pickMultiImage(imageQuality: 85, maxWidth: 1800);
     final escolhidas = <_FotoEscolhida>[];
@@ -151,7 +142,6 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
     setState(() => alvo.escolhidas.addAll(escolhidas));
   }
 
-  /// Adiciona um tamanho digitado pelo admin.
   void _adicionarTamanho() {
     final valor = _tamanhoPersonalizado.text.trim();
     if (valor.isEmpty) return;
@@ -161,7 +151,6 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
     });
   }
 
-  /// Marca ou desmarca um tamanho padrão.
   void _alternarTamanho(String tamanho, bool selecionado) {
     setState(() {
       if (!selecionado) {
@@ -172,7 +161,6 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
     });
   }
 
-  /// Remove uma cor e as fotos dela.
   void _removerCor(int indice) {
     setState(() => _cores.removeAt(indice).nome.dispose());
   }
@@ -183,7 +171,6 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
         ..._tamanhos.where((s) => !ControladorCatalogo.tamanhos.contains(s)),
       ];
 
-  /// Valida tudo envia as fotos e grava o produto.
   Future<void> _salvar() async {
     final erroPeriodo = _temDesconto ? validarPeriodoDesconto(_inicioDesconto, _fimDesconto) : null;
     setState(() => _erroDesconto = erroPeriodo);
@@ -240,7 +227,6 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
     }
   }
 
-  /// Dois campos lado a lado ou um embaixo do outro no celular.
   Widget _par(Widget a, Widget b) {
     if (context.ehCelular) {
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [a, const SizedBox(height: 12), b]);
@@ -520,7 +506,6 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
   }
 }
 
-/// Card de uma cor com nome e fotos.
 class _CartaoCor extends StatelessWidget {
   const _CartaoCor({
     super.key,
@@ -569,7 +554,6 @@ class _CartaoCor extends StatelessWidget {
   }
 }
 
-/// Miniaturas das fotos com o botão de adicionar mais.
 class _GradeFotos extends StatelessWidget {
   const _GradeFotos({required this.fotos, required this.aoEscolher, required this.aoMudar});
 
@@ -620,7 +604,6 @@ class _GradeFotos extends StatelessWidget {
   }
 }
 
-/// Miniatura com o botão de remover.
 class _Miniatura extends StatelessWidget {
   const _Miniatura({required this.conteudo, required this.aoRemover});
 

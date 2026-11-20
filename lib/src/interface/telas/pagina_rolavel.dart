@@ -1,5 +1,3 @@
-// Rolagem de cada página.
-
 import 'package:flutter/material.dart';
 
 import '../componentes/responsivo.dart';

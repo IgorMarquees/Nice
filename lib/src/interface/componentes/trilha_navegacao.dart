@@ -1,5 +1,3 @@
-// Caminho de navegação da página do produto.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,7 +13,6 @@ class ItemTrilha {
   final String? caminho;
 }
 
-/// Mostra Home depois Catálogo depois a categoria e o produto com links.
 class TrilhaNavegacao extends StatelessWidget {
   const TrilhaNavegacao({super.key, required this.itens});
 

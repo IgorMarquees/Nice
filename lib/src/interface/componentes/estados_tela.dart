@@ -1,10 +1,7 @@
-// Telas de estado reaproveitadas.
-
 import 'package:flutter/material.dart';
 
 import '../../nucleo/tema.dart';
 
-/// Indicador de carregamento centralizado.
 class Carregando extends StatelessWidget {
   const Carregando({super.key});
 
@@ -17,7 +14,6 @@ class Carregando extends StatelessWidget {
   }
 }
 
-/// Aviso de lista vazia com ícone texto e um botão opcional.
 class EstadoVazio extends StatelessWidget {
   const EstadoVazio({
     super.key,
@@ -61,7 +57,6 @@ class EstadoVazio extends StatelessWidget {
   }
 }
 
-/// Mensagem de erro ou de sucesso dentro de formulários.
 class MensagemFormulario extends StatelessWidget {
   const MensagemFormulario({super.key, required this.texto, this.ehErro = true});
 

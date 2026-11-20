@@ -1,6 +1,3 @@
-// Identidade visual da NICE.
-// Todas as cores fontes e estilos do app ficam aqui.
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -27,14 +24,12 @@ class TemaNice {
   static const linhaRodape = Color(0xFF2E2E2E);
   static const veu = Color(0x8A000000);
 
-  /// Medidas de cantos e larguras da tela.
   static const raio = 8.0;
   static const raioPilula = 28.0;
   static const larguraMaximaConteudo = 1280.0;
   static const larguraTablet = 640.0;
   static const larguraComputador = 1024.0;
 
-  /// Sombras e degradês usados por cima das fotos.
   static const sombraLateral = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
@@ -55,7 +50,6 @@ class TemaNice {
     stops: [0, 0.45, 1],
   );
 
-  /// Fonte Archivo dos títulos.
   static TextStyle _titulo(
     double tamanho, {
     FontWeight peso = FontWeight.w900,
@@ -64,7 +58,6 @@ class TemaNice {
   }) =>
       GoogleFonts.archivo(fontSize: tamanho, fontWeight: peso, height: altura, letterSpacing: espacamento, color: grafite);
 
-  /// Fonte Inter dos textos.
   static TextStyle _texto(
     double tamanho, {
     FontWeight peso = FontWeight.w400,
@@ -73,7 +66,6 @@ class TemaNice {
     double espacamento = 0,
   }) => GoogleFonts.inter(fontSize: tamanho, fontWeight: peso, color: cor, height: altura, letterSpacing: espacamento);
 
-  /// Tamanhos de texto usados em todo o app.
   static TextTheme _estilosTexto() {
     return TextTheme(
       displayLarge: _titulo(72),
@@ -97,7 +89,6 @@ class TemaNice {
   static TextStyle rotuloChip({required bool selecionado}) =>
       _texto(13, peso: FontWeight.w700, cor: selecionado ? branco : cinzaTexto);
 
-  /// Sobretítulo vermelho acima dos títulos de seção.
   static TextStyle sobretituloSecao({bool grande = true}) =>
       _texto(grande ? 18 : 14, peso: FontWeight.w500, cor: vermelhoVivo, altura: 1.2);
 
@@ -138,7 +129,6 @@ class TemaNice {
   static TextStyle rotuloCategoria({bool grande = true}) =>
       _texto(grande ? 30 : 18, peso: FontWeight.w600, cor: branco, altura: 1.1);
 
-  /// Tema claro completo com botões campos chips e avisos.
   static ThemeData claro() {
     final esquema = ColorScheme.fromSeed(
       seedColor: vermelho,

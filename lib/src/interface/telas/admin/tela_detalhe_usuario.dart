@@ -1,5 +1,3 @@
-// Detalhes de um usuário para o administrador.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +13,6 @@ import '../../componentes/cartao_pedido.dart';
 import '../../componentes/responsivo.dart';
 import '../../componentes/estados_tela.dart';
 
-/// Dados endereços pedidos e o botão de tornar ou remover admin.
 class TelaDetalheUsuario extends StatefulWidget {
   const TelaDetalheUsuario({super.key, required this.idUsuario});
 
@@ -36,7 +33,6 @@ class _TelaDetalheUsuarioEstado extends State<TelaDetalheUsuario> {
     _carregar();
   }
 
-  /// Carrega perfil endereços e pedidos.
   Future<void> _carregar() async {
     final detalhes = await context.read<ControladorUsuarios>().detalhes(widget.idUsuario);
     if (!mounted) return;
@@ -46,7 +42,6 @@ class _TelaDetalheUsuarioEstado extends State<TelaDetalheUsuario> {
     });
   }
 
-  /// Pede confirmação e troca o tipo de conta.
   Future<void> _trocarPapel(Usuario usuario) async {
     final tornarAdmin = !usuario.ehAdmin;
     final confirmado = await showDialog<bool>(

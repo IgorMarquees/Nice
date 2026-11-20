@@ -1,6 +1,3 @@
-// Controlador da página de usuários do admin.
-// Lista clientes e troca o tipo de conta.
-
 import 'package:flutter/foundation.dart';
 
 import '../dados/usuario.dart';
@@ -9,7 +6,6 @@ import '../dados/repositorio_enderecos.dart';
 import '../dados/repositorio_pedidos.dart';
 import '../dados/repositorio_usuarios.dart';
 
-/// Tudo o que o admin vê sobre um cliente.
 class DetalhesUsuario {
   const DetalhesUsuario({required this.usuario, required this.enderecos, required this.pedidos});
 
@@ -21,7 +17,6 @@ class DetalhesUsuario {
       DetalhesUsuario(usuario: usuario ?? this.usuario, enderecos: enderecos, pedidos: pedidos);
 }
 
-/// Lista de usuários com busca e ações do administrador.
 class ControladorUsuarios extends ChangeNotifier {
   ControladorUsuarios(this._usuarios, this._enderecos, this._pedidos);
 
@@ -37,7 +32,6 @@ class ControladorUsuarios extends ChangeNotifier {
   bool get carregando => _carregando;
   String? get erro => _erro;
 
-  /// Usuários filtrados pelo nome ou email digitado.
   List<Usuario> get itens {
     final q = _busca.trim().toLowerCase();
     if (q.isEmpty) return _itens;
@@ -51,7 +45,6 @@ class ControladorUsuarios extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Busca todos os perfis cadastrados.
   Future<void> carregar() async {
     _carregando = true;
     _erro = null;
@@ -65,7 +58,6 @@ class ControladorUsuarios extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Junta perfil endereços e pedidos de um usuário de uma vez.
   Future<DetalhesUsuario?> detalhes(String idUsuario) async {
     try {
       final resultados = await Future.wait([

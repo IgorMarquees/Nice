@@ -1,5 +1,3 @@
-// Barra de navegação do site.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -11,14 +9,12 @@ import '../../nucleo/navegacao.dart';
 import 'logo_nice.dart';
 import 'responsivo.dart';
 
-/// Um link do menu do site.
 class DestinoMenu {
   const DestinoMenu(this.rotulo, this.caminho);
   final String rotulo;
   final String caminho;
 }
 
-/// Páginas que aparecem no menu.
 const destinosWeb = [
   DestinoMenu('Home', '/'),
   DestinoMenu('Novidades', '/novidades'),
@@ -26,15 +22,12 @@ const destinosWeb = [
   DestinoMenu('Sobre nós', '/sobre'),
 ];
 
-/// Diz se o link é da página aberta agora.
 bool _estaAtivo(String local, String caminho) =>
     caminho == '/' ? local == '/' : local.startsWith(caminho);
 
 /// Toda busca abre o catálogo já rolado até os produtos.
 void _buscar(BuildContext context, String valor) => context.buscarNoCatalogo(valor);
 
-/// Barra do topo do site com logo menu busca carrinho e conta.
-/// Em telas estreitas o menu vai para uma gaveta lateral.
 class BarraNavegacaoWeb extends StatelessWidget {
   const BarraNavegacaoWeb({super.key, required this.local});
 
@@ -118,8 +111,6 @@ class BarraNavegacaoWeb extends StatelessWidget {
     );
   }
 
-  /// Botões de entrar e de minha conta.
-  /// O admin também vê o atalho do painel.
   List<Widget> _acoesConta(BuildContext context, ControladorAutenticacao autenticacao, {required bool mostrarApelido}) {
     if (!autenticacao.estaLogado) {
       return [
@@ -153,7 +144,6 @@ class BarraNavegacaoWeb extends StatelessWidget {
   }
 }
 
-/// Link do menu com uma linha vermelha na página atual.
 class _LinkMenu extends StatelessWidget {
   const _LinkMenu({required this.item, required this.ativo});
 
@@ -179,7 +169,6 @@ class _LinkMenu extends StatelessWidget {
   }
 }
 
-/// Campo de busca da barra.
 class _CampoBusca extends StatelessWidget {
   const _CampoBusca({required this.aoEnviar});
 
@@ -199,7 +188,6 @@ class _CampoBusca extends StatelessWidget {
   }
 }
 
-/// Menu lateral usado em telas estreitas.
 class MenuLateralWeb extends StatelessWidget {
   const MenuLateralWeb({super.key, required this.local});
 

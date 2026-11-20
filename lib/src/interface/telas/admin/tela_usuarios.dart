@@ -1,5 +1,3 @@
-// Lista de usuários para o administrador.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +9,6 @@ import '../../../nucleo/formatadores.dart';
 import '../../componentes/responsivo.dart';
 import '../../componentes/estados_tela.dart';
 
-/// Mostra os usuários cadastrados com busca por nome ou email.
 class TelaUsuarios extends StatefulWidget {
   const TelaUsuarios({super.key});
 
@@ -70,7 +67,6 @@ class _TelaUsuariosEstado extends State<TelaUsuarios> {
   }
 }
 
-/// Linha de um usuário que abre os detalhes.
 class _ItemUsuario extends StatelessWidget {
   const _ItemUsuario({required this.usuario});
 

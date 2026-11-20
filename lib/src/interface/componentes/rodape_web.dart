@@ -1,5 +1,3 @@
-// Rodapé do site.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -7,7 +5,6 @@ import '../../nucleo/tema.dart';
 import 'responsivo.dart';
 import 'redes_sociais.dart';
 
-/// Slogan links redes sociais e direitos reservados.
 class RodapeWeb extends StatelessWidget {
   const RodapeWeb({super.key});
 
@@ -158,7 +155,6 @@ class _LinkRodape {
   final String? caminho;
 }
 
-/// Uma coluna de links do rodapé.
 class _ColunaRodape extends StatelessWidget {
   const _ColunaRodape({required this.titulo, required this.links});
 

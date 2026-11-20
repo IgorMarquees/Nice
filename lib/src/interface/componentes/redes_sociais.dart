@@ -1,18 +1,14 @@
-// Ícones das redes sociais.
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../nucleo/tema.dart';
 
-/// Uma rede social com nome e ícone.
 class _Rede {
   const _Rede(this.nome, this.icone);
   final String nome;
   final FaIconData icone;
 }
 
-/// Redes mostradas no rodapé no perfil e no Sobre.
 const _redes = [
   _Rede('Instagram', FontAwesomeIcons.instagram),
   _Rede('TikTok', FontAwesomeIcons.tiktok),

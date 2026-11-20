@@ -1,10 +1,7 @@
-// Imagem vinda da internet.
-
 import 'package:flutter/material.dart';
 
 import '../../nucleo/tema.dart';
 
-/// Mostra a foto e um ícone no lugar enquanto carrega ou se der erro.
 class ImagemRede extends StatelessWidget {
   const ImagemRede({super.key, required this.url, this.ajuste = BoxFit.contain});
 
@@ -26,7 +23,6 @@ class ImagemRede extends StatelessWidget {
   }
 }
 
-/// Ícone de roupa usado quando não há foto.
 class _SemImagem extends StatelessWidget {
   const _SemImagem();
 

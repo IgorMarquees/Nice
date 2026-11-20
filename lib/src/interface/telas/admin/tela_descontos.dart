@@ -1,5 +1,3 @@
-// Painel de descontos do administrador.
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +12,6 @@ import '../../componentes/imagem_rede.dart';
 import '../../componentes/responsivo.dart';
 import '../../componentes/estados_tela.dart';
 
-/// Filtro da lista pela situação do desconto.
 enum _FiltroSituacao {
   todos('Todos'),
   comDesconto('Com desconto'),
@@ -24,7 +21,6 @@ enum _FiltroSituacao {
   final String rotulo;
 }
 
-/// Seleciona vários produtos e aplica ou cancela o desconto de todos de uma vez.
 class TelaDescontos extends StatefulWidget {
   const TelaDescontos({super.key});
 
@@ -33,7 +29,6 @@ class TelaDescontos extends StatefulWidget {
 }
 
 class _TelaDescontosEstado extends State<TelaDescontos> {
-  /// Ids dos produtos marcados.
   final Set<String> _selecionados = {};
   String _busca = '';
   String _categoria = ControladorCatalogo.todasCategorias;
@@ -47,7 +42,6 @@ class _TelaDescontosEstado extends State<TelaDescontos> {
     });
   }
 
-  /// Produtos que passam na busca e nos filtros.
   List<Produto> _visiveis(List<Produto> todos) {
     final q = _busca.trim().toLowerCase();
     return todos.where((p) {
@@ -63,7 +57,6 @@ class _TelaDescontosEstado extends State<TelaDescontos> {
     }).toList();
   }
 
-  /// Abre o diálogo e aplica o desconto nos produtos escolhidos.
   Future<void> _aplicar(List<String> ids, {Produto? unico}) async {
     final admin = context.read<ControladorAdmin>();
     final catalogo = context.read<ControladorCatalogo>();
@@ -84,7 +77,6 @@ class _TelaDescontosEstado extends State<TelaDescontos> {
     mostrarMensagem(context, deuCerto ? 'Desconto aplicado em ${ids.length} produto(s).' : (admin.erro ?? 'Erro.'));
   }
 
-  /// Pede confirmação e tira o desconto dos produtos escolhidos.
   Future<void> _cancelar(List<String> ids) async {
     final admin = context.read<ControladorAdmin>();
     final catalogo = context.read<ControladorCatalogo>();
@@ -229,7 +221,6 @@ class _TelaDescontosEstado extends State<TelaDescontos> {
   }
 }
 
-/// Linha de um produto com caixa de seleção situação e botões.
 class _ItemDesconto extends StatelessWidget {
   const _ItemDesconto({
     required this.produto,

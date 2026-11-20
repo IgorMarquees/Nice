@@ -1,5 +1,3 @@
-// Card de pedido.
-
 import 'package:flutter/material.dart';
 
 import '../../dados/pedido.dart';
@@ -7,7 +5,6 @@ import '../../nucleo/tema.dart';
 import '../../nucleo/formatadores.dart';
 import 'formulario_endereco.dart';
 
-/// Mostra número data situação itens endereço e valores de um pedido.
 class CartaoPedido extends StatelessWidget {
   const CartaoPedido({super.key, required this.pedido});
 

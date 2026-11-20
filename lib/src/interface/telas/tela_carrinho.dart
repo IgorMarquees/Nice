@@ -1,5 +1,3 @@
-// Tela do carrinho.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +12,6 @@ import '../componentes/imagem_rede.dart';
 import '../componentes/responsivo.dart';
 import '../componentes/estados_tela.dart';
 
-/// Itens do carrinho e o resumo da compra.
 class TelaCarrinho extends StatelessWidget {
   const TelaCarrinho({super.key});
 
@@ -72,7 +69,6 @@ class TelaCarrinho extends StatelessWidget {
   }
 }
 
-/// Resumo com frete quanto falta para o frete grátis e o total no Pix.
 class _ResumoPedido extends StatelessWidget {
   const _ResumoPedido();
 
@@ -160,7 +156,6 @@ class _ResumoPedido extends StatelessWidget {
   }
 }
 
-/// Linha de um item com botões de quantidade e remover.
 class _LinhaCarrinho extends StatelessWidget {
   const _LinhaCarrinho({required this.item});
 

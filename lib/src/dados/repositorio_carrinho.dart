@@ -1,10 +1,7 @@
-// Acesso à tabela cart_items do Supabase.
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'item_carrinho.dart';
 
-/// Carrinho salvo no banco para cada cliente.
 class RepositorioCarrinho {
   RepositorioCarrinho(this._conexao);
 
@@ -12,7 +9,6 @@ class RepositorioCarrinho {
 
   SupabaseQueryBuilder get _tabela => _conexao.from('cart_items');
 
-  /// Busca o carrinho salvo do cliente.
   Future<List<ItemCarrinho>> buscar(String idUsuario) async {
     final registros = await _tabela.select().eq('user_id', idUsuario).order('created_at');
     return registros.map<ItemCarrinho>((registro) => ItemCarrinho.doMapa(registro)).toList();
@@ -23,7 +19,6 @@ class RepositorioCarrinho {
     await _tabela.upsert(item.paraLinha(idUsuario), onConflict: 'user_id,product_id,size');
   }
 
-  /// Remove um item do carrinho.
   Future<void> remover(String idUsuario, ItemCarrinho item) async {
     await _tabela
         .delete()
@@ -32,7 +27,6 @@ class RepositorioCarrinho {
         .eq('size', item.tamanho);
   }
 
-  /// Remove todos os itens do cliente.
   Future<void> limpar(String idUsuario) async {
     await _tabela.delete().eq('user_id', idUsuario);
   }

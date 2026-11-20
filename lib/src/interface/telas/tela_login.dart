@@ -1,5 +1,3 @@
-// Tela de login.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -11,11 +9,9 @@ import '../componentes/botao_principal.dart';
 import '../componentes/botoes_login_social.dart';
 import '../componentes/estados_tela.dart';
 
-/// Login com email e senha ou Google.
 class TelaLogin extends StatefulWidget {
   const TelaLogin({super.key, this.origem});
 
-  /// Página para voltar depois do login.
   final String? origem;
 
   @override
@@ -43,13 +39,11 @@ class _TelaLoginEstado extends State<TelaLogin> {
     super.dispose();
   }
 
-  /// Valida o formulário e tenta entrar.
   Future<void> _enviarFormulario() async {
     if (!_chaveFormulario.currentState!.validate()) return;
     await context.read<ControladorAutenticacao>().entrar(_email.text, _senha.text);
   }
 
-  /// Abre o diálogo e envia o email de recuperação de senha.
   Future<void> _esqueciSenha() async {
     final email = await showDialog<String>(
       context: context,

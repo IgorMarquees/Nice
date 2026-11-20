@@ -1,8 +1,5 @@
-// Configurações fixas do app.
-
 import 'package:flutter/foundation.dart';
 
-/// Endereço do Supabase e regras de frete e Pix.
 class Configuracao {
   Configuracao._();
 
@@ -19,19 +16,16 @@ class Configuracao {
     defaultValue: 'sb_publishable_ftHYmk7sptm5QeBdb8SENw_XQX0e4YK',
   );
 
-  /// Pasta do Supabase onde ficam as fotos dos produtos.
   static const bucketProdutos = 'product-images';
 
   /// Endereço de volta para o app depois do login com Google no celular.
   static const redirecionamentoCelular = 'io.supabase.nicestore://login-callback/';
 
-  /// Para onde o Supabase devolve o usuário depois do login.
   static String get redirecionamentoLogin => kIsWeb ? Uri.base.origin : redirecionamentoCelular;
 
   static bool get supabaseConfigurado =>
       !urlSupabase.contains('SEU-PROJETO') && !chaveSupabase.contains('SUA-ANON');
 
-  /// O botão do Google aparece só no Android e na web.
   static bool get mostrarLoginGoogle =>
       kIsWeb || defaultTargetPlatform == TargetPlatform.android;
 
@@ -44,6 +38,5 @@ class Configuracao {
   /// Desconto do Pix sobre o valor dos produtos.
   static const descontoPix = 0.05;
 
-  /// Endereço da API de CEP gratuita.
   static String urlCep(String digitos) => 'https://viacep.com.br/ws/$digitos/json/';
 }

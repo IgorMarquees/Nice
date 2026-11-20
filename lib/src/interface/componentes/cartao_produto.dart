@@ -1,5 +1,3 @@
-// Card de produto usado nas grades e carrosséis.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -12,13 +10,11 @@ import '../../nucleo/navegacao.dart';
 import 'imagem_rede.dart';
 import 'etiqueta_preco.dart';
 
-/// Foto nome descrição preço e botão rápido de carrinho.
 class CartaoProduto extends StatelessWidget {
   const CartaoProduto({super.key, required this.produto});
 
   final Produto produto;
 
-  /// Proporção da foto do card.
   static const proporcaoFoto = 0.95;
 
   @override

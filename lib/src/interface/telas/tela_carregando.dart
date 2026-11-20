@@ -1,5 +1,3 @@
-// Tela mostrada enquanto o app confere se havia alguém logado.
-
 import 'package:flutter/material.dart';
 
 import '../componentes/logo_nice.dart';

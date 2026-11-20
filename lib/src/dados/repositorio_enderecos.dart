@@ -1,5 +1,3 @@
-// Acesso aos endereços salvos e à consulta de CEP.
-
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -8,7 +6,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../nucleo/configuracao.dart';
 import 'pedido.dart';
 
-/// Dados que a API de CEP devolve.
 class ResultadoCep {
   const ResultadoCep({
     required this.rua,
@@ -23,7 +20,6 @@ class ResultadoCep {
   final String estado;
 }
 
-/// Endereços na tabela addresses e consulta no ViaCEP.
 class RepositorioEnderecos {
   RepositorioEnderecos(this._conexao, {http.Client? clienteHttp}) : _http = clienteHttp ?? http.Client();
 
@@ -32,19 +28,16 @@ class RepositorioEnderecos {
 
   SupabaseQueryBuilder get _tabela => _conexao.from('addresses');
 
-  /// Busca os endereços do cliente.
   Future<List<EnderecoSalvo>> buscar(String idUsuario) async {
     final registros = await _tabela.select().eq('user_id', idUsuario).order('created_at');
     return registros.map<EnderecoSalvo>((registro) => EnderecoSalvo.doMapa(registro)).toList();
   }
 
-  /// Grava ou atualiza um endereço.
   Future<EnderecoSalvo> salvar(String idUsuario, EnderecoSalvo endereco) async {
     final registro = await _tabela.upsert(endereco.paraLinha(idUsuario)).select().single();
     return EnderecoSalvo.doMapa(registro);
   }
 
-  /// Exclui um endereço.
   Future<void> excluir(String id) async {
     await _tabela.delete().eq('id', id);
   }

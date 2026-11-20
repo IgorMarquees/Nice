@@ -1,11 +1,8 @@
-// Envio de fotos dos produtos para o armazenamento do Supabase.
-
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../nucleo/configuracao.dart';
 
-/// Sobe as fotos dos produtos para a pasta pública do Supabase.
 class RepositorioFotos {
   RepositorioFotos(this._conexao);
 

@@ -1,5 +1,3 @@
-// Grade de produtos.
-
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -7,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../dados/produto.dart';
 import 'cartao_produto.dart';
 
-/// Quantas colunas cabem na largura disponível.
 int colunasProdutos(double largura, {int maxColunas = 4}) =>
     min(maxColunas, largura >= 900 ? 4 : (largura >= 600 ? 3 : 2));
 
@@ -37,8 +34,6 @@ class GradeProdutos extends StatelessWidget {
   }
 }
 
-/// Uma linha da grade.
-/// As posições que sobram ficam vazias.
 class LinhaProdutos extends StatelessWidget {
   const LinhaProdutos({super.key, required this.produtos, required this.colunas, this.espaco = 20});
 

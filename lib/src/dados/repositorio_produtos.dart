@@ -1,10 +1,7 @@
-// Acesso à tabela products do Supabase.
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'produto.dart';
 
-/// Leitura e gravação de produtos.
 class RepositorioProdutos {
   RepositorioProdutos(this._conexao);
 
@@ -18,7 +15,6 @@ class RepositorioProdutos {
     return registros.map<Produto>((registro) => Produto.doMapa(registro)).toList();
   }
 
-  /// Busca um produto pelo id.
   Future<Produto?> buscarPorId(String id) async {
     final registro = await _tabela.select(Produto.colunasPublicas).eq('id', id).maybeSingle();
     return registro == null ? null : Produto.doMapa(registro);
@@ -32,7 +28,6 @@ class RepositorioProdutos {
     };
   }
 
-  /// Produtos com o estoque preenchido para o painel do admin.
   Future<List<Produto>> buscarTodosAdmin() async {
     final produtos = await buscarTodos();
     final estoque = await buscarEstoque();
@@ -50,7 +45,6 @@ class RepositorioProdutos {
         .eq('id', produto.id);
   }
 
-  /// Liga ou desliga Destaque e Novidade.
   Future<void> definirMarcacoes(String id, {bool? emDestaque, bool? novidade}) async {
     await _tabela.update({
       'is_featured': ?emDestaque,
@@ -70,7 +64,6 @@ class RepositorioProdutos {
     }).inFilter('id', ids);
   }
 
-  /// Exclui um produto.
   Future<void> excluir(String id) async {
     await _tabela.delete().eq('id', id);
   }

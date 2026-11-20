@@ -1,6 +1,3 @@
-// Controlador do painel de produtos do administrador.
-// Carrega a lista com estoque e salva exclui e aplica descontos.
-
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -17,7 +14,6 @@ class RascunhoVariante {
   final List<XFile> novosArquivos;
 }
 
-/// Guarda o estado da tela de produtos do admin e avisa a interface quando algo muda.
 class ControladorAdmin extends ChangeNotifier {
   ControladorAdmin(this._produtos, this._armazenamento);
 
@@ -34,10 +30,8 @@ class ControladorAdmin extends ChangeNotifier {
   bool get salvando => _salvando;
   String? get erro => _erro;
 
-  /// Todos os produtos sem o filtro da busca.
   List<Produto> get todos => _itens;
 
-  /// Produtos filtrados pelo texto digitado na busca.
   List<Produto> get itens {
     final q = _busca.trim().toLowerCase();
     if (q.isEmpty) return _itens;
@@ -46,13 +40,11 @@ class ControladorAdmin extends ChangeNotifier {
         .toList();
   }
 
-  /// Atualiza o texto da busca e redesenha a lista.
   void pesquisar(String valor) {
     _busca = valor;
     notifyListeners();
   }
 
-  /// Busca os produtos no banco já com a quantidade em estoque.
   Future<void> carregar() async {
     _carregando = true;
     _erro = null;
@@ -66,7 +58,6 @@ class ControladorAdmin extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Procura um produto na lista e carrega a lista se ela ainda estiver vazia.
   Future<Produto?> encontrarPorId(String id) async {
     if (_itens.isEmpty) await carregar();
     for (final p in _itens) {
@@ -128,18 +119,15 @@ class ControladorAdmin extends ChangeNotifier {
     }
   }
 
-  /// Aplica o mesmo desconto com início e fim em um ou vários produtos.
   Future<bool> aplicarDesconto(List<String> ids, {required int percentual, DateTime? comecaEm, DateTime? terminaEm}) async {
     return _emMassa(() => _produtos.definirDesconto(ids, percentual: percentual, comecaEm: comecaEm, terminaEm: terminaEm),
         'Não foi possível aplicar o desconto.');
   }
 
-  /// Tira o desconto de um ou vários produtos.
   Future<bool> cancelarDesconto(List<String> ids) {
     return _emMassa(() => _produtos.definirDesconto(ids, percentual: 0), 'Não foi possível cancelar o desconto.');
   }
 
-  /// Executa uma ação em massa e recarrega a lista no final.
   Future<bool> _emMassa(Future<void> Function() acao, String mensagemErro) async {
     _salvando = true;
     _erro = null;
@@ -157,7 +145,6 @@ class ControladorAdmin extends ChangeNotifier {
     }
   }
 
-  /// Exclui o produto do banco e da lista.
   Future<bool> excluir(Produto produto) async {
     try {
       await _produtos.excluir(produto.id);

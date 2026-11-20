@@ -1,13 +1,9 @@
-// Controlador dos pedidos.
-// Finaliza compras e carrega o histórico do cliente.
-
 import 'package:flutter/foundation.dart';
 
 import '../dados/item_carrinho.dart';
 import '../dados/pedido.dart';
 import '../dados/repositorio_pedidos.dart';
 
-/// Pedidos do cliente e o envio de pedidos novos.
 class ControladorPedidos extends ChangeNotifier {
   ControladorPedidos(this._repositorio);
 
@@ -23,7 +19,6 @@ class ControladorPedidos extends ChangeNotifier {
   bool get enviando => _enviando;
   String? get erro => _erro;
 
-  /// Carrega o histórico de pedidos do cliente.
   Future<void> carregarMeus(String idUsuario) async {
     _carregando = true;
     _erro = null;
@@ -37,7 +32,6 @@ class ControladorPedidos extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Grava o pedido no banco e diz se deu certo.
   Future<bool> fazerPedido({
     required String idUsuario,
     required List<ItemCarrinho> itens,
@@ -66,7 +60,6 @@ class ControladorPedidos extends ChangeNotifier {
     }
   }
 
-  /// Limpa a lista de pedidos.
   void reiniciar() {
     _pedidos = [];
     notifyListeners();

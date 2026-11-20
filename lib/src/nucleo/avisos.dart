@@ -1,5 +1,3 @@
-// Avisos rápidos na parte de baixo da tela.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -23,7 +21,6 @@ void avisarAdicionadoAoCarrinho(BuildContext context, String titulo) {
     );
 }
 
-/// Aviso simples de texto.
 void mostrarMensagem(BuildContext context, String mensagem) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()

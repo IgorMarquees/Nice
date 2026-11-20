@@ -1,5 +1,3 @@
-// Página sobre nós.
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +6,6 @@ import '../componentes/imagem_banner.dart';
 import '../componentes/responsivo.dart';
 import '../componentes/redes_sociais.dart';
 
-/// Banners e o texto que conta a história da marca.
 class TelaSobre extends StatelessWidget {
   const TelaSobre({super.key});
 

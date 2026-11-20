@@ -1,5 +1,3 @@
-// Tela de finalizar compra.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +15,6 @@ import '../componentes/formulario_endereco.dart';
 import '../componentes/responsivo.dart';
 import '../componentes/estados_tela.dart';
 
-/// Endereço forma de pagamento e resumo do pedido.
 class TelaFinalizarCompra extends StatefulWidget {
   const TelaFinalizarCompra({super.key});
 
@@ -42,7 +39,6 @@ class _TelaFinalizarCompraEstado extends State<TelaFinalizarCompra> {
     return salvo.isEmpty ? null : salvo.first.id;
   }
 
-  /// Monta o pedido grava no banco e limpa o carrinho.
   Future<void> _confirmar() async {
     final idUsuario = context.read<ControladorAutenticacao>().usuario?.id;
     if (idUsuario == null) return;
@@ -270,7 +266,6 @@ class _TelaFinalizarCompraEstado extends State<TelaFinalizarCompra> {
   }
 }
 
-/// Cartão que pode ser marcado como uma opção de escolha.
 class _CartaoSelecionavel extends StatelessWidget {
   const _CartaoSelecionavel({required this.selecionado, required this.aoTocar, required this.conteudo});
 

@@ -1,6 +1,3 @@
-// Testes de comportamento.
-// Conferem os fluxos principais e as regras de preço.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -218,6 +215,33 @@ void main() {
 
     expect(roteador.state.uri.path, '/catalogo');
     expect(roteador.state.uri.queryParameters['busca'], 'hoodie');
+    final pagina = find.descendant(of: find.byType(PaginaRolavel), matching: find.byType(Scrollable)).first;
+    final rolagem = testador.state<ScrollableState>(pagina);
+    expect(rolagem.position.pixels, greaterThan(100), reason: 'deveria rolar até a área dos produtos');
+    expect(testador.takeException(), isNull);
+    await testador.pumpWidget(const SizedBox());
+    testador.view.reset();
+  });
+
+  testWidgets('categoria da Home abre o Catálogo filtrado e rolado até os produtos', (testador) async {
+    testador.view.physicalSize = const Size(1440, 900);
+    testador.view.devicePixelRatio = 1;
+    final roteador = rotasTeste('/', web: true);
+    await testador.pumpWidget(
+      ProvedoresTeste(
+        conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: roteador),
+      ),
+    );
+    await testador.pump(const Duration(milliseconds: 100));
+
+    final categoria = find.text('MOLETONS');
+    await testador.ensureVisible(categoria);
+    await testador.pumpAndSettle();
+    await testador.tap(categoria);
+    await testador.pumpAndSettle();
+
+    expect(roteador.state.uri.path, '/catalogo');
+    expect(roteador.state.uri.queryParameters['categoria'], 'Moletons');
     final pagina = find.descendant(of: find.byType(PaginaRolavel), matching: find.byType(Scrollable)).first;
     final rolagem = testador.state<ScrollableState>(pagina);
     expect(rolagem.position.pixels, greaterThan(100), reason: 'deveria rolar até a área dos produtos');

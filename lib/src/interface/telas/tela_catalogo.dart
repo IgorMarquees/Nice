@@ -1,5 +1,3 @@
-// Tela do catálogo.
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +10,6 @@ import '../componentes/grade_produtos.dart';
 import '../componentes/responsivo.dart';
 import '../componentes/estados_tela.dart';
 
-/// Todos os produtos com busca filtros e ordenação.
 class TelaCatalogo extends StatefulWidget {
   const TelaCatalogo({super.key, this.categoriaInicial, this.buscaInicial, this.rolarAteProdutos = false});
 
@@ -44,7 +41,6 @@ class _TelaCatalogoEstado extends State<TelaCatalogo> {
     });
   }
 
-  /// Rola a página até os produtos.
   void _rolarAteProdutos() {
     final alvo = _chaveProdutos.currentContext;
     if (alvo == null) return;
@@ -57,7 +53,6 @@ class _TelaCatalogoEstado extends State<TelaCatalogo> {
     super.dispose();
   }
 
-  /// Abre os filtros numa gaveta no celular.
   void _abrirFiltros() {
     showModalBottomSheet<void>(
       context: context,

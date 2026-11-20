@@ -1,5 +1,3 @@
-// Carrossel de produtos das Novidades.
-
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -8,7 +6,6 @@ import '../../dados/produto.dart';
 import '../../nucleo/tema.dart';
 import 'grade_produtos.dart';
 
-/// Mostra até três peças por vez com setas indicadores e arraste.
 class CarrosselProdutos extends StatefulWidget {
   const CarrosselProdutos({super.key, required this.produtos, this.maxPorPagina = 3});
 
@@ -19,7 +16,6 @@ class CarrosselProdutos extends StatefulWidget {
   State<CarrosselProdutos> createState() => _CarrosselProdutosEstado();
 }
 
-/// Guarda a página atual e o lado para onde o carrossel girou.
 class _CarrosselProdutosEstado extends State<CarrosselProdutos> {
   int _pagina = 0;
   int _direcao = 1;

@@ -1,5 +1,3 @@
-// Moldura das telas de login e cadastro.
-
 import 'package:flutter/material.dart';
 
 import '../../nucleo/imagens.dart';
@@ -7,7 +5,6 @@ import '../../nucleo/tema.dart';
 import 'logo_nice.dart';
 import 'responsivo.dart';
 
-/// Foto de fundo com o formulário dentro de um cartão branco.
 class LayoutAutenticacao extends StatelessWidget {
   const LayoutAutenticacao({super.key, required this.conteudo});
 

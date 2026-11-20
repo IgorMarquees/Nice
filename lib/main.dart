@@ -1,6 +1,3 @@
-// Ponto de partida do app NICE.
-// Liga o Supabase e entrega os repositórios e controladores para todas as telas.
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -26,14 +23,12 @@ import 'src/dados/repositorio_fotos.dart';
 import 'src/dados/repositorio_usuarios.dart';
 import 'src/nucleo/tema.dart';
 
-/// Primeira função executada quando o app abre.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Na web os endereços ficam limpos como /produto/123 em vez de /#/produto/123.
   usePathUrlStrategy();
 
-  // Deixa o app ocupar a tela inteira no celular.
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -52,7 +47,6 @@ Future<void> main() async {
   // Conexão única com o Supabase usada por todos os repositórios.
   final conexao = Supabase.instance.client;
 
-  // O MultiProvider deixa cada repositório e controlador disponível em qualquer tela.
   runApp(
     MultiProvider(
       providers: [

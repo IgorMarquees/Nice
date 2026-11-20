@@ -1,5 +1,3 @@
-// Página de novidades.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +14,6 @@ import '../componentes/responsivo.dart';
 import '../componentes/cabecalho_secao.dart';
 import '../componentes/estados_tela.dart';
 
-/// Banner carrossel de lançamentos bloco Em destaque e banner final.
 class TelaNovidades extends StatelessWidget {
   const TelaNovidades({super.key});
 
@@ -68,7 +65,6 @@ class TelaNovidades extends StatelessWidget {
   }
 }
 
-/// Bloco Em destaque com foto editorial texto e a foto do produto.
 class _EmDestaque extends StatelessWidget {
   const _EmDestaque({required this.produto});
 

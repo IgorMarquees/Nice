@@ -1,6 +1,3 @@
-// Tudo sobre pedidos.
-// Endereços formas de pagamento cálculo do total e o pedido em si.
-
 import '../nucleo/configuracao.dart';
 import 'item_carrinho.dart';
 
@@ -10,7 +7,6 @@ const estadosBrasileiros = [
   'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
 ];
 
-/// Endereço de entrega de um pedido.
 class EnderecoEntrega {
   const EnderecoEntrega({
     required this.destinatario,
@@ -32,10 +28,8 @@ class EnderecoEntrega {
   final String cidade;
   final String estado;
 
-  /// Verdadeiro quando o endereço não foi preenchido.
   bool get vazio => rua.isEmpty && cidade.isEmpty && cep.isEmpty;
 
-  /// Endereço completo em uma linha só.
   String get emUmaLinha {
     final textoComplemento = complemento.isEmpty ? '' : ' - $complemento';
     return '$rua, $numero$textoComplemento - $bairro, $cidade/$estado - CEP $cep';
@@ -64,7 +58,6 @@ class EnderecoEntrega {
       );
 }
 
-/// Endereço que o cliente deixou salvo no perfil.
 class EnderecoSalvo {
   /// O id fica vazio enquanto o endereço ainda não foi gravado.
   const EnderecoSalvo({required this.id, required this.rotulo, required this.endereco});
@@ -73,7 +66,6 @@ class EnderecoSalvo {
   final String rotulo;
   final EnderecoEntrega endereco;
 
-  /// Nome mostrado na tela como Casa ou Trabalho.
   String get titulo => rotulo.isEmpty ? 'Endereço' : rotulo;
 
   Map<String, dynamic> paraLinha(String idUsuario) => {
@@ -105,7 +97,6 @@ enum FormaPagamento {
       values.firstWhere((m) => m.codigo == codigo, orElse: () => FormaPagamento.pix);
 }
 
-/// Valores do pedido com produtos desconto do Pix e frete.
 class TotaisPedido {
   const TotaisPedido({required this.subtotal, required this.desconto, required this.frete});
 
@@ -120,14 +111,12 @@ class TotaisPedido {
   final double desconto;
   final double frete;
 
-  /// Valor final que o cliente paga.
   double get total => _arredondar(subtotal - desconto + frete);
   bool get freteGratis => frete == 0;
 
   static double _arredondar(double valor) => (valor * 100).roundToDouble() / 100;
 }
 
-/// Pedido feito pelo cliente.
 class Pedido {
   const Pedido({
     required this.id,
@@ -155,7 +144,6 @@ class Pedido {
   final EnderecoEntrega endereco;
   final DateTime? criadoEm;
 
-  /// Texto da situação do pedido em português.
   String get rotuloSituacao {
     switch (situacao) {
       case 'paid':
@@ -171,10 +159,8 @@ class Pedido {
     }
   }
 
-  /// Primeiros caracteres do id para mostrar na tela.
   String get idCurto => id.length > 8 ? id.substring(0, 8).toUpperCase() : id.toUpperCase();
 
-  /// Lê um pedido que veio do banco.
   factory Pedido.doMapa(Map<String, dynamic> mapa) {
     final itensBrutos = (mapa['items'] as List?) ?? const [];
     return Pedido(

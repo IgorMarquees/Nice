@@ -1,5 +1,3 @@
-// Formulário de endereço com busca pelo CEP.
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,14 +15,12 @@ class CamposEndereco extends StatefulWidget {
   final EnderecoSalvo? inicial;
   final String destinatarioInicial;
 
-  /// Mostra o campo de apelido usado nos endereços salvos.
   final bool mostrarApelido;
 
   @override
   State<CamposEndereco> createState() => CamposEnderecoEstado();
 }
 
-/// Guarda os campos digitados e a consulta de CEP.
 class CamposEnderecoEstado extends State<CamposEndereco> {
   late final _apelido = TextEditingController(text: widget.inicial?.rotulo ?? '');
   late final _destinatario = TextEditingController(text: widget.inicial?.endereco.destinatario ?? widget.destinatarioInicial);
@@ -53,7 +49,6 @@ class CamposEnderecoEstado extends State<CamposEndereco> {
     super.dispose();
   }
 
-  /// Endereço montado a partir dos campos.
   EnderecoSalvo get valor => EnderecoSalvo(
         id: widget.inicial?.id ?? '',
         rotulo: _apelido.text.trim(),
@@ -96,7 +91,6 @@ class CamposEnderecoEstado extends State<CamposEndereco> {
 
   String? _obrigatorio(String? valor) => valor == null || valor.trim().isEmpty ? 'Obrigatório' : null;
 
-  /// Campos lado a lado no computador e um embaixo do outro no celular.
   Widget _linha(List<Widget> campos, {List<int>? peso}) {
     if (context.ehCelular) {
       return Column(
@@ -211,7 +205,6 @@ class CamposEnderecoEstado extends State<CamposEndereco> {
   }
 }
 
-/// Abre o diálogo para cadastrar ou editar um endereço.
 Future<EnderecoSalvo?> abrirDialogoEndereco(BuildContext context, {EnderecoSalvo? inicial, String destinatario = ''}) {
   return showDialog<EnderecoSalvo>(
     context: context,
@@ -229,7 +222,6 @@ class _DialogoEndereco extends StatefulWidget {
   State<_DialogoEndereco> createState() => _DialogoEnderecoEstado();
 }
 
-/// Diálogo que salva o endereço no perfil.
 class _DialogoEnderecoEstado extends State<_DialogoEndereco> {
   final _chaveFormulario = GlobalKey<FormState>();
   final _campos = GlobalKey<CamposEnderecoEstado>();
@@ -286,7 +278,6 @@ class _DialogoEnderecoEstado extends State<_DialogoEndereco> {
   }
 }
 
-/// Endereço só para leitura usado no perfil pedidos e painel.
 class ResumoEndereco extends StatelessWidget {
   const ResumoEndereco({super.key, required this.endereco, this.titulo});
 

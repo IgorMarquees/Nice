@@ -1,5 +1,3 @@
-// Tela de minha conta.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -18,11 +16,8 @@ import '../componentes/politica_trocas.dart';
 import '../componentes/redes_sociais.dart';
 import '../componentes/estados_tela.dart';
 
-/// Seções da página para os atalhos rolarem até elas.
 enum _Secao { pedidos, enderecos, trocas }
 
-/// Pedidos endereços e política de trocas.
-/// No computador tem um menu lateral.
 class TelaPerfil extends StatefulWidget {
   const TelaPerfil({super.key});
 
@@ -43,7 +38,6 @@ class _TelaPerfilEstado extends State<TelaPerfil> {
     });
   }
 
-  /// Rola a página até a seção escolhida.
   void _rolarAte(_Secao secao) {
     final alvo = _chaves[secao]!.currentContext;
     if (alvo == null) return;
@@ -176,7 +170,6 @@ class _TelaPerfilEstado extends State<TelaPerfil> {
   }
 }
 
-/// Um atalho do menu do perfil.
 class _ItemMenu {
   const _ItemMenu(this.secao, this.icone, this.rotulo);
   final _Secao secao;
@@ -190,7 +183,6 @@ const _menu = [
   _ItemMenu(_Secao.trocas, Icons.autorenew, 'Trocas e devoluções'),
 ];
 
-/// Cartão de uma seção com ícone título e conteúdo.
 class _CartaoSecao extends StatelessWidget {
   const _CartaoSecao({super.key, required this.icone, required this.titulo, required this.conteudo, this.acaoDireita});
 
@@ -230,7 +222,6 @@ class _CartaoSecao extends StatelessWidget {
   }
 }
 
-/// Cartão preto com as iniciais nome e email.
 class _CartaoUsuario extends StatelessWidget {
   const _CartaoUsuario({required this.usuario});
 
@@ -288,7 +279,6 @@ class _CartaoUsuario extends StatelessWidget {
   }
 }
 
-/// Menu lateral do perfil no computador.
 class _MenuLateral extends StatelessWidget {
   const _MenuLateral({required this.usuario, required this.qtdPedidos, required this.aoNavegar, required this.aoSair});
 
@@ -344,7 +334,6 @@ class _MenuLateral extends StatelessWidget {
   }
 }
 
-/// Bloco Siga a NICE com as redes sociais.
 class _SigaNice extends StatelessWidget {
   const _SigaNice();
 
@@ -361,7 +350,6 @@ class _SigaNice extends StatelessWidget {
   }
 }
 
-/// Lista de pedidos ou aviso de lista vazia.
 class _ListaPedidos extends StatelessWidget {
   const _ListaPedidos({required this.controlador});
 
@@ -469,7 +457,6 @@ class _ListaEnderecos extends StatelessWidget {
   }
 }
 
-/// Aviso de lista vazia com um botão de ação.
 class _BlocoVazio extends StatelessWidget {
   const _BlocoVazio({required this.icone, required this.mensagem, required this.textoAcao, required this.aoAgir});
 

@@ -1,5 +1,3 @@
-// Botão de login com Google.
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -45,7 +43,6 @@ class BotoesLoginSocial extends StatelessWidget {
   }
 }
 
-/// Botão de um provedor de login.
 class _BotaoSocial extends StatelessWidget {
   const _BotaoSocial({required this.rotulo, required this.icone, required this.aoPressionar});
 

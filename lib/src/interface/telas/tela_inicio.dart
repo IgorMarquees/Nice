@@ -1,5 +1,3 @@
-// Página inicial.
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +18,6 @@ import '../componentes/responsivo.dart';
 import '../componentes/cabecalho_secao.dart';
 import '../componentes/estados_tela.dart';
 
-/// Banners do carrossel do topo.
 const _slides = [
   SlideBanner(
     imagem: ImagensNice.inicioBanner1,
@@ -36,7 +33,6 @@ const _slides = [
   ),
 ];
 
-/// Carrossel destaques e categorias.
 class TelaInicio extends StatelessWidget {
   const TelaInicio({super.key});
 
@@ -161,7 +157,6 @@ class _FaixaDestaques extends StatelessWidget {
   }
 }
 
-/// Saudação e campo de busca no celular.
 class _SaudacaoCelular extends StatelessWidget {
   const _SaudacaoCelular();
 

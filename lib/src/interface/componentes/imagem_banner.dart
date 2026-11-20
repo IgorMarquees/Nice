@@ -1,5 +1,3 @@
-// Banner com a arte pronta.
-
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/foundation.dart';
@@ -22,11 +20,9 @@ class ImagemBanner extends StatelessWidget {
 
   final String arte;
 
-  /// Largura dividida pela altura da arte original.
   final double proporcao;
   final VoidCallback? aoTocar;
 
-  /// Texto lido por leitores de tela.
   final String? rotulo;
   final bool caberNaTela;
 
@@ -37,7 +33,6 @@ class ImagemBanner extends StatelessWidget {
   static bool _usarApp(BuildContext context, double? proporcaoApp) =>
       !kIsWeb && proporcaoApp != null && context.ehCelular;
 
-  /// Calcula a altura do banner para uma largura.
   static double alturaPara(
     BuildContext context,
     double largura,

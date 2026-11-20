@@ -1,12 +1,8 @@
-// Controlador dos endereços salvos do cliente.
-// Também consulta o CEP para preencher o endereço.
-
 import 'package:flutter/foundation.dart';
 
 import '../dados/pedido.dart';
 import '../dados/repositorio_enderecos.dart';
 
-/// Endereços do usuário logado.
 class ControladorEnderecos extends ChangeNotifier {
   ControladorEnderecos(this._repositorio);
 
@@ -24,7 +20,6 @@ class ControladorEnderecos extends ChangeNotifier {
   bool get salvando => _salvando;
   String? get erro => _erro;
 
-  /// Carrega os endereços sempre que o usuário muda.
   void vincularUsuario(String? idUsuario) {
     if (_idUsuario == idUsuario) return;
     _idUsuario = idUsuario;
@@ -40,7 +35,6 @@ class ControladorEnderecos extends ChangeNotifier {
     });
   }
 
-  /// Busca os endereços de novo.
   Future<void> recarregar() async {
     final idUsuario = _idUsuario;
     if (idUsuario != null) await _carregar(idUsuario, ++_fichaCarga);
@@ -63,7 +57,6 @@ class ControladorEnderecos extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Grava um endereço novo ou atualiza um existente.
   Future<EnderecoSalvo?> salvar(EnderecoSalvo endereco) async {
     final idUsuario = _idUsuario;
     if (idUsuario == null) return null;
@@ -84,7 +77,6 @@ class ControladorEnderecos extends ChangeNotifier {
     }
   }
 
-  /// Exclui um endereço salvo.
   Future<bool> excluir(EnderecoSalvo endereco) async {
     try {
       await _repositorio.excluir(endereco.id);
@@ -98,7 +90,6 @@ class ControladorEnderecos extends ChangeNotifier {
     }
   }
 
-  /// Consulta o CEP e devolve rua bairro cidade e UF.
   Future<ResultadoCep?> consultarCep(String cep) async {
     try {
       return await _repositorio.consultarCep(cep);

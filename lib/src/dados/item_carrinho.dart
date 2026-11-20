@@ -1,5 +1,3 @@
-// Item do carrinho e dos pedidos.
-
 import 'produto.dart';
 
 /// Uma peça no carrinho com uma cópia do nome foto e preço.
@@ -22,9 +20,7 @@ class ItemCarrinho {
   final String tamanho;
   final int quantidade;
 
-  /// Chave que identifica o item pelo produto e pela variação.
   String get chave => '$idProduto|$tamanho';
-  /// Preço do item vezes a quantidade.
   double get subtotal => precoUnitario * quantidade;
 
   /// Cria o item a partir de um produto usando o preço com desconto.
@@ -48,7 +44,6 @@ class ItemCarrinho {
         quantidade: quantidade ?? this.quantidade,
       );
 
-  /// Lê um item que veio do banco.
   factory ItemCarrinho.doMapa(Map<String, dynamic> mapa) {
     return ItemCarrinho(
       idProduto: mapa['product_id'].toString(),
@@ -60,7 +55,6 @@ class ItemCarrinho {
     );
   }
 
-  /// Formato de uma linha da tabela cart_items.
   Map<String, dynamic> paraLinha(String idUsuario) => {
         'user_id': idUsuario,
         'product_id': idProduto,
@@ -71,7 +65,6 @@ class ItemCarrinho {
         'image_url': urlFoto,
       };
 
-  /// Formato salvo dentro do pedido.
   Map<String, dynamic> paraMapaPedido() => {
         'product_id': idProduto,
         'title': titulo,

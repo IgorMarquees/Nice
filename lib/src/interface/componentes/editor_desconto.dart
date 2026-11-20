@@ -1,12 +1,9 @@
-// Peças do sistema de descontos com período.
-
 import 'package:flutter/material.dart';
 
 import '../../dados/produto.dart';
 import '../../nucleo/tema.dart';
 import '../../nucleo/formatadores.dart';
 
-/// Desconto escolhido no diálogo.
 class DadosDesconto {
   const DadosDesconto({required this.percentual, this.comecaEm, this.terminaEm});
 
@@ -27,7 +24,6 @@ String? validarPeriodoDesconto(DateTime? comecaEm, DateTime? terminaEm) {
   return null;
 }
 
-/// Texto que resume o desconto na lista do admin.
 String descreverDesconto(Produto produto) {
   final inicio = produto.inicioDesconto;
   final fim = produto.fimDesconto;
@@ -44,7 +40,6 @@ String descreverDesconto(Produto produto) {
   }
 }
 
-/// Selo colorido com a situação do desconto.
 class SeloSituacaoDesconto extends StatelessWidget {
   const SeloSituacaoDesconto({super.key, required this.situacao});
 
@@ -69,7 +64,6 @@ class SeloSituacaoDesconto extends StatelessWidget {
   }
 }
 
-/// Campo que abre o calendário e depois o relógio.
 class CampoDataHora extends StatelessWidget {
   const CampoDataHora({
     super.key,
@@ -83,10 +77,8 @@ class CampoDataHora extends StatelessWidget {
   final DateTime? valor;
   final ValueChanged<DateTime?> aoMudar;
 
-  /// Texto mostrado quando o campo está vazio.
   final String textoVazio;
 
-  /// Escolhe a data e depois a hora.
   Future<void> _escolher(BuildContext context) async {
     final agora = DateTime.now();
     final inicial = valor ?? agora;
@@ -125,7 +117,6 @@ class CampoDataHora extends StatelessWidget {
   }
 }
 
-/// Abre o diálogo de aplicar desconto para um ou vários produtos.
 Future<DadosDesconto?> abrirDialogoDesconto(
   BuildContext context, {
   required String titulo,
@@ -151,7 +142,6 @@ class _DialogoDesconto extends StatefulWidget {
   State<_DialogoDesconto> createState() => _DialogoDescontoEstado();
 }
 
-/// Formulário do diálogo com porcentagem início e fim.
 class _DialogoDescontoEstado extends State<_DialogoDesconto> {
   final _chaveFormulario = GlobalKey<FormState>();
   late final _percentual = TextEditingController(text: '${widget.percentual}');
@@ -165,7 +155,6 @@ class _DialogoDescontoEstado extends State<_DialogoDesconto> {
     super.dispose();
   }
 
-  /// Valida e devolve o desconto escolhido.
   void _confirmar() {
     final erroPeriodo = validarPeriodoDesconto(_comecaEm, _terminaEm);
     setState(() => _erroPeriodo = erroPeriodo);
@@ -232,7 +221,6 @@ class _DialogoDescontoEstado extends State<_DialogoDesconto> {
   }
 }
 
-/// Aceita descontos de 1 a 90 por cento.
 String? validarPercentualDesconto(String? valor) {
   final percentual = int.tryParse((valor ?? '').trim());
   return percentual == null || percentual < 1 || percentual > 90 ? 'Entre 1 e 90' : null;

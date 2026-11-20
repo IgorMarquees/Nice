@@ -1,5 +1,3 @@
-// Lista de produtos do administrador.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +11,6 @@ import '../../componentes/imagem_rede.dart';
 import '../../componentes/responsivo.dart';
 import '../../componentes/estados_tela.dart';
 
-/// Busca chaves de Destaque e Novidade editar e excluir.
 class TelaProdutosAdmin extends StatefulWidget {
   const TelaProdutosAdmin({super.key});
 
@@ -30,7 +27,6 @@ class _TelaProdutosAdminEstado extends State<TelaProdutosAdmin> {
     });
   }
 
-  /// Liga ou desliga Destaque ou Novidade e atualiza a loja.
   Future<void> _marcar(Produto produto, {bool? emDestaque, bool? novidade}) async {
     final admin = context.read<ControladorAdmin>();
     final catalogo = context.read<ControladorCatalogo>();
@@ -43,7 +39,6 @@ class _TelaProdutosAdminEstado extends State<TelaProdutosAdmin> {
     }
   }
 
-  /// Pede confirmação e exclui o produto.
   Future<void> _excluir(Produto produto) async {
     final admin = context.read<ControladorAdmin>();
     final catalogo = context.read<ControladorCatalogo>();
@@ -133,7 +128,6 @@ class _TelaProdutosAdminEstado extends State<TelaProdutosAdmin> {
   }
 }
 
-/// Linha de um produto na lista do admin.
 class _ItemProdutoAdmin extends StatelessWidget {
   const _ItemProdutoAdmin({
     required this.produto,
@@ -210,7 +204,6 @@ class _ItemProdutoAdmin extends StatelessWidget {
   }
 }
 
-/// Chave liga e desliga com um texto ao lado.
 class _ChaveComRotulo extends StatelessWidget {
   const _ChaveComRotulo({required this.rotulo, required this.valor, required this.aoMudar});
 

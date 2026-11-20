@@ -1,5 +1,3 @@
-// Filtros do catálogo.
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,8 +5,6 @@ import '../../controladores/controlador_catalogo.dart';
 import '../../nucleo/tema.dart';
 import '../../nucleo/formatadores.dart';
 
-/// Categoria tamanho preço máximo e ordenação.
-/// Fica na lateral no computador e numa gaveta no celular.
 class PainelFiltros extends StatelessWidget {
   const PainelFiltros({super.key});
 

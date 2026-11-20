@@ -1,5 +1,3 @@
-// Atalhos de navegação usados pelas telas.
-
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -17,17 +15,14 @@ extension NavegacaoNice on BuildContext {
     return false;
   }
 
-  /// Volta para a tela anterior ou abre a página indicada.
   void voltarOu(String alternativa) => canPop() ? pop() : go(alternativa);
 
-  /// Toda busca abre o catálogo já rolado até os produtos.
   void buscarNoCatalogo(String valor) => go(caminhoCatalogo(busca: valor, irParaProdutos: true));
 }
 
 /// Valor do endereço que pede para o catálogo rolar até os produtos.
 const secaoProdutosCatalogo = 'produtos';
 
-/// Monta o endereço do catálogo com busca categoria e rolagem.
 String caminhoCatalogo({String? busca, String? categoria, bool irParaProdutos = false}) {
   final q = busca?.trim() ?? '';
   final parametros = {

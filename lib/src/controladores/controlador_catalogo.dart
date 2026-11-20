@@ -1,13 +1,9 @@
-// Controlador do catálogo.
-// Carrega os produtos e cuida da busca dos filtros e da ordenação.
-
 import 'package:flutter/foundation.dart';
 
 import '../dados/produto.dart';
 import '../dados/repositorio_vitrine_reserva.dart';
 import '../dados/repositorio_produtos.dart';
 
-/// Opções de ordenação mostradas no filtro.
 enum Ordenacao {
   recentes('Mais recentes'),
   menorPreco('Menor preço'),
@@ -18,21 +14,16 @@ enum Ordenacao {
   final String rotulo;
 }
 
-/// Lista de produtos da loja com busca e filtros.
 class ControladorCatalogo extends ChangeNotifier {
   ControladorCatalogo(this._produtos, this._vitrineReserva);
 
-  /// Texto da opção que mostra todas as categorias.
   static const todasCategorias = 'Ver tudo';
-  /// Categorias fixas da loja.
   static const categorias = [todasCategorias, 'Camisetas', 'Moletons', 'Calças', 'Acessórios'];
-  /// Tamanhos padrão mostrados primeiro no filtro.
   static const tamanhos = ['P', 'M', 'G', 'GG'];
 
   final RepositorioProdutos _produtos;
   final RepositorioVitrineReserva _vitrineReserva;
 
-  /// Produtos que vieram do banco.
   List<Produto> _remotos = [];
   /// Produtos de exemplo usados quando o banco está vazio.
   List<Produto> _reserva = [];
@@ -55,13 +46,11 @@ class ControladorCatalogo extends ChangeNotifier {
   /// Usa os produtos do banco e só cai na vitrine reserva se o banco estiver vazio.
   List<Produto> get _base => _remotos.isNotEmpty ? _remotos : _reserva;
 
-  /// Produtos marcados como destaque para a Home.
   List<Produto> get destaques {
     final marcados = _remotos.where((p) => p.emDestaque).toList();
     return marcados.isNotEmpty ? marcados : _reserva.where((p) => p.emDestaque).toList();
   }
 
-  /// Produtos marcados como novidade.
   List<Produto> get novidades {
     final marcados = _remotos.where((p) => p.novidade).toList();
     return marcados.isNotEmpty ? marcados : _reserva.where((p) => p.novidade).toList();
@@ -85,7 +74,6 @@ class ControladorCatalogo extends ChangeNotifier {
     return '';
   }
 
-  /// Maior preço da loja arredondado para usar no filtro.
   double get maiorPreco {
     if (_base.isEmpty) return 500;
     final maximo = _base.map((p) => p.precoFinal).reduce((a, b) => a > b ? a : b);
@@ -94,7 +82,6 @@ class ControladorCatalogo extends ChangeNotifier {
 
   double get precoMaximo => _precoMaximo ?? maiorPreco;
 
-  /// Produtos que passam na busca e nos filtros na ordem escolhida.
   List<Produto> get filtrados {
     final q = _busca.trim().toLowerCase();
     final lista = _base.where((p) {
@@ -120,7 +107,6 @@ class ControladorCatalogo extends ChangeNotifier {
     return lista;
   }
 
-  /// Carregamento em andamento para quem pedir os dados ao mesmo tempo.
   Future<void>? _emAndamento;
 
   /// Carrega os produtos uma vez só.
@@ -131,7 +117,6 @@ class ControladorCatalogo extends ChangeNotifier {
     return _emAndamento = _carregar().whenComplete(() => _emAndamento = null);
   }
 
-  /// Busca no banco e decide se precisa da vitrine reserva.
   Future<void> _carregar() async {
     _carregando = true;
     notifyListeners();
@@ -153,7 +138,6 @@ class ControladorCatalogo extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Procura um produto pelo id na lista e depois no banco.
   Future<Produto?> encontrarPorId(String id) async {
     for (final p in [..._remotos, ..._reserva]) {
       if (p.id == id) return p;
@@ -166,7 +150,6 @@ class ControladorCatalogo extends ChangeNotifier {
     }
   }
 
-  /// Aplica os filtros que vieram no endereço da página.
   void aplicarFiltrosIniciais({String? categoria, String? busca}) {
     _categoria = categorias.contains(categoria) ? categoria! : todasCategorias;
     _busca = busca ?? '';
@@ -201,6 +184,5 @@ class ControladorCatalogo extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Volta todos os filtros para o padrão.
   void limparFiltros() => aplicarFiltrosIniciais();
 }

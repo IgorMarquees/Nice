@@ -1,11 +1,8 @@
-// Acesso à tabela orders do Supabase.
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'item_carrinho.dart';
 import 'pedido.dart';
 
-/// Gravação e leitura de pedidos.
 class RepositorioPedidos {
   RepositorioPedidos(this._conexao);
 
@@ -13,7 +10,6 @@ class RepositorioPedidos {
 
   SupabaseQueryBuilder get _tabela => _conexao.from('orders');
 
-  /// Grava um pedido novo com itens endereço e valores.
   Future<void> criar({
     required String idUsuario,
     required List<ItemCarrinho> itens,

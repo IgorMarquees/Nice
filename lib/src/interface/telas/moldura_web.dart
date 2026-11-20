@@ -1,5 +1,3 @@
-// Moldura do site.
-
 import 'package:flutter/material.dart';
 
 import '../componentes/barra_navegacao_web.dart';

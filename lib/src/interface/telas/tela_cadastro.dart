@@ -1,5 +1,3 @@
-// Tela de cadastro.
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -11,11 +9,9 @@ import '../componentes/botao_principal.dart';
 import '../componentes/botoes_login_social.dart';
 import '../componentes/estados_tela.dart';
 
-/// Cria uma conta nova com nome email e senha.
 class TelaCadastro extends StatefulWidget {
   const TelaCadastro({super.key, this.origem});
 
-  /// Página para voltar depois do cadastro.
   final String? origem;
 
   @override
@@ -46,7 +42,6 @@ class _TelaCadastroEstado extends State<TelaCadastro> {
     super.dispose();
   }
 
-  /// Valida o formulário e cria a conta.
   Future<void> _enviarFormulario() async {
     if (!_chaveFormulario.currentState!.validate()) return;
     await context.read<ControladorAutenticacao>().cadastrar(_nome.text, _email.text, _senha.text);

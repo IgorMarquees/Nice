@@ -1,10 +1,7 @@
-// Botão vermelho principal.
-
 import 'package:flutter/material.dart';
 
 import '../../nucleo/tema.dart';
 
-/// Botão que ocupa a largura toda e mostra um indicador enquanto carrega.
 class BotaoPrincipal extends StatelessWidget {
   const BotaoPrincipal({
     super.key,

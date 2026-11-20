@@ -43,7 +43,6 @@ import 'package:nice_store/src/interface/telas/tela_cadastro.dart';
 import 'package:nice_store/src/interface/telas/pagina_rolavel.dart';
 import 'package:nice_store/src/interface/telas/moldura_web.dart';
 
-/// Vitrine reserva que devolve a lista fixa sem usar a internet.
 class ProdutosFalsos implements RepositorioVitrineReserva {
   @override
   Future<List<Produto>> buscarProdutos() async => produtosReserva;
@@ -52,7 +51,6 @@ class ProdutosFalsos implements RepositorioVitrineReserva {
   List<Produto> get produtosReserva => RepositorioVitrineReserva().produtosReserva;
 }
 
-/// Repositório de produtos que não usa o banco.
 class ProdutosOffline extends RepositorioProdutos {
   ProdutosOffline(super.conexao, [this.produtos = const []]);
 
@@ -65,7 +63,6 @@ class ProdutosOffline extends RepositorioProdutos {
   Future<Produto?> buscarPorId(String id) async => produtos.where((p) => p.id == id).firstOrNull;
 }
 
-/// Login que não escuta o Supabase.
 class AutenticacaoOffline extends RepositorioAutenticacao {
   AutenticacaoOffline(super.conexao);
 
@@ -73,7 +70,6 @@ class AutenticacaoOffline extends RepositorioAutenticacao {
   Stream<AuthState> get mudancasLogin => const Stream.empty();
 }
 
-/// Mesmos provedores do app sem rede.
 class ProvedoresTeste extends StatelessWidget {
   const ProvedoresTeste({super.key, required this.conteudo, this.usuario, this.produtos = const []});
 
@@ -132,7 +128,6 @@ class ProvedoresTeste extends StatelessWidget {
   }
 }
 
-/// Roteador dos testes com as telas reais e sem bloqueio de login.
 GoRouter rotasTeste(String inicial, {required bool web}) => GoRouter(
   initialLocation: inicial,
   routes: [

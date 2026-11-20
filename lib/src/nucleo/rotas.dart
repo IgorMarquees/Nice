@@ -1,5 +1,3 @@
-// Rotas do app e quem pode abrir cada página.
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -28,10 +26,8 @@ import '../interface/telas/moldura_web.dart';
 import 'navegacao.dart';
 import '../interface/componentes/estados_tela.dart';
 
-/// Páginas que exigem login.
 const _soCliente = ['/carrinho', '/checkout', '/perfil'];
 
-/// Páginas só do administrador.
 const _soAdmin = ['/admin'];
 
 /// Cria o roteador.
