@@ -1,97 +1,104 @@
+// Ponto de partida do app NICE.
+// Liga o Supabase e entrega os repositórios e controladores para todas as telas.
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'src/app.dart';
-import 'src/config/app_config.dart';
-import 'src/controllers/address_controller.dart';
-import 'src/controllers/admin_controller.dart';
-import 'src/controllers/auth_controller.dart';
-import 'src/controllers/cart_controller.dart';
-import 'src/controllers/catalog_controller.dart';
-import 'src/controllers/order_controller.dart';
-import 'src/controllers/user_admin_controller.dart';
-import 'src/repositories/address_repository.dart';
-import 'src/repositories/auth_repository.dart';
-import 'src/repositories/cart_repository.dart';
-import 'src/repositories/fake_store_repository.dart';
-import 'src/repositories/order_repository.dart';
-import 'src/repositories/product_repository.dart';
-import 'src/repositories/storage_repository.dart';
-import 'src/repositories/user_repository.dart';
-import 'src/theme/nice_theme.dart';
+import 'src/aplicativo.dart';
+import 'src/nucleo/configuracao.dart';
+import 'src/controladores/controlador_enderecos.dart';
+import 'src/controladores/controlador_admin.dart';
+import 'src/controladores/controlador_autenticacao.dart';
+import 'src/controladores/controlador_carrinho.dart';
+import 'src/controladores/controlador_catalogo.dart';
+import 'src/controladores/controlador_pedidos.dart';
+import 'src/controladores/controlador_usuarios.dart';
+import 'src/dados/repositorio_enderecos.dart';
+import 'src/dados/repositorio_autenticacao.dart';
+import 'src/dados/repositorio_carrinho.dart';
+import 'src/dados/repositorio_vitrine_reserva.dart';
+import 'src/dados/repositorio_pedidos.dart';
+import 'src/dados/repositorio_produtos.dart';
+import 'src/dados/repositorio_fotos.dart';
+import 'src/dados/repositorio_usuarios.dart';
+import 'src/nucleo/tema.dart';
 
+/// Primeira função executada quando o app abre.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // URLs limpas na Web (/produto/123) em vez de /#/produto/123.
+  // Na web os endereços ficam limpos como /produto/123 em vez de /#/produto/123.
   usePathUrlStrategy();
 
+  // Deixa o app ocupar a tela inteira no celular.
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      systemNavigationBarColor: NiceTheme.transparent,
+      systemNavigationBarColor: TemaNice.transparente,
       systemNavigationBarContrastEnforced: false,
     ),
   );
 
-  if (!AppConfig.isSupabaseConfigured) {
+  if (!Configuracao.supabaseConfigurado) {
     debugPrint('⚠️ Supabase não configurado: use --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...');
   }
   await Supabase.initialize(
-    url: AppConfig.supabaseUrl,
-    publishableKey: AppConfig.supabaseAnonKey,
+    url: Configuracao.urlSupabase,
+    publishableKey: Configuracao.chaveSupabase,
   );
-  final client = Supabase.instance.client;
+  // Conexão única com o Supabase usada por todos os repositórios.
+  final conexao = Supabase.instance.client;
 
+  // O MultiProvider deixa cada repositório e controlador disponível em qualquer tela.
   runApp(
     MultiProvider(
       providers: [
-        Provider(create: (_) => AuthRepository(client)),
-        Provider(create: (_) => ProductRepository(client)),
-        Provider(create: (_) => FakeStoreRepository()),
-        Provider(create: (_) => CartRepository(client)),
-        Provider(create: (_) => OrderRepository(client)),
-        Provider(create: (_) => StorageRepository(client)),
-        Provider(create: (_) => AddressRepository(client)),
-        Provider(create: (_) => UserRepository(client)),
+        Provider(create: (_) => RepositorioAutenticacao(conexao)),
+        Provider(create: (_) => RepositorioProdutos(conexao)),
+        Provider(create: (_) => RepositorioVitrineReserva()),
+        Provider(create: (_) => RepositorioCarrinho(conexao)),
+        Provider(create: (_) => RepositorioPedidos(conexao)),
+        Provider(create: (_) => RepositorioFotos(conexao)),
+        Provider(create: (_) => RepositorioEnderecos(conexao)),
+        Provider(create: (_) => RepositorioUsuarios(conexao)),
         ChangeNotifierProvider(
-          create: (context) => AuthController(context.read<AuthRepository>()),
+          create: (context) => ControladorAutenticacao(context.read<RepositorioAutenticacao>()),
         ),
         ChangeNotifierProvider(
-          create: (context) => CatalogController(
-            context.read<ProductRepository>(),
-            context.read<FakeStoreRepository>(),
-          )..load(),
+          create: (context) => ControladorCatalogo(
+            context.read<RepositorioProdutos>(),
+            context.read<RepositorioVitrineReserva>(),
+          )..carregar(),
         ),
-        ChangeNotifierProxyProvider<AuthController, CartController>(
-          create: (context) => CartController(context.read<CartRepository>()),
-          update: (_, auth, cart) => cart!..bindUser(auth.user?.id),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => OrderController(context.read<OrderRepository>()),
+        ChangeNotifierProxyProvider<ControladorAutenticacao, ControladorCarrinho>(
+          create: (context) => ControladorCarrinho(context.read<RepositorioCarrinho>()),
+          update: (_, autenticacao, carrinho) => carrinho!..vincularUsuario(autenticacao.usuario?.id),
         ),
         ChangeNotifierProvider(
-          create: (context) => AdminController(
-            context.read<ProductRepository>(),
-            context.read<StorageRepository>(),
+          create: (context) => ControladorPedidos(context.read<RepositorioPedidos>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ControladorAdmin(
+            context.read<RepositorioProdutos>(),
+            context.read<RepositorioFotos>(),
           ),
         ),
-        ChangeNotifierProxyProvider<AuthController, AddressController>(
-          create: (context) => AddressController(context.read<AddressRepository>()),
-          update: (_, auth, addresses) => addresses!..bindUser(auth.user?.id),
+        ChangeNotifierProxyProvider<ControladorAutenticacao, ControladorEnderecos>(
+          create: (context) => ControladorEnderecos(context.read<RepositorioEnderecos>()),
+          update: (_, autenticacao, enderecos) => enderecos!..vincularUsuario(autenticacao.usuario?.id),
         ),
         ChangeNotifierProvider(
-          create: (context) => UserAdminController(
-            context.read<UserRepository>(),
-            context.read<AddressRepository>(),
-            context.read<OrderRepository>(),
+          create: (context) => ControladorUsuarios(
+            context.read<RepositorioUsuarios>(),
+            context.read<RepositorioEnderecos>(),
+            context.read<RepositorioPedidos>(),
           ),
         ),
       ],
-      child: const NiceApp(),
+      child: const AplicativoNice(),
     ),
   );
 }

@@ -1,89 +1,90 @@
+// Testes de comportamento.
+// Conferem os fluxos principais e as regras de preço.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import 'package:nice_store/src/controllers/cart_controller.dart';
-import 'package:nice_store/src/models/app_user.dart';
-import 'package:nice_store/src/models/order.dart';
-import 'package:nice_store/src/models/product.dart';
-import 'package:nice_store/src/screens/login_screen.dart';
-import 'package:nice_store/src/screens/shell_page.dart';
-import 'package:nice_store/src/theme/nice_theme.dart';
-import 'package:nice_store/src/utils/feedback.dart';
-import 'package:nice_store/src/utils/formatters.dart';
-import 'package:nice_store/src/widgets/banner_carousel.dart';
-import 'package:nice_store/src/widgets/banner_image.dart';
-import 'package:nice_store/src/widgets/product_card.dart';
+import 'package:nice_store/src/controladores/controlador_carrinho.dart';
+import 'package:nice_store/src/dados/usuario.dart';
+import 'package:nice_store/src/dados/pedido.dart';
+import 'package:nice_store/src/dados/produto.dart';
+import 'package:nice_store/src/interface/telas/tela_login.dart';
+import 'package:nice_store/src/interface/telas/pagina_rolavel.dart';
+import 'package:nice_store/src/nucleo/tema.dart';
+import 'package:nice_store/src/nucleo/avisos.dart';
+import 'package:nice_store/src/nucleo/formatadores.dart';
+import 'package:nice_store/src/interface/componentes/carrossel_banners.dart';
+import 'package:nice_store/src/interface/componentes/imagem_banner.dart';
+import 'package:nice_store/src/interface/componentes/cartao_produto.dart';
 
 import 'test_harness.dart';
 
 void main() {
   GoogleFonts.config.allowRuntimeFetching = false;
 
-  testWidgets('"Esqueceu a senha?" abre, envia e fecha sem exceção', (tester) async {
-    final router = GoRouter(
+  testWidgets('"Esqueceu a senha?" abre, envia e fecha sem exceção', (testador) async {
+    final roteador = GoRouter(
       initialLocation: '/login',
-      routes: [GoRoute(path: '/login', builder: (_, _) => const LoginScreen())],
+      routes: [GoRoute(path: '/login', builder: (_, _) => const TelaLogin())],
     );
-    await tester.pumpWidget(
-      TestProviders(
-        child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: router),
+    await testador.pumpWidget(
+      ProvedoresTeste(
+        conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: roteador),
       ),
     );
-    await tester.pump();
+    await testador.pump();
 
-    await tester.tap(find.text('Esqueceu a senha?'));
-    await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextFormField).last, 'cliente@nice.com');
-    await tester.tap(find.text('Enviar link'));
-    await tester.pumpAndSettle();
+    await testador.tap(find.text('Esqueceu a senha?'));
+    await testador.pumpAndSettle();
+    await testador.enterText(find.byType(TextFormField).last, 'cliente@nice.com');
+    await testador.tap(find.text('Enviar link'));
+    await testador.pumpAndSettle();
 
     expect(find.text('Recuperar senha'), findsNothing);
-    expect(tester.takeException(), isNull);
-    await tester.pumpWidget(const SizedBox());
+    expect(testador.takeException(), isNull);
+    await testador.pumpWidget(const SizedBox());
   });
 
-  testWidgets('aviso de carrinho some sozinho e "VER CARRINHO" navega', (tester) async {
-    final router = testRouter('/sobre', web: true);
-    await tester.pumpWidget(
-      TestProviders(
-        child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: router),
+  testWidgets('aviso de carrinho some sozinho e "VER CARRINHO" navega', (testador) async {
+    final roteador = rotasTeste('/sobre', web: true);
+    await testador.pumpWidget(
+      ProvedoresTeste(
+        conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: roteador),
       ),
     );
-    await tester.pump();
+    await testador.pump();
 
-    final context = tester.element(find.byType(Scaffold).first);
-    showAddedToCart(context, 'Kuro Tee');
-    await tester.pumpAndSettle();
+    final context = testador.element(find.byType(Scaffold).first);
+    avisarAdicionadoAoCarrinho(context, 'Kuro Tee');
+    await testador.pumpAndSettle();
     expect(find.text('Kuro Tee adicionado ao carrinho'), findsOneWidget);
 
-    // Some sozinho (antes ficava fixo por ter ação).
-    await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle();
+    await testador.pump(const Duration(seconds: 5));
+    await testador.pumpAndSettle();
     expect(find.text('Kuro Tee adicionado ao carrinho'), findsNothing);
 
-    // O botão leva ao carrinho.
-    showAddedToCart(context, 'Kuro Tee');
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('VER CARRINHO'));
-    await tester.pumpAndSettle();
-    expect(router.state.uri.path, '/carrinho');
+    avisarAdicionadoAoCarrinho(context, 'Kuro Tee');
+    await testador.pumpAndSettle();
+    await testador.tap(find.text('VER CARRINHO'));
+    await testador.pumpAndSettle();
+    expect(roteador.state.uri.path, '/carrinho');
     expect(find.text('Seu carrinho está vazio'), findsOneWidget);
-    await tester.pumpWidget(const SizedBox());
+    await testador.pumpWidget(const SizedBox());
   });
 
-  testWidgets('produto: breadcrumbs, frete, Pix e estoque oculto para visitante', (tester) async {
-    tester.view.physicalSize = const Size(1440, 1200);
-    tester.view.devicePixelRatio = 1;
-    final router = testRouter('/produto/fake-101', web: true);
-    await tester.pumpWidget(
-      TestProviders(
-        child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: router),
+  testWidgets('produto: breadcrumbs, frete, Pix e estoque oculto para visitante', (testador) async {
+    testador.view.physicalSize = const Size(1440, 1200);
+    testador.view.devicePixelRatio = 1;
+    final roteador = rotasTeste('/produto/fake-101', web: true);
+    await testador.pumpWidget(
+      ProvedoresTeste(
+        conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: roteador),
       ),
     );
-    await tester.pump(const Duration(milliseconds: 200));
+    await testador.pump(const Duration(milliseconds: 200));
 
     expect(find.text('HOME'), findsWidgets);
     expect(find.text('CATÁLOGO'), findsWidgets);
@@ -91,247 +92,245 @@ void main() {
     expect(find.textContaining('no Pix', findRichText: true), findsOneWidget);
     expect(find.textContaining('em estoque'), findsNothing);
 
-    await tester.tap(find.text('CATÁLOGO').first);
-    await tester.pumpAndSettle();
-    expect(router.state.uri.path, '/catalogo');
-    await tester.pumpWidget(const SizedBox());
-    tester.view.reset();
+    await testador.tap(find.text('CATÁLOGO').first);
+    await testador.pumpAndSettle();
+    expect(roteador.state.uri.path, '/catalogo');
+    await testador.pumpWidget(const SizedBox());
+    testador.view.reset();
   });
 
-  const colorful = Product(
+  const produtoColorido = Produto(
     id: 'p1',
-    title: 'Oni Hoodie',
-    description: 'Moletom',
-    price: 300,
-    category: 'Moletons',
-    discountPercent: 10,
-    technicalDetails: 'Composição: 100% algodão\nModelagem: oversized',
-    sizes: ['M', '42'],
-    colorVariants: [
-      ColorVariant(name: 'Preto', images: ['https://x/preto.jpg']),
-      ColorVariant(name: 'Branco', images: ['https://x/branco.jpg']),
+    titulo: 'Oni Hoodie',
+    descricao: 'Moletom',
+    preco: 300,
+    categoria: 'Moletons',
+    percentualDesconto: 10,
+    detalhesTecnicos: 'Composição: 100% algodão\nModelagem: oversized',
+    tamanhos: ['M', '42'],
+    variantesCor: [
+      VarianteCor(nome: 'Preto', fotos: ['https://x/preto.jpg']),
+      VarianteCor(nome: 'Branco', fotos: ['https://x/branco.jpg']),
     ],
-    isFeatured: true,
-    isNew: true,
+    emDestaque: true,
+    novidade: true,
   );
 
-  testWidgets('produto: clicar na cor troca a foto grande; detalhes técnicos e desconto aparecem', (tester) async {
-    tester.view.physicalSize = const Size(1440, 1400);
-    tester.view.devicePixelRatio = 1;
-    await tester.pumpWidget(
-      TestProviders(
-        products: const [colorful],
-        child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: testRouter('/produto/p1', web: true)),
+  testWidgets('produto: clicar na cor troca a foto grande; detalhes técnicos e desconto aparecem', (testador) async {
+    testador.view.physicalSize = const Size(1440, 1400);
+    testador.view.devicePixelRatio = 1;
+    await testador.pumpWidget(
+      ProvedoresTeste(
+        produtos: const [produtoColorido],
+        conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: rotasTeste('/produto/p1', web: true)),
       ),
     );
-    await tester.pump(const Duration(milliseconds: 200));
+    await testador.pump(const Duration(milliseconds: 200));
 
     expect(find.text('DETALHES TÉCNICOS'), findsOneWidget);
     expect(find.text('-10%'), findsOneWidget);
-    expect(find.text('R\$ 300,00'), findsOneWidget); // preço cheio riscado
-    expect(find.text('R\$ 270,00'), findsOneWidget); // preço com desconto
+    expect(find.text('R\$ 300,00'), findsOneWidget);
+    expect(find.text('R\$ 270,00'), findsOneWidget);
 
-    await tester.tap(find.text('Branco'));
-    await tester.pumpAndSettle();
+    await testador.tap(find.text('Branco'));
+    await testador.pumpAndSettle();
     expect(find.byKey(const ValueKey('https://x/branco.jpg')), findsOneWidget);
-    // Clicar de novo na cor selecionada desmarca e volta a mostrar todas as fotos.
-    await tester.tap(find.text('Branco'));
-    await tester.pumpAndSettle();
+    await testador.tap(find.text('Branco'));
+    await testador.pumpAndSettle();
     expect(find.text('COR'), findsOneWidget);
     expect(find.byKey(const ValueKey('https://x/preto.jpg')), findsOneWidget);
-    await tester.tap(find.text('Preto'));
-    await tester.pumpAndSettle();
+    await testador.tap(find.text('Preto'));
+    await testador.pumpAndSettle();
     expect(find.byKey(const ValueKey('https://x/preto.jpg')), findsOneWidget);
-    expect(tester.takeException(), isNull);
-    await tester.pumpWidget(const SizedBox());
-    tester.view.reset();
+    expect(testador.takeException(), isNull);
+    await testador.pumpWidget(const SizedBox());
+    testador.view.reset();
   });
 
-  for (final width in [360.0, 1440.0]) {
-    testWidgets('checkout com carrinho cheio ($width px): UF obrigatória, Pix e frete', (tester) async {
-      tester.view.physicalSize = Size(width, 1600);
-      tester.view.devicePixelRatio = 1;
-      final router = testRouter('/carrinho', web: true);
-      await tester.pumpWidget(
-        TestProviders(
-          user: const AppUser(id: 'u1', email: 'c@nice.com', name: 'Cliente'),
-          products: const [colorful],
-          child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: router),
+  for (final largura in [360.0, 1440.0]) {
+    testWidgets('checkout com carrinho cheio ($largura px): UF obrigatória, Pix e frete', (testador) async {
+      testador.view.physicalSize = Size(largura, 1600);
+      testador.view.devicePixelRatio = 1;
+      final roteador = rotasTeste('/carrinho', web: true);
+      await testador.pumpWidget(
+        ProvedoresTeste(
+          usuario: const Usuario(id: 'u1', email: 'c@nice.com', nome: 'Cliente'),
+          produtos: const [produtoColorido],
+          conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: roteador),
         ),
       );
-      await tester.pump(const Duration(milliseconds: 100));
-      final context = tester.element(find.byType(Scaffold).first);
-      Provider.of<CartController>(context, listen: false).add(colorful, size: 'M / Preto');
-      router.go('/checkout');
-      await tester.pumpAndSettle();
+      await testador.pump(const Duration(milliseconds: 100));
+      final context = testador.element(find.byType(Scaffold).first);
+      Provider.of<ControladorCarrinho>(context, listen: false).adicionar(produtoColorido, tamanho: 'M / Preto');
+      roteador.go('/checkout');
+      await testador.pumpAndSettle();
 
       expect(find.text('FINALIZAR COMPRA'), findsOneWidget);
       expect(find.text('UF'), findsOneWidget);
       expect(find.textContaining('Desconto Pix'), findsOneWidget);
       expect(find.text('Frete'), findsOneWidget);
 
-      // Sem UF o pedido não segue.
-      await tester.ensureVisible(find.text('CONFIRMAR PEDIDO'));
-      await tester.tap(find.text('CONFIRMAR PEDIDO'));
-      await tester.pumpAndSettle();
+      await testador.ensureVisible(find.text('CONFIRMAR PEDIDO'));
+      await testador.tap(find.text('CONFIRMAR PEDIDO'));
+      await testador.pumpAndSettle();
       expect(find.text('Selecione a UF'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox());
-      tester.view.reset();
+      expect(testador.takeException(), isNull);
+      await testador.pumpWidget(const SizedBox());
+      testador.view.reset();
     });
   }
 
-  for (final size in const [Size(1440, 700), Size(1920, 900), Size(1366, 650)]) {
-    testWidgets('banner do topo cabe inteiro na tela em ${size.width.toInt()}x${size.height.toInt()}', (tester) async {
-      tester.view.physicalSize = size;
-      tester.view.devicePixelRatio = 1;
-      for (final route in const ['/', '/novidades', '/catalogo', '/sobre']) {
-        await tester.pumpWidget(
-          TestProviders(
-            child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: testRouter(route, web: true)),
+  for (final tamanho in const [Size(1440, 700), Size(1920, 900), Size(1366, 650)]) {
+    testWidgets('banner do topo cabe inteiro na tela em ${tamanho.width.toInt()}x${tamanho.height.toInt()}', (testador) async {
+      testador.view.physicalSize = tamanho;
+      testador.view.devicePixelRatio = 1;
+      for (final rota in const ['/', '/novidades', '/catalogo', '/sobre']) {
+        await testador.pumpWidget(
+          ProvedoresTeste(
+            conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: rotasTeste(rota, web: true)),
           ),
         );
-        await tester.pump(const Duration(milliseconds: 100));
-        final top = route == '/' ? find.byType(BannerCarousel) : find.byType(BannerImage).first;
-        final rect = tester.getRect(top);
-        expect(rect.bottom, lessThanOrEqualTo(size.height + 0.5), reason: '$route: banner termina em ${rect.bottom}');
-        expect(tester.takeException(), isNull);
+        await testador.pump(const Duration(milliseconds: 100));
+        final topo = rota == '/' ? find.byType(CarrosselBanners) : find.byType(ImagemBanner).first;
+        final retangulo = testador.getRect(topo);
+        expect(retangulo.bottom, lessThanOrEqualTo(tamanho.height + 0.5), reason: '$rota: banner termina em ${retangulo.bottom}');
+        expect(testador.takeException(), isNull);
       }
-      await tester.pumpWidget(const SizedBox());
-      tester.view.reset();
+      await testador.pumpWidget(const SizedBox());
+      testador.view.reset();
     });
   }
 
-  testWidgets('busca na navbar abre o Catálogo já rolado até os produtos', (tester) async {
-    tester.view.physicalSize = const Size(1440, 900);
-    tester.view.devicePixelRatio = 1;
-    final router = testRouter('/sobre', web: true);
-    await tester.pumpWidget(
-      TestProviders(
-        child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: router),
+  testWidgets('busca na navbar abre o Catálogo já rolado até os produtos', (testador) async {
+    testador.view.physicalSize = const Size(1440, 900);
+    testador.view.devicePixelRatio = 1;
+    final roteador = rotasTeste('/sobre', web: true);
+    await testador.pumpWidget(
+      ProvedoresTeste(
+        conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: roteador),
       ),
     );
-    await tester.pump(const Duration(milliseconds: 100));
+    await testador.pump(const Duration(milliseconds: 100));
 
-    await tester.enterText(find.byType(TextField).first, 'hoodie');
-    await tester.testTextInput.receiveAction(TextInputAction.search);
-    await tester.pumpAndSettle();
+    await testador.enterText(find.byType(TextField).first, 'hoodie');
+    await testador.testTextInput.receiveAction(TextInputAction.search);
+    await testador.pumpAndSettle();
 
-    expect(router.state.uri.path, '/catalogo');
-    expect(router.state.uri.queryParameters['busca'], 'hoodie');
-    final page = find.descendant(of: find.byType(ShellPage), matching: find.byType(Scrollable)).first;
-    final scrollable = tester.state<ScrollableState>(page);
-    expect(scrollable.position.pixels, greaterThan(100), reason: 'deveria rolar até a área dos produtos');
-    expect(tester.takeException(), isNull);
-    await tester.pumpWidget(const SizedBox());
-    tester.view.reset();
+    expect(roteador.state.uri.path, '/catalogo');
+    expect(roteador.state.uri.queryParameters['busca'], 'hoodie');
+    final pagina = find.descendant(of: find.byType(PaginaRolavel), matching: find.byType(Scrollable)).first;
+    final rolagem = testador.state<ScrollableState>(pagina);
+    expect(rolagem.position.pixels, greaterThan(100), reason: 'deveria rolar até a área dos produtos');
+    expect(testador.takeException(), isNull);
+    await testador.pumpWidget(const SizedBox());
+    testador.view.reset();
   });
 
-  testWidgets('Home mostra só 3 destaques e não tem mais "Acabou de chegar"', (tester) async {
-    tester.view.physicalSize = const Size(1440, 2400);
-    tester.view.devicePixelRatio = 1;
-    await tester.pumpWidget(
-      TestProviders(
-        child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: testRouter('/', web: true)),
+  testWidgets('Home mostra só 3 destaques e não tem mais "Acabou de chegar"', (testador) async {
+    testador.view.physicalSize = const Size(1440, 2400);
+    testador.view.devicePixelRatio = 1;
+    await testador.pumpWidget(
+      ProvedoresTeste(
+        conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: rotasTeste('/', web: true)),
       ),
     );
-    await tester.pump(const Duration(milliseconds: 100));
+    await testador.pump(const Duration(milliseconds: 100));
     expect(find.text('ACABOU DE CHEGAR'), findsNothing);
-    expect(find.byType(ProductCard), findsNWidgets(3));
-    expect(tester.takeException(), isNull);
-    await tester.pumpWidget(const SizedBox());
-    tester.view.reset();
+    expect(find.byType(CartaoProduto), findsNWidgets(3));
+    expect(testador.takeException(), isNull);
+    await testador.pumpWidget(const SizedBox());
+    testador.view.reset();
   });
 
-  for (final width in [400.0, 1440.0]) {
-    testWidgets('perfil sem endereço mostra "Cadastrar endereço" e trocas ($width px)', (tester) async {
-      tester.view.physicalSize = Size(width, 2400);
-      tester.view.devicePixelRatio = 1;
-      await tester.pumpWidget(
-        TestProviders(
-          user: const AppUser(id: 'u1', email: 'c@nice.com', name: 'Cliente Teste'),
-          child: MaterialApp.router(theme: NiceTheme.light(), routerConfig: testRouter('/perfil', web: true)),
+  for (final largura in [400.0, 1440.0]) {
+    testWidgets('perfil sem endereço mostra "Cadastrar endereço" e trocas ($largura px)', (testador) async {
+      testador.view.physicalSize = Size(largura, 2400);
+      testador.view.devicePixelRatio = 1;
+      await testador.pumpWidget(
+        ProvedoresTeste(
+          usuario: const Usuario(id: 'u1', email: 'c@nice.com', nome: 'Cliente Teste'),
+          conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: rotasTeste('/perfil', web: true)),
         ),
       );
-      await tester.pumpAndSettle();
+      await testador.pumpAndSettle();
       expect(find.text('MEUS ENDEREÇOS'), findsOneWidget);
       expect(find.text('CADASTRAR ENDEREÇO'), findsOneWidget);
       expect(find.text('TROCAS E DEVOLUÇÕES'), findsOneWidget);
       expect(find.byTooltip('Instagram'), findsWidgets);
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox());
-      tester.view.reset();
+      expect(testador.takeException(), isNull);
+      await testador.pumpWidget(const SizedBox());
+      testador.view.reset();
     });
   }
 
   group('regras de preço', () {
-    const product = Product(
+    const produto = Produto(
       id: 'x',
-      title: 'Teste',
-      description: '',
-      price: 200,
-      category: 'Camisetas',
-      discountPercent: 20,
-      colorVariants: [
-        ColorVariant(name: 'Preto', images: ['p1', 'p2']),
-        ColorVariant(name: 'Branco', images: ['b1']),
+      titulo: 'Teste',
+      descricao: '',
+      preco: 200,
+      categoria: 'Camisetas',
+      percentualDesconto: 20,
+      variantesCor: [
+        VarianteCor(nome: 'Preto', fotos: ['p1', 'p2']),
+        VarianteCor(nome: 'Branco', fotos: ['b1']),
       ],
-      images: ['geral'],
+      fotos: ['geral'],
     );
 
     test('desconto, Pix e fotos por cor', () {
-      expect(product.finalPrice, 160);
-      expect(product.pixPrice, 152);
-      expect(product.imagesFor('Branco'), ['b1']);
-      expect(product.imagesFor(null), ['geral', 'p1', 'p2', 'b1']);
-      expect(product.toMap()['colors'], ['Preto', 'Branco']);
-      expect(product.toMap().containsKey('stock'), isFalse);
+      expect(produto.precoFinal, 160);
+      expect(produto.precoPix, 152);
+      expect(produto.fotosDaCor('Branco'), ['b1']);
+      expect(produto.fotosDaCor(null), ['geral', 'p1', 'p2', 'b1']);
+      expect(produto.paraMapa()['colors'], ['Preto', 'Branco']);
+      expect(produto.paraMapa().containsKey('stock'), isFalse);
     });
 
     test('desconto só vale dentro do período', () {
-      final now = DateTime.now();
-      Product withPeriod(DateTime? start, DateTime? end) => Product(
+      final agora = DateTime.now();
+      Produto comPeriodo(DateTime? inicio, DateTime? fim) => Produto(
             id: 'd',
-            title: 'D',
-            description: '',
-            price: 100,
-            category: 'Camisetas',
-            discountPercent: 30,
-            discountStartsAt: start,
-            discountEndsAt: end,
+            titulo: 'D',
+            descricao: '',
+            preco: 100,
+            categoria: 'Camisetas',
+            percentualDesconto: 30,
+            inicioDesconto: inicio,
+            fimDesconto: fim,
           );
-      final scheduled = withPeriod(now.add(const Duration(days: 1)), null);
-      expect(scheduled.discountStatus, DiscountStatus.scheduled);
-      expect(scheduled.finalPrice, 100);
-      expect(scheduled.activeDiscountPercent, 0);
+      final agendado = comPeriodo(agora.add(const Duration(days: 1)), null);
+      expect(agendado.situacaoDesconto, SituacaoDesconto.agendado);
+      expect(agendado.precoFinal, 100);
+      expect(agendado.percentualDescontoAtivo, 0);
 
-      final active = withPeriod(now.subtract(const Duration(hours: 1)), now.add(const Duration(hours: 1)));
-      expect(active.discountStatus, DiscountStatus.active);
-      expect(active.finalPrice, 70);
+      final ativo = comPeriodo(agora.subtract(const Duration(hours: 1)), agora.add(const Duration(hours: 1)));
+      expect(ativo.situacaoDesconto, SituacaoDesconto.ativo);
+      expect(ativo.precoFinal, 70);
 
-      final expired = withPeriod(null, now.subtract(const Duration(minutes: 1)));
-      expect(expired.discountStatus, DiscountStatus.expired);
-      expect(expired.finalPrice, 100);
+      final encerrado = comPeriodo(null, agora.subtract(const Duration(minutes: 1)));
+      expect(encerrado.situacaoDesconto, SituacaoDesconto.encerrado);
+      expect(encerrado.precoFinal, 100);
 
-      expect(withPeriod(null, null).discountStatus, DiscountStatus.active);
-      expect(active.toMap()['discount_ends_at'], isA<String>());
+      expect(comPeriodo(null, null).situacaoDesconto, SituacaoDesconto.ativo);
+      expect(ativo.paraMapa()['discount_ends_at'], isA<String>());
     });
 
     test('frete grátis a partir de 400 e 5% no Pix', () {
-      final small = OrderTotals.calculate(100, PaymentMethod.card);
-      expect(small.shipping, greaterThan(0));
-      final pix = OrderTotals.calculate(400, PaymentMethod.pix);
-      expect(pix.shipping, 0);
-      expect(pix.discount, 20);
+      final pequeno = TotaisPedido.calcular(100, FormaPagamento.cartao);
+      expect(pequeno.frete, greaterThan(0));
+      final pix = TotaisPedido.calcular(400, FormaPagamento.pix);
+      expect(pix.frete, 0);
+      expect(pix.desconto, 20);
       expect(pix.total, 380);
     });
 
     test('máscara de CEP', () {
-      final formatted = CepInputFormatter().formatEditUpdate(
+      final formatado = MascaraCep().formatEditUpdate(
         TextEditingValue.empty,
         const TextEditingValue(text: '17500a000'),
       );
-      expect(formatted.text, '17500-000');
+      expect(formatado.text, '17500-000');
     });
   });
 }

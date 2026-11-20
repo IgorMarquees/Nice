@@ -49,21 +49,20 @@ O app começou no Firebase e depois migramos tudo pro Supabase. Hoje o projeto t
 
 ## Como o código está organizado
 
-As telas nunca falam direto com o banco. O caminho é sempre tela → controller → repository → Supabase.
+O código fica em quatro camadas e todos os nomes estão em português. As telas nunca falam direto com o banco. O caminho é sempre tela → controlador → repositório → Supabase.
 
 ```
 lib/
-  main.dart          inicia o Supabase e os providers
+  main.dart            inicia o Supabase e os provedores
   src/
-    config/          chaves, regras de frete e Pix, caminhos das imagens
-    theme/           cores, fontes e estilos do app inteiro
-    models/          produto, carrinho, pedido, endereço e usuário
-    repositories/    acesso ao Supabase e às APIs
-    controllers/     estado e regras de cada parte
-    router/          rotas e permissões
-    screens/         telas da loja e do painel
-    widgets/         componentes reaproveitados
-    utils/           formatação e navegação
+    aplicativo.dart    tema, rotas e idioma do app
+    nucleo/            configuração, tema, rotas, navegação, avisos e formatação
+    dados/             modelos e repositórios: produto, carrinho, pedido, usuário e acesso ao Supabase
+    controladores/     estado e regras de cada parte
+    interface/
+      telas/           telas da loja, molduras do site e do celular
+      telas/admin/     painel do administrador
+      componentes/     peças de tela reaproveitadas
 supabase/
   schema.sql         banco completo
   migrations/        atualizações pra quem já tem o banco criado
