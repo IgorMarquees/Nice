@@ -33,6 +33,12 @@ const _secoes = [
     '/admin/descontos',
   ),
   _SecaoAdmin(
+    'Categorias',
+    'Criar e excluir categorias. Os produtos de uma categoria excluída vão para Sem categoria.',
+    Icons.sell_outlined,
+    '/admin/categorias',
+  ),
+  _SecaoAdmin(
     'Usuários',
     'Clientes cadastrados, endereços, histórico de pedidos e permissão de admin.',
     Icons.people_outline,

@@ -51,8 +51,6 @@ class TelaFormularioProduto extends StatefulWidget {
 }
 
 class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
-  static final _categorias = ControladorCatalogo.categorias.skip(1).toList();
-
   final _chaveFormulario = GlobalKey<FormState>();
   final _titulo = TextEditingController();
   final _descricao = TextEditingController();
@@ -62,7 +60,8 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
   final _estoque = TextEditingController(text: '0');
   final _tamanhoPersonalizado = TextEditingController();
 
-  String _categoria = _categorias.first;
+  /// Vazio até o admin escolher ou o produto carregar. Aí vale a primeira categoria da lista.
+  String? _categoria;
   final List<String> _tamanhos = [];
   bool _emDestaque = false;
   bool _novidade = false;
@@ -105,7 +104,7 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
           _inicioDesconto = produto.inicioDesconto;
           _fimDesconto = produto.fimDesconto;
         }
-        _categoria = _categorias.contains(produto.categoria) ? produto.categoria : _categorias.first;
+        _categoria = produto.categoria;
         _tamanhos
           ..clear()
           ..addAll(produto.tamanhos);
@@ -197,7 +196,7 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
       percentualDesconto: _temDesconto ? int.parse(_desconto.text.trim()) : 0,
       inicioDesconto: _temDesconto ? _inicioDesconto : null,
       fimDesconto: _temDesconto ? _fimDesconto : null,
-      categoria: _categoria,
+      categoria: _categoriaEscolhida(_comAtual(context.read<ControladorCatalogo>().categoriasCadastro)),
       fotos: _gerais.urls,
       tamanhos: _tamanhosOrdenados,
       estoque: int.parse(_estoque.text.trim()),
@@ -227,6 +226,12 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
     }
   }
 
+  /// Mantém a categoria do produto na lista mesmo que ela tenha saído do cadastro.
+  List<String> _comAtual(List<String> lista) =>
+      _categoria != null && !lista.contains(_categoria) ? [...lista, _categoria!] : lista;
+
+  String _categoriaEscolhida(List<String> lista) => _categoria ?? lista.first;
+
   Widget _par(Widget a, Widget b) {
     if (context.ehCelular) {
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [a, const SizedBox(height: 12), b]);
@@ -250,6 +255,7 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
     }
 
     final admin = context.watch<ControladorAdmin>();
+    final categorias = _comAtual(context.watch<ControladorCatalogo>().categoriasCadastro);
     final texto = Theme.of(context).textTheme;
     String? obrigatorio(String? v) => v == null || v.trim().isEmpty ? 'Obrigatório' : null;
     final preco = double.tryParse(_preco.text.trim().replaceAll(',', '.'));
@@ -367,9 +373,10 @@ class _TelaFormularioProdutoEstado extends State<TelaFormularioProduto> {
               ],
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: _categoria,
+                key: ValueKey(categorias.join('|')),
+                initialValue: _categoriaEscolhida(categorias),
                 decoration: const InputDecoration(labelText: 'Categoria'),
-                items: [for (final c in _categorias) DropdownMenuItem(value: c, child: Text(c))],
+                items: [for (final c in categorias) DropdownMenuItem(value: c, child: Text(c))],
                 onChanged: (v) => setState(() => _categoria = v ?? _categoria),
               ),
               const SizedBox(height: 24),

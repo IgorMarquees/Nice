@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../controladores/controlador_autenticacao.dart';
 import '../interface/telas/tela_sobre.dart';
 import '../interface/telas/admin/tela_painel_admin.dart';
+import '../interface/telas/admin/tela_categorias.dart';
 import '../interface/telas/admin/tela_descontos.dart';
 import '../interface/telas/admin/tela_formulario_produto.dart';
 import '../interface/telas/admin/tela_produtos_admin.dart';
@@ -124,6 +125,10 @@ GoRouter criarRotas(ControladorAutenticacao autenticacao) {
           GoRoute(
             path: '/admin/descontos',
             builder: (_, _) => const PaginaRolavel(conteudo: TelaDescontos()),
+          ),
+          GoRoute(
+            path: '/admin/categorias',
+            builder: (_, _) => const PaginaRolavel(conteudo: TelaCategorias()),
           ),
           GoRoute(
             path: '/admin/usuarios',

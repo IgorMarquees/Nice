@@ -15,6 +15,9 @@ const _iconesCategorias = <String, IconData>{
   'Acessórios': Icons.watch_outlined,
 };
 
+/// Categorias criadas pelo admin usam um ícone genérico.
+IconData _iconeDa(String categoria) => _iconesCategorias[categoria] ?? Icons.sell_outlined;
+
 /// Abre o catálogo filtrado pela categoria já rolado até os produtos.
 void abrirCategoria(BuildContext context, String categoria) =>
     context.go(caminhoCatalogo(categoria: categoria, irParaProdutos: true));
@@ -24,7 +27,8 @@ class SecaoCategorias extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nomes = ControladorCatalogo.categorias.skip(1).toList();
+    final catalogo = context.watch<ControladorCatalogo>();
+    final nomes = catalogo.categorias;
 
     if (context.ehCelular) {
       return SizedBox(
@@ -34,7 +38,7 @@ class SecaoCategorias extends StatelessWidget {
           itemCount: nomes.length,
           separatorBuilder: (_, _) => const SizedBox(width: 10),
           itemBuilder: (context, indice) => ActionChip(
-            avatar: Icon(_iconesCategorias[nomes[indice]], size: 18, color: TemaNice.vermelho),
+            avatar: Icon(_iconeDa(nomes[indice]), size: 18, color: TemaNice.vermelho),
             label: Text(nomes[indice]),
             onPressed: () => abrirCategoria(context, nomes[indice]),
           ),
@@ -42,7 +46,6 @@ class SecaoCategorias extends StatelessWidget {
       );
     }
 
-    final catalogo = context.watch<ControladorCatalogo>();
     final colunas = context.ehComputador ? 4 : 2;
     const formato = 1.35;
     const grande = false;
@@ -94,7 +97,7 @@ class _CartaoCategoria extends StatelessWidget {
             if (capa.isNotEmpty)
               ImagemRede(url: capa, ajuste: BoxFit.cover)
             else
-              Center(child: Icon(_iconesCategorias[nome], size: 56, color: TemaNice.vermelhoVivo)),
+              Center(child: Icon(_iconeDa(nome), size: 56, color: TemaNice.vermelhoVivo)),
             const DecoratedBox(decoration: BoxDecoration(gradient: TemaNice.sombraInferior)),
             Positioned(
               left: grande ? 32 : 16,

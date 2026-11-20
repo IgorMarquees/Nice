@@ -21,7 +21,8 @@ void main() {
   ];
   const rotas = [
     '/', '/novidades', '/catalogo', '/sobre', '/carrinho', '/produto/fake-101', '/admin',
-    '/admin/produtos', '/admin/descontos', '/admin/usuarios', '/admin/produto/novo', '/checkout', '/perfil', '/login', '/cadastro',
+    '/admin/produtos', '/admin/descontos',
+    '/admin/categorias', '/admin/usuarios', '/admin/produto/novo', '/checkout', '/perfil', '/login', '/cadastro',
   ];
 
   for (final usuario in [null, _administrador]) {

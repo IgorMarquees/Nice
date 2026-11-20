@@ -22,7 +22,7 @@ class PainelFiltros extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final categoria in ControladorCatalogo.categorias)
+            for (final categoria in catalogo.categoriasFiltro)
               ChoiceChip(
                 label: Text(categoria),
                 selected: catalogo.categoriaSelecionada == categoria,

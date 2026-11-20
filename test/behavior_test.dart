@@ -287,6 +287,66 @@ void main() {
     });
   }
 
+  const administrador = Usuario(id: 'adm', email: 'adm@nice.com', nome: 'Admin', papel: PapelUsuario.admin);
+
+  testWidgets('admin cria uma categoria e ela aparece no catálogo e na Home', (testador) async {
+    testador.view.physicalSize = const Size(1440, 1400);
+    testador.view.devicePixelRatio = 1;
+    final roteador = rotasTeste('/admin/categorias', web: true);
+    await testador.pumpWidget(
+      ProvedoresTeste(
+        usuario: administrador,
+        conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: roteador),
+      ),
+    );
+    await testador.pumpAndSettle();
+
+    await testador.enterText(find.byType(TextField).last, 'Jaquetas');
+    await testador.tap(find.text('CRIAR CATEGORIA'));
+    await testador.pumpAndSettle();
+    expect(find.text('Jaquetas'), findsOneWidget);
+
+    roteador.go('/catalogo');
+    await testador.pumpAndSettle();
+    expect(find.widgetWithText(ChoiceChip, 'Jaquetas'), findsOneWidget);
+
+    roteador.go('/');
+    await testador.pumpAndSettle();
+    expect(find.text('JAQUETAS'), findsOneWidget);
+    expect(testador.takeException(), isNull);
+    await testador.pumpWidget(const SizedBox());
+    testador.view.reset();
+  });
+
+  testWidgets('admin exclui uma categoria e Sem categoria não pode ser excluída', (testador) async {
+    testador.view.physicalSize = const Size(1440, 1400);
+    testador.view.devicePixelRatio = 1;
+    final roteador = rotasTeste('/admin/categorias', web: true);
+    await testador.pumpWidget(
+      ProvedoresTeste(
+        usuario: administrador,
+        conteudo: MaterialApp.router(theme: TemaNice.claro(), routerConfig: roteador),
+      ),
+    );
+    await testador.pumpAndSettle();
+
+    final botoes = find.byTooltip('Excluir categoria');
+    expect(botoes, findsNWidgets(4));
+    final protegida = find.byTooltip('Categoria protegida');
+    expect(testador.widget<IconButton>(find.ancestor(of: find.byIcon(Icons.delete_outline).last, matching: find.byType(IconButton))).onPressed, isNull);
+    expect(protegida, findsOneWidget);
+
+    await testador.tap(botoes.first);
+    await testador.pumpAndSettle();
+    await testador.tap(find.widgetWithText(FilledButton, 'Excluir'));
+    await testador.pumpAndSettle();
+    expect(find.text('Camisetas'), findsNothing);
+    expect(find.byTooltip('Excluir categoria'), findsNWidgets(3));
+    expect(testador.takeException(), isNull);
+    await testador.pumpWidget(const SizedBox());
+    testador.view.reset();
+  });
+
   group('regras de preço', () {
     const produto = Produto(
       id: 'x',

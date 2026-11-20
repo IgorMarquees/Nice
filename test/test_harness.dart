@@ -17,6 +17,7 @@ import 'package:nice_store/src/dados/usuario.dart';
 import 'package:nice_store/src/dados/produto.dart';
 import 'package:nice_store/src/dados/repositorio_enderecos.dart';
 import 'package:nice_store/src/dados/repositorio_autenticacao.dart';
+import 'package:nice_store/src/dados/repositorio_categorias.dart';
 import 'package:nice_store/src/dados/repositorio_carrinho.dart';
 import 'package:nice_store/src/dados/repositorio_vitrine_reserva.dart';
 import 'package:nice_store/src/dados/repositorio_pedidos.dart';
@@ -26,6 +27,7 @@ import 'package:nice_store/src/dados/repositorio_usuarios.dart';
 import 'package:nice_store/src/nucleo/navegacao.dart';
 import 'package:nice_store/src/interface/telas/tela_sobre.dart';
 import 'package:nice_store/src/interface/telas/admin/tela_painel_admin.dart';
+import 'package:nice_store/src/interface/telas/admin/tela_categorias.dart';
 import 'package:nice_store/src/interface/telas/admin/tela_descontos.dart';
 import 'package:nice_store/src/interface/telas/admin/tela_formulario_produto.dart';
 import 'package:nice_store/src/interface/telas/admin/tela_produtos_admin.dart';
@@ -63,6 +65,25 @@ class ProdutosOffline extends RepositorioProdutos {
   Future<Produto?> buscarPorId(String id) async => produtos.where((p) => p.id == id).firstOrNull;
 }
 
+/// Categorias guardadas na memória para testar criar e excluir sem o banco.
+class CategoriasOffline extends RepositorioCategorias {
+  CategoriasOffline(super.conexao);
+
+  final List<String> nomes = ['Camisetas', 'Moletons', 'Calças', 'Acessórios', 'Sem categoria'];
+
+  @override
+  Future<List<String>> buscarTodas() async => [...nomes];
+
+  @override
+  Future<void> criar(String nome) async => nomes.add(nome);
+
+  @override
+  Future<int> excluir(String nome) async {
+    nomes.remove(nome);
+    return 0;
+  }
+}
+
 class AutenticacaoOffline extends RepositorioAutenticacao {
   AutenticacaoOffline(super.conexao);
 
@@ -96,6 +117,7 @@ class ProvedoresTeste extends StatelessWidget {
         Provider(create: (_) => RepositorioFotos(conexao)),
         Provider(create: (_) => RepositorioEnderecos(conexao)),
         Provider(create: (_) => RepositorioUsuarios(conexao)),
+        Provider<RepositorioCategorias>(create: (_) => CategoriasOffline(conexao)),
         ChangeNotifierProvider(
           create: (c) {
             final autenticacao = ControladorAutenticacao(c.read<RepositorioAutenticacao>());
@@ -104,7 +126,7 @@ class ProvedoresTeste extends StatelessWidget {
           },
         ),
         ChangeNotifierProvider(
-          create: (c) => ControladorCatalogo(c.read<RepositorioProdutos>(), c.read<RepositorioVitrineReserva>())..carregar(),
+          create: (c) => ControladorCatalogo(c.read<RepositorioProdutos>(), c.read<RepositorioVitrineReserva>(), c.read<RepositorioCategorias>())..carregar(),
         ),
         ChangeNotifierProxyProvider<ControladorAutenticacao, ControladorCarrinho>(
           create: (c) => ControladorCarrinho(c.read<RepositorioCarrinho>()),
@@ -185,6 +207,10 @@ GoRouter rotasTeste(String inicial, {required bool web}) => GoRouter(
         GoRoute(
           path: '/admin/descontos',
           builder: (_, _) => const PaginaRolavel(conteudo: TelaDescontos()),
+        ),
+        GoRoute(
+          path: '/admin/categorias',
+          builder: (_, _) => const PaginaRolavel(conteudo: TelaCategorias()),
         ),
         GoRoute(
           path: '/checkout',

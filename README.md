@@ -33,6 +33,7 @@ O app começou no Firebase e depois migramos tudo pro Supabase. Hoje o projeto t
 
 - Cadastrar e editar produtos com fotos, cores com fotos próprias, tamanhos, estoque e detalhes técnicos
 - Marcar produtos como Destaque ou Novidade
+- Criar e excluir categorias. Quando uma categoria é excluída, os produtos dela vão para Sem categoria
 - Criar descontos com data e hora pra começar e terminar, em um produto só ou em vários de uma vez, e cancelar quando quiser
 - Ver os usuários cadastrados, seus endereços e pedidos, e transformar alguém em admin
 - Só o admin consegue ver o estoque
@@ -106,6 +107,7 @@ Somente um administrador pode promover outros admins, pelo painel de administrad
 | cart_items | carrinho de cada cliente | só o dono |
 | orders | pedidos com itens, endereço, frete e desconto | o cliente vê os dele, o admin vê todos |
 | addresses | endereços salvos | o dono, e o admin pode consultar |
+| categories | categorias da loja | todo mundo vê, só admin cria e exclui |
 
 As fotos ficam no bucket `product-images` e só admin consegue enviar.
 

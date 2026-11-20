@@ -15,6 +15,7 @@ import 'src/controladores/controlador_pedidos.dart';
 import 'src/controladores/controlador_usuarios.dart';
 import 'src/dados/repositorio_enderecos.dart';
 import 'src/dados/repositorio_autenticacao.dart';
+import 'src/dados/repositorio_categorias.dart';
 import 'src/dados/repositorio_carrinho.dart';
 import 'src/dados/repositorio_vitrine_reserva.dart';
 import 'src/dados/repositorio_pedidos.dart';
@@ -58,6 +59,7 @@ Future<void> main() async {
         Provider(create: (_) => RepositorioFotos(conexao)),
         Provider(create: (_) => RepositorioEnderecos(conexao)),
         Provider(create: (_) => RepositorioUsuarios(conexao)),
+        Provider(create: (_) => RepositorioCategorias(conexao)),
         ChangeNotifierProvider(
           create: (context) => ControladorAutenticacao(context.read<RepositorioAutenticacao>()),
         ),
@@ -65,6 +67,7 @@ Future<void> main() async {
           create: (context) => ControladorCatalogo(
             context.read<RepositorioProdutos>(),
             context.read<RepositorioVitrineReserva>(),
+            context.read<RepositorioCategorias>(),
           )..carregar(),
         ),
         ChangeNotifierProxyProvider<ControladorAutenticacao, ControladorCarrinho>(

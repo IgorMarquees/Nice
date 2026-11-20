@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../dados/produto.dart';
+import '../dados/repositorio_categorias.dart';
 import '../dados/repositorio_vitrine_reserva.dart';
 import '../dados/repositorio_produtos.dart';
 
@@ -15,14 +16,20 @@ enum Ordenacao {
 }
 
 class ControladorCatalogo extends ChangeNotifier {
-  ControladorCatalogo(this._produtos, this._vitrineReserva);
+  ControladorCatalogo(this._produtos, this._vitrineReserva, this._categoriasRepositorio);
 
   static const todasCategorias = 'Ver tudo';
-  static const categorias = [todasCategorias, 'Camisetas', 'Moletons', 'Calças', 'Acessórios'];
+  static const semCategoria = 'Sem categoria';
+
+  /// Usadas enquanto o banco não responde ou se a tabela de categorias ainda não existir.
+  static const categoriasPadrao = ['Camisetas', 'Moletons', 'Calças', 'Acessórios'];
   static const tamanhos = ['P', 'M', 'G', 'GG'];
 
   final RepositorioProdutos _produtos;
   final RepositorioVitrineReserva _vitrineReserva;
+  final RepositorioCategorias _categoriasRepositorio;
+
+  List<String> _categorias = [...categoriasPadrao, semCategoria];
 
   List<Produto> _remotos = [];
   /// Produtos de exemplo usados quando o banco está vazio.
@@ -42,6 +49,21 @@ class ControladorCatalogo extends ChangeNotifier {
   String get categoriaSelecionada => _categoria;
   String? get tamanhoSelecionado => _tamanho;
   Ordenacao get ordenacao => _ordenacao;
+
+  /// Todas as categorias cadastradas para o admin escolher no produto.
+  List<String> get categoriasCadastro => _categorias;
+
+  /// Categorias mostradas na loja.
+  /// Sem categoria só aparece quando algum produto está nela.
+  List<String> get categorias => [
+    for (final c in _categorias)
+      if (c != semCategoria || _base.any((p) => p.categoria == semCategoria)) c,
+  ];
+
+  List<String> get categoriasFiltro => [todasCategorias, ...categorias];
+
+  /// Produtos reais do banco em uma categoria.
+  int qtdProdutosDa(String categoria) => _remotos.where((p) => p.categoria == categoria).length;
 
   /// Usa os produtos do banco e só cai na vitrine reserva se o banco estiver vazio.
   List<Produto> get _base => _remotos.isNotEmpty ? _remotos : _reserva;
@@ -126,6 +148,7 @@ class ControladorCatalogo extends ChangeNotifier {
     } catch (_) {
       _remotos = [];
     }
+    await _carregarCategorias();
     final precisaReserva = _remotos.isEmpty ||
         !_remotos.any((p) => p.emDestaque) ||
         !_remotos.any((p) => p.novidade);
@@ -136,6 +159,49 @@ class ControladorCatalogo extends ChangeNotifier {
     _carregando = false;
     _carregado = true;
     notifyListeners();
+  }
+
+  Future<void> _carregarCategorias() async {
+    try {
+      final lista = await _categoriasRepositorio.buscarTodas();
+      if (lista.isNotEmpty) _categorias = lista;
+    } catch (_) {
+      // Sem a tabela de categorias a loja segue com a lista padrão.
+    }
+  }
+
+  /// Devolve uma mensagem de erro ou nada quando a categoria foi criada.
+  Future<String?> criarCategoria(String nome) async {
+    final limpo = nome.trim();
+    if (limpo.isEmpty) return 'Informe o nome da categoria.';
+    if (limpo == todasCategorias) return 'Esse nome é reservado.';
+    if (_categorias.any((c) => c.toLowerCase() == limpo.toLowerCase())) {
+      return 'Já existe uma categoria com esse nome.';
+    }
+    try {
+      await _categoriasRepositorio.criar(limpo);
+    } on ErroCategoria catch (e) {
+      return e.mensagem;
+    } catch (_) {
+      return 'Não foi possível criar a categoria.';
+    }
+    await _carregarCategorias();
+    notifyListeners();
+    return null;
+  }
+
+  /// Os produtos da categoria vão para Sem categoria.
+  /// Devolve uma mensagem de erro ou nada quando deu certo.
+  Future<String?> excluirCategoria(String nome) async {
+    if (nome == semCategoria) return 'A categoria Sem categoria não pode ser excluída.';
+    try {
+      await _categoriasRepositorio.excluir(nome);
+    } catch (_) {
+      return 'Não foi possível excluir a categoria.';
+    }
+    if (_categoria == nome) _categoria = todasCategorias;
+    await carregar(forcar: true);
+    return null;
   }
 
   Future<Produto?> encontrarPorId(String id) async {
@@ -151,7 +217,8 @@ class ControladorCatalogo extends ChangeNotifier {
   }
 
   void aplicarFiltrosIniciais({String? categoria, String? busca}) {
-    _categoria = categorias.contains(categoria) ? categoria! : todasCategorias;
+    // A categoria do endereço é aceita como veio porque a lista pode ainda não ter carregado.
+    _categoria = (categoria == null || categoria.trim().isEmpty) ? todasCategorias : categoria;
     _busca = busca ?? '';
     _tamanho = null;
     _precoMaximo = null;

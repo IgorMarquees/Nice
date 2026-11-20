@@ -136,7 +136,7 @@ class _TelaDescontosEstado extends State<TelaDescontos> {
               runSpacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                for (final categoria in ControladorCatalogo.categorias)
+                for (final categoria in context.watch<ControladorCatalogo>().categoriasFiltro)
                   ChoiceChip(
                     label: Text(categoria),
                     selected: _categoria == categoria,
