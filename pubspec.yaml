@@ -11,12 +11,11 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  # Textos do Material (calendário, relógio...) em português
   flutter_localizations:
     sdk: flutter
   cupertino_icons: ^1.0.8
 
-  # Backend (Auth + Postgres + Storage) - Android, iOS e Web
+  # Backend Auth + Postgres + Storage 
   supabase_flutter: ^2.8.4
 
   # Estado e navegação
@@ -29,10 +28,10 @@ dependencies:
   # UI
   google_fonts: ^6.2.1
 
-  # Upload de imagens de produtos (admin) - Android, iOS e Web
+  # Upload de imagens de produtos (admin) 
   image_picker: ^1.1.2
 
-  # Ícones de redes sociais (Instagram, TikTok...) - Android, iOS e Web
+  # Ícones de redes sociais 
   font_awesome_flutter: ^11.0.0
 
 dev_dependencies:
@@ -43,8 +42,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Logos e banners prontos. Lista explícita: as imagens "*_inspiracao_*" e
-  # "*_nao_usar_*" são só referência de design e NÃO entram no app.
   assets:
     - assets/NiceB.PSD.png
     - assets/NiceP.PSD.png
