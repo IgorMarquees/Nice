@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../dados/classificador_categorias.dart';
+import '../dados/indice_busca.dart';
 import '../dados/produto.dart';
 import '../dados/repositorio_categorias.dart';
 import '../dados/repositorio_vitrine_reserva.dart';
@@ -104,18 +106,65 @@ class ControladorCatalogo extends ChangeNotifier {
 
   double get precoMaximo => _precoMaximo ?? maiorPreco;
 
+  static const _classificador = ClassificadorCategorias();
+
+  /// Abaixo disso o modelo está em dúvida e a categoria não influencia a busca.
+  static const confiancaMinima = 0.6;
+
+  /// Fração da nota do melhor resultado que um produto precisa ter para aparecer.
+  static const relevanciaMinima = 0.3;
+
+  IndiceBusca? _indice;
+  List<Produto>? _indiceDe;
+
+  /// Refeito só quando a lista de produtos muda.
+  IndiceBusca get _indiceBusca {
+    if (!identical(_indiceDe, _base)) {
+      _indiceDe = _base;
+      _indice = IndiceBusca(_base);
+    }
+    return _indice!;
+  }
+
+  /// Categoria que o modelo de PLN acha que o cliente procura.
+  PrevisaoCategoria? get categoriaPrevista {
+    if (_busca.trim().isEmpty) return null;
+    final previsao = _classificador.prever(_busca);
+    if (previsao == null || previsao.confianca < confiancaMinima) return null;
+    return categorias.contains(previsao.categoria) ? previsao : null;
+  }
+
+  /// Relevância de cada produto: texto parecido mais um bônus para a categoria prevista.
+  Map<String, double> _relevancia(String consulta) {
+    final pontos = _indiceBusca.pontuar(consulta);
+    final previsao = categoriaPrevista;
+    if (previsao != null) {
+      for (final p in _base) {
+        if (p.categoria == previsao.categoria) pontos[p.id] = (pontos[p.id] ?? 0) + 0.3 * previsao.confianca;
+      }
+    }
+    // Some com quem só bateu de raspão como uma cor parecida quando há resultados bem melhores
+    if (pontos.isNotEmpty) {
+      final melhor = pontos.values.reduce((a, b) => a > b ? a : b);
+      pontos.removeWhere((_, nota) => nota < melhor * relevanciaMinima);
+    }
+    return pontos;
+  }
+
   List<Produto> get filtrados {
-    final q = _busca.trim().toLowerCase();
+    final relevancia = _busca.trim().isEmpty ? null : _relevancia(_busca);
     final lista = _base.where((p) {
       final bateCategoria = _categoria == todasCategorias || p.categoria == _categoria;
-      final bateBusca = q.isEmpty ||
-          p.titulo.toLowerCase().contains(q) ||
-          p.descricao.toLowerCase().contains(q);
+      final bateBusca = relevancia == null || relevancia.containsKey(p.id);
       final bateTamanho = _tamanho == null || p.tamanhos.contains(_tamanho);
       final batePreco = p.precoFinal <= precoMaximo;
       return bateCategoria && bateBusca && bateTamanho && batePreco;
     }).toList();
 
+    if (relevancia != null && _ordenacao == Ordenacao.recentes) {
+      lista.sort((a, b) => relevancia[b.id]!.compareTo(relevancia[a.id]!));
+      return lista;
+    }
     switch (_ordenacao) {
       case Ordenacao.menorPreco:
         lista.sort((a, b) => a.precoFinal.compareTo(b.precoFinal));

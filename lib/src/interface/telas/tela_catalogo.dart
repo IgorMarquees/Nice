@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../nucleo/imagens.dart';
+import '../../nucleo/tema.dart';
 import '../../controladores/controlador_catalogo.dart';
 import '../componentes/imagem_banner.dart';
 import '../componentes/secao_categorias.dart';
@@ -91,6 +92,18 @@ class _TelaCatalogoEstado extends State<TelaCatalogo> {
       ),
     );
 
+    final previsao = catalogo.categoriaPrevista;
+    final sugestao = previsao == null || previsao.categoria == catalogo.categoriaSelecionada
+        ? null
+        : _SugestaoCategoria(
+            categoria: previsao.categoria,
+            aoTocar: () {
+              _buscar.clear();
+              catalogo.definirBusca('');
+              catalogo.definirCategoria(previsao.categoria);
+            },
+          );
+
     final resultados = catalogo.carregando && !catalogo.carregado
         ? const Carregando()
         : produtos.isEmpty
@@ -122,6 +135,7 @@ class _TelaCatalogoEstado extends State<TelaCatalogo> {
                       Text('${produtos.length} produtos', style: texto.bodySmall),
                       const SizedBox(height: 20),
                       campoBusca,
+                      if (sugestao != null) ...[const SizedBox(height: 12), sugestao],
                       const SizedBox(height: 28),
                       resultados,
                     ],
@@ -141,6 +155,7 @@ class _TelaCatalogoEstado extends State<TelaCatalogo> {
                     IconButton.filledTonal(tooltip: 'Filtros', onPressed: _abrirFiltros, icon: const Icon(Icons.tune)),
                   ],
                 ),
+                if (sugestao != null) ...[const SizedBox(height: 12), sugestao],
                 const SizedBox(height: 16),
                 Text('${produtos.length} produtos', style: texto.bodySmall),
                 const SizedBox(height: 16),
@@ -181,6 +196,7 @@ class _TelaCatalogoEstado extends State<TelaCatalogo> {
               IconButton.filledTonal(tooltip: 'Filtros', onPressed: _abrirFiltros, icon: const Icon(Icons.tune)),
             ],
           ),
+          if (sugestao != null) ...[const SizedBox(height: 12), sugestao],
           const SizedBox(height: 16),
           const SecaoCategorias(),
           const SizedBox(height: 16),
@@ -190,6 +206,29 @@ class _TelaCatalogoEstado extends State<TelaCatalogo> {
           const SizedBox(height: 32),
         ],
       ),
+    );
+  }
+}
+
+/// Atalho para a categoria que o classificador de PLN previu a partir da busca.
+class _SugestaoCategoria extends StatelessWidget {
+  const _SugestaoCategoria({required this.categoria, required this.aoTocar});
+
+  final String categoria;
+  final VoidCallback aoTocar;
+
+  @override
+  Widget build(BuildContext context) {
+    final texto = Theme.of(context).textTheme;
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 8,
+      runSpacing: 4,
+      children: [
+        const Icon(Icons.auto_awesome, size: 16, color: TemaNice.vermelho),
+        Text('Parece que você procura $categoria.', style: texto.bodySmall),
+        TextButton(onPressed: aoTocar, child: Text('VER TUDO EM ${categoria.toUpperCase()}')),
+      ],
     );
   }
 }

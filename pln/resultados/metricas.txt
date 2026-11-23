@@ -1,0 +1,35 @@
+Consultas no CSV: 800  únicas: 790
+Treino: 632  teste: 158  vocabulário: 221 termos
+
+Naive Bayes  acurácia no teste: 0.943
+Naive Bayes  validação cruzada 5 partes: 0.948 +- 0.019
+Regressão logística  acurácia no teste: 0.956
+
+Matriz de confusão  linhas = real  colunas = previsto
+                Acessórios     Calças  Camisetas   Moletons
+    Acessórios          37          1          0          1
+        Calças           2         35          2          0
+     Camisetas           0          0         39          1
+      Moletons           1          1          0         38
+
+              precision    recall  f1-score   support
+
+  Acessórios      0.925     0.949     0.937        39
+      Calças      0.946     0.897     0.921        39
+   Camisetas      0.951     0.975     0.963        40
+    Moletons      0.950     0.950     0.950        40
+
+    accuracy                          0.943       158
+   macro avg      0.943     0.943     0.943       158
+weighted avg      0.943     0.943     0.943       158
+
+Erros no teste:
+  "tem pantalona vermelha tamanho p"  real=Calças  previsto=Acessórios
+  "quero uma windbreeaker vermelha harajuku"  real=Moletons  previsto=Acessórios
+  "preciso de regatta preto tie dye"  real=Camisetas  previsto=Moletons
+  "moletons larga em oferta"  real=Moletons  previsto=Calças
+  "quero uma pantalonna branca"  real=Calças  previsto=Acessórios
+  "procuro peça de baixo pra andar de skate"  real=Calças  previsto=Camisetas
+  "peça de baixo pra andar de skate"  real=Calças  previsto=Camisetas
+  "queria um bonés vermelho tie dye barato"  real=Acessórios  previsto=Moletons
+  "meais"  real=Acessórios  previsto=Calças

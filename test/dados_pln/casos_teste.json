@@ -1,0 +1,1032 @@
+{
+ "acuracia_python": 0.9430379746835443,
+ "preprocessamento": [
+  {
+   "texto": "Moletons PRETOS com capuz",
+   "termos": [
+    "moletom",
+    "preto",
+    "capuz"
+   ]
+  },
+  {
+   "texto": "quero uma camiseta oversized do Japão",
+   "termos": [
+    "camiseta",
+    "oversized",
+    "japao"
+   ]
+  },
+  {
+   "texto": "Calças cargo bege",
+   "termos": [
+    "calca",
+    "cargo",
+    "bege"
+   ]
+  },
+  {
+   "texto": "Bonés e anéis",
+   "termos": [
+    "bone",
+    "anel"
+   ]
+  },
+  {
+   "texto": "tem hoodie tamanho GG?",
+   "termos": [
+    "moletom",
+    "tamanho",
+    "gg"
+   ]
+  },
+  {
+   "texto": "T-shirt estampada",
+   "termos": [
+    "t",
+    "camiseta",
+    "estampada"
+   ]
+  },
+  {
+   "texto": "calça de moletom",
+   "termos": [
+    "calca",
+    "moletom"
+   ]
+  },
+  {
+   "texto": "Óculos de sol & correntes",
+   "termos": [
+    "oculo",
+    "sol",
+    "corrente"
+   ]
+  },
+  {
+   "texto": "camisa sem manga",
+   "termos": [
+    "camiseta",
+    "sem",
+    "manga"
+   ]
+  },
+  {
+   "texto": "jeans larga",
+   "termos": [
+    "jeans",
+    "larga"
+   ]
+  }
+ ],
+ "casos": [
+  {
+   "texto": "quero uma presente pequeno",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.878105
+  },
+  {
+   "texto": "me mostra blusinha vermelha cyberpunk",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.735064
+  },
+  {
+   "texto": "quero corta vento roxo",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.960519
+  },
+  {
+   "texto": "t-shirt grafite",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.979155
+  },
+  {
+   "texto": "calças bege harajuku",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.834968
+  },
+  {
+   "texto": "busco bandana",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.93602
+  },
+  {
+   "texto": "quero chapéu bucket azul",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.974892
+  },
+  {
+   "texto": "tem pantalona vermelha tamanho p",
+   "real": "Calças",
+   "previsto": "Acessórios",
+   "confianca": 0.374304
+  },
+  {
+   "texto": "meia kanji",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.924394
+  },
+  {
+   "texto": "algo com bolsos laterais",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.861603
+  },
+  {
+   "texto": "busco calça jeans feminina",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.987335
+  },
+  {
+   "texto": "tem anéis marrom",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.8666
+  },
+  {
+   "texto": "procuro calça cargo vermelho minimalista",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.964555
+  },
+  {
+   "texto": "me mostra chaveiro harajuku",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.915158
+  },
+  {
+   "texto": "calça larga",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.972454
+  },
+  {
+   "texto": "vcs tem calça reta marrom unissex tamanho p",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.645334
+  },
+  {
+   "texto": "blusa de manga curta branco",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.969813
+  },
+  {
+   "texto": "quero uma windbreeaker vermelha harajuku",
+   "real": "Moletons",
+   "previsto": "Acessórios",
+   "confianca": 0.367739
+  },
+  {
+   "texto": "queria um corrente bege anime",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.816402
+  },
+  {
+   "texto": "quero algo com capuz",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.902167
+  },
+  {
+   "texto": "algo pra usar no pescoço",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.799265
+  },
+  {
+   "texto": "claça skinny azul tokyo",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.915192
+  },
+  {
+   "texto": "me mostra baby look roxo barato",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.841134
+  },
+  {
+   "texto": "queria um touca vermelha kanji",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.878351
+  },
+  {
+   "texto": "procuro blua de frio off white",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.580835
+  },
+  {
+   "texto": "queria um canguru roxo",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.736158
+  },
+  {
+   "texto": "brinco marrom nice",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.768948
+  },
+  {
+   "texto": "me mostra jeans japonês",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.933618
+  },
+  {
+   "texto": "tem calça wide leg grafite unissex",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.983634
+  },
+  {
+   "texto": "busco colar lançamento",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.862769
+  },
+  {
+   "texto": "preciso de regatta preto tie dye",
+   "real": "Camisetas",
+   "previsto": "Moletons",
+   "confianca": 0.473149
+  },
+  {
+   "texto": "vcs tem top off white",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.80661
+  },
+  {
+   "texto": "queria um chapéu bucket branca oversized",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.9531
+  },
+  {
+   "texto": "queria um blusa de frio vermelha japonesa",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.918749
+  },
+  {
+   "texto": "procuro tee azul harajuku",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.68396
+  },
+  {
+   "texto": "tem blusa de lã branco básico de couro",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.919325
+  },
+  {
+   "texto": "queria um camiseta manga longa branca",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.995958
+  },
+  {
+   "texto": "moletons larga em oferta",
+   "real": "Moletons",
+   "previsto": "Calças",
+   "confianca": 0.725353
+  },
+  {
+   "texto": "me mostra camiseta longline largo",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.975275
+  },
+  {
+   "texto": "camiseta gola alta off white novo",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.981526
+  },
+  {
+   "texto": "chapéu bucket",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.992338
+  },
+  {
+   "texto": "preciso de moeltom de zíper oversized",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.797236
+  },
+  {
+   "texto": "camiseta gola alta marrom",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.995062
+  },
+  {
+   "texto": "tem camiseta estampada grafite bordado",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.96624
+  },
+  {
+   "texto": "preciso de algo pra esquentar no frio",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.948866
+  },
+  {
+   "texto": "procuro anéis off white tie dye",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.494455
+  },
+  {
+   "texto": "procuro tee bege tokyo promoção",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.490057
+  },
+  {
+   "texto": "gorro marrom",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.859947
+  },
+  {
+   "texto": "vcs tem boné larga",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.86455
+  },
+  {
+   "texto": "quero moletom",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.855904
+  },
+  {
+   "texto": "quero uma pulseira",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.924685
+  },
+  {
+   "texto": "camiseta manga curta branca estampa japonesa",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.981498
+  },
+  {
+   "texto": "quero calça de moletom",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.91299
+  },
+  {
+   "texto": "vcs tem t-shirt",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.993787
+  },
+  {
+   "texto": "vcs tem tee verde",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.889949
+  },
+  {
+   "texto": "procuro calça wide leg anime",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.988134
+  },
+  {
+   "texto": "preciso de camiseta longline verde largo",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.954358
+  },
+  {
+   "texto": "quero uma pantalonna branca",
+   "real": "Calças",
+   "previsto": "Acessórios",
+   "confianca": 0.337012
+  },
+  {
+   "texto": "quero joggre estampa japonesa de nylon",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.378594
+  },
+  {
+   "texto": "quero blusinha anime",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.823365
+  },
+  {
+   "texto": "jaqueta bomber bege",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.965715
+  },
+  {
+   "texto": "preciso de t-shirt roxo",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.981378
+  },
+  {
+   "texto": "queria um blusão larga",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.692853
+  },
+  {
+   "texto": "casaco off white",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.87204
+  },
+  {
+   "texto": "queria um jaqueeta bomber larga",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.666279
+  },
+  {
+   "texto": "vcs tem camisetas vermelho minimalista em oferta",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.643792
+  },
+  {
+   "texto": "tem baby look off white tamanho gg",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.860773
+  },
+  {
+   "texto": "busco corrente branca anime novo",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.810372
+  },
+  {
+   "texto": "baby look off white masculino tamanho gg",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.825562
+  },
+  {
+   "texto": "quero uma sueter azul",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.917509
+  },
+  {
+   "texto": "pulseira azul tie dye",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.455125
+  },
+  {
+   "texto": "queria um camisa larga",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.86697
+  },
+  {
+   "texto": "queria um chaveiro verde tie dye",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.533875
+  },
+  {
+   "texto": "quero uma sueter azul largo",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.885144
+  },
+  {
+   "texto": "jeans harajuku",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.919864
+  },
+  {
+   "texto": "preciso de boné",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.951647
+  },
+  {
+   "texto": "camisetas off white básico de algodão",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.697076
+  },
+  {
+   "texto": "quero tee off white harajuku",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.684796
+  },
+  {
+   "texto": "me mostra meias anime de couro",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.806128
+  },
+  {
+   "texto": "quero uma camiseta básica cinza",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.978265
+  },
+  {
+   "texto": "tem calça reta feminina",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.967967
+  },
+  {
+   "texto": "me mostra camiseta oversized feminina tamanho g",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.914655
+  },
+  {
+   "texto": "quero uma moletom peluciado cinza anime",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.971278
+  },
+  {
+   "texto": "queria um pulseira",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.924685
+  },
+  {
+   "texto": "tem pochete roxo",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.77227
+  },
+  {
+   "texto": "algo com capuz",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.902167
+  },
+  {
+   "texto": "queria um parachtue pants",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.936498
+  },
+  {
+   "texto": "preciso de jogger preta",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.88319
+  },
+  {
+   "texto": "calça cargo off white",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.977091
+  },
+  {
+   "texto": "tem calça novo",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.770693
+  },
+  {
+   "texto": "tem baby look cinza",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.932405
+  },
+  {
+   "texto": "busco chaveiro preta",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.834993
+  },
+  {
+   "texto": "calça cargo cyberpunk",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.978357
+  },
+  {
+   "texto": "queria um camisa polo verde",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.980353
+  },
+  {
+   "texto": "tem moletom de zíper verde feminina",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.948088
+  },
+  {
+   "texto": "me mostra jogger branco",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.89852
+  },
+  {
+   "texto": "calça de moletom rosa básico",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.718156
+  },
+  {
+   "texto": "jaqueta college branco",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.969658
+  },
+  {
+   "texto": "camiseta manga longa vermelha oversized",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.99643
+  },
+  {
+   "texto": "preciso de calça de sarja bege larga de nylon",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.976923
+  },
+  {
+   "texto": "casaco harajuku",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.885535
+  },
+  {
+   "texto": "busco meia",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.964476
+  },
+  {
+   "texto": "vcs tem camisea básica",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.946281
+  },
+  {
+   "texto": "peça pra usar quando esfriar",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.824693
+  },
+  {
+   "texto": "parrachute pants tie dye",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.492462
+  },
+  {
+   "texto": "preciso de shorts roxo feminina",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.871383
+  },
+  {
+   "texto": "vcs tem hoodie branca",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.818393
+  },
+  {
+   "texto": "procuro peça de baixo pra andar de skate",
+   "real": "Calças",
+   "previsto": "Camisetas",
+   "confianca": 0.77615
+  },
+  {
+   "texto": "tem bermuda",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.969081
+  },
+  {
+   "texto": "queria um camiseta básica grafite tie dye",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.953114
+  },
+  {
+   "texto": "peça de baixo pra andar de skate",
+   "real": "Calças",
+   "previsto": "Camisetas",
+   "confianca": 0.77615
+  },
+  {
+   "texto": "busco corta vento promoção",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.971972
+  },
+  {
+   "texto": "quero uma caça de moletom grafite em oferta",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.766837
+  },
+  {
+   "texto": "queria um bonés vermelho tie dye barato",
+   "real": "Acessórios",
+   "previsto": "Moletons",
+   "confianca": 0.307172
+  },
+  {
+   "texto": "tem crota vento verde promoção",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.823747
+  },
+  {
+   "texto": "cropped",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.92179
+  },
+  {
+   "texto": "calaç baggy roxo largo",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.930696
+  },
+  {
+   "texto": "blusão branco",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.89606
+  },
+  {
+   "texto": "calaç baggy",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.970961
+  },
+  {
+   "texto": "me mostra regata cinza barato",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.704712
+  },
+  {
+   "texto": "camiseat preto tamanho g",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.527037
+  },
+  {
+   "texto": "me mostra calça skinny vermelha unissex até 100 reais",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.778567
+  },
+  {
+   "texto": "procuro corta vento vermelho streetwear tamanho p",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.88229
+  },
+  {
+   "texto": "tem calça de moletom",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.91299
+  },
+  {
+   "texto": "tem bonés unissex",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.874398
+  },
+  {
+   "texto": "tem algo pra completar o look",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.579254
+  },
+  {
+   "texto": "tem moletons japonesa",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.672831
+  },
+  {
+   "texto": "vcs tem moletom de zíper oversized de algodão",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.908894
+  },
+  {
+   "texto": "tem clça jeans",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.956239
+  },
+  {
+   "texto": "preciso de hoodie rosa",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.736011
+  },
+  {
+   "texto": "chapéu bucket grafite japonês até 100 reais",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.932439
+  },
+  {
+   "texto": "shorts básico tamanho g",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.670131
+  },
+  {
+   "texto": "top azul cyberpunk barato",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.538296
+  },
+  {
+   "texto": "quero cropped feminina",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.865646
+  },
+  {
+   "texto": "vcs tem anéis vermelho básico barato",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.418543
+  },
+  {
+   "texto": "jaqueta bomber vermelho",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.964348
+  },
+  {
+   "texto": "moletom peluciado branco",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.95062
+  },
+  {
+   "texto": "vcs tem calça marrom",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.9283
+  },
+  {
+   "texto": "queria um badana cinza de algodão",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.715229
+  },
+  {
+   "texto": "calça anime",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.722931
+  },
+  {
+   "texto": "preciso de jaqueta bomber unissex",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.972329
+  },
+  {
+   "texto": "preciso de moletom com capuz vermelha em oferta",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.87077
+  },
+  {
+   "texto": "queria um blusa de manga curta preto básico tamanho p",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.951808
+  },
+  {
+   "texto": "queria um shoulder bag preto bordado novo",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.967722
+  },
+  {
+   "texto": "tem blusa de frio bege anime",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.947087
+  },
+  {
+   "texto": "meais",
+   "real": "Acessórios",
+   "previsto": "Calças",
+   "confianca": 0.251582
+  },
+  {
+   "texto": "queria um tote bag preto",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.987296
+  },
+  {
+   "texto": "tem jeans preta kanji",
+   "real": "Calças",
+   "previsto": "Calças",
+   "confianca": 0.745671
+  },
+  {
+   "texto": "procuro jaqueta college off white",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.953604
+  },
+  {
+   "texto": "blusão",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.954432
+  },
+  {
+   "texto": "tem shoulder bag vermelha minimalista",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.976504
+  },
+  {
+   "texto": "preciso de moletom marrom promoção",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.593608
+  },
+  {
+   "texto": "vcs tem camiseta manga longa com logo",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.993037
+  },
+  {
+   "texto": "tote bag branco de couro",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.960669
+  },
+  {
+   "texto": "vcs tem casaco de inverno branco",
+   "real": "Moletons",
+   "previsto": "Moletons",
+   "confianca": 0.982916
+  },
+  {
+   "texto": "quero uma bolsa preto estampa japonesa tamanho g",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.724143
+  },
+  {
+   "texto": "anel vermelha japonês barato",
+   "real": "Acessórios",
+   "previsto": "Acessórios",
+   "confianca": 0.427189
+  },
+  {
+   "texto": "camiseta oversized grafite",
+   "real": "Camisetas",
+   "previsto": "Camisetas",
+   "confianca": 0.91411
+  }
+ ]
+}

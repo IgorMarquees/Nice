@@ -70,3 +70,6 @@ build/
 
 # Arquivos de ambiente/chaves secretas (se você usar)
 .env
+
+# Python
+__pycache__/
